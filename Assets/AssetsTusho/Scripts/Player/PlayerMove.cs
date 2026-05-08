@@ -4,12 +4,16 @@ using UnityEngine;
 public class PlayerMove : MonoBehaviour
 {
     [SerializeField] float horizontal, vertical;
+    [SerializeField] float WalkDist;
     [SerializeField] Vector3 WalkDir = Vector3.zero;
     [SerializeField] bool IsWalking = false;
-    [SerializeField] bool CheckCollision;
     [SerializeField] LayerMask CollisionMask;
     Transform tf;
     
+    public bool CheckCollision()
+    {
+        return Physics2D.BoxCast(tf.position + WalkDir , Vector2.one * 0.75f, 0f, Vector2.zero, CollisionMask);
+    }
     void Awake()
     {
         tf = GetComponent<Transform>();
@@ -22,7 +26,7 @@ public class PlayerMove : MonoBehaviour
 
     void Walk()
     {
-        WalkDir = new Vector3(horizontal, vertical);
+        WalkDir = new Vector3(horizontal, vertical) * WalkDist;
         if(vertical == 0 && IsWalking == false)
         {
             horizontal = Input.GetAxisRaw("Horizontal");
@@ -41,14 +45,14 @@ public class PlayerMove : MonoBehaviour
 
     IEnumerator StartWalk(Vector3 dir)
     {
-        if(IsWalking == true) yield break;
+        if(IsWalking == true || CheckCollision() == true) yield break;
         IsWalking = true;
         Vector3 FinalPosition = tf.position + WalkDir;
         float Dist = Vector3.Distance(tf.position, FinalPosition);
 
         while(Dist > 0.1f)
         {
-            tf.position = Vector3.Lerp(tf.position, FinalPosition, 0.1f);
+            tf.position = Vector3.Lerp(tf.position, FinalPosition, 0.15f);
             Dist = Vector3.Distance(tf.position, FinalPosition);
             yield return new WaitForSeconds(0.01f);
         }
