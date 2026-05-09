@@ -12,7 +12,7 @@ public class PlayerMove : MonoBehaviour
     
     public bool CheckCollision()
     {
-        return Physics2D.BoxCast(tf.position + WalkDir , Vector2.one * 0.75f, 0f, Vector2.zero, CollisionMask);
+        return Physics2D.BoxCast(tf.position + WalkDir, Vector2.one * 0.75f, 0f, Vector2.zero, 1f,CollisionMask);
     }
     void Awake()
     {
@@ -27,17 +27,17 @@ public class PlayerMove : MonoBehaviour
     void Walk()
     {
         WalkDir = new Vector3(horizontal, vertical) * WalkDist;
-        if(vertical == 0 && IsWalking == false)
+        if(vertical == 0)
         {
             horizontal = Input.GetAxisRaw("Horizontal");
         }
 
-        if (horizontal == 0 && IsWalking == false)
+        if (horizontal == 0)
         {
             vertical = Input.GetAxisRaw("Vertical");
         }
 
-        if(horizontal !=0 || vertical != 0)
+        if (WalkDir != Vector3.zero)
         {
             StartCoroutine(StartWalk(WalkDir));
         }
