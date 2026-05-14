@@ -3,58 +3,39 @@ using UnityEngine;
 
 public class PlayerMove : MonoBehaviour
 {
-    [SerializeField] float horizontal, vertical;
     [SerializeField] float WalkDist;
-    [SerializeField] Vector3 WalkDir = Vector3.zero;
     [SerializeField] bool IsWalking = false;
     [SerializeField] LayerMask CollisionMask;
     Transform tf;
     
-    public bool CheckCollision()
-    {
-        return Physics2D.BoxCast(tf.position + WalkDir, Vector2.one * 0.75f, 0f, Vector2.zero, 1f,CollisionMask);
-    }
     void Awake()
     {
         tf = GetComponent<Transform>();
     }
 
-    void FixedUpdate()
+
+    public void Walk(Vector3 WalkDir)
     {
-        Walk();
-    }
-
-    void Walk()
-    {
-        WalkDir = new Vector3(horizontal, vertical) * WalkDist;
-        if(vertical == 0)
-        {
-            horizontal = Input.GetAxisRaw("Horizontal");
-        }
-
-        if (horizontal == 0)
-        {
-            vertical = Input.GetAxisRaw("Vertical");
-        }
-
-        if (WalkDir != Vector3.zero)
-        {
-            StartCoroutine(StartWalk(WalkDir));
-        }
+        StartCoroutine(StartWalk(WalkDir));
     }
 
     IEnumerator StartWalk(Vector3 dir)
     {
-        if(IsWalking == true || CheckCollision() == true) yield break;
+        Vector3 Normalized = dir.normalized;
+        float magnitude = Mathf.Abs(Normalized.x) + Mathf.Abs(Normalized.y);
+        float walkingTime = 0.01f;
+        if (magnitude > 1f) walkingTime = magnitude / 100;
+        bool CheckCollision = Physics2D.BoxCast(tf.position + dir, Vector2.one * 0.75f, 0f, Vector2.zero, 1f, CollisionMask);
+        if (IsWalking == true || CheckCollision == true) yield break;
         IsWalking = true;
-        Vector3 FinalPosition = tf.position + WalkDir;
+        Vector3 FinalPosition = tf.position + dir;
         float Dist = Vector3.Distance(tf.position, FinalPosition);
 
         while(Dist > 0.1f)
         {
             tf.position = Vector3.Lerp(tf.position, FinalPosition, 0.15f);
             Dist = Vector3.Distance(tf.position, FinalPosition);
-            yield return new WaitForSeconds(0.01f);
+            yield return new WaitForSeconds(walkingTime);
         }
         
         tf.position = FinalPosition;
