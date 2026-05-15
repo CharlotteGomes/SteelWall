@@ -12,4 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: de7640f27fc58ac49adfcb01077a80e7, type: 3}
   m_Name: Fight_x
   m_EditorClassIdentifier: Assembly-CSharp::BattleData
-  EnemyStats: []
+  EnemiesData:
+  - {fileID: 11400000, guid: 45f842977c4077247aa1a36b1528693c, type: 2}
+  - {fileID: 11400000, guid: 9beacb74a1ffdf840a1b0740d6d4293a, type: 2}
+  - {fileID: 11400000, guid: 288b67b1b4b6a8e49b5ce1ba2726d3bb, type: 2}

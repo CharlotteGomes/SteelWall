@@ -9,13 +9,15 @@ MonoBehaviour:
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 0}
-  m_Name: pj test
+  m_Script: {fileID: 11500000, guid: 7b8d410c909c7d94999e501242598960, type: 3}
+  m_Name: New PJ Stats
   m_EditorClassIdentifier: Assembly-CSharp::PJStats
-  Name: Player
+  Name: Melchior
   strength: 1
   dexterity: 2
   vigor: 3
   inteligence: 4
   knowledge: 5
   faith: 6
+  skills:
+  - {fileID: 11400000, guid: bce1a0d9445805043b871bbc39ae1b7d, type: 2}

@@ -36,5 +36,8 @@ public abstract class Character : MonoBehaviour
         Debug.Log($" {Name} | {Str} | {Dex} | {Vig} | {Int} | {Kno} | {Fai}");
     }
 
-    
+    public virtual void GetNewStats(BaseStats stats)
+    {
+        this.stats = stats;
+    }
 }

@@ -3,6 +3,8 @@ using UnityEngine;
 public class GameMaster : MonoBehaviour
 {
     public static GameMaster Instance;
+    public PartyManager partyManager;
+    public BattleController battleController;
     public GameStates CurrentState;
 
     public void ChangeState(GameStates state)

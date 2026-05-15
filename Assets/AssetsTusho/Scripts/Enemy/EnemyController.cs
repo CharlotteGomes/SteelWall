@@ -1,8 +1,18 @@
 using UnityEngine;
-
-public class EnemyController : MonoBehaviour
+using System.Collections;
+public class EnemyController : BattleCharacter, IDamageable, IKillable
 {
-    // Start is called once before the first execution of Update after the MonoBehaviour is created
+    public override IEnumerator ExecuteTurn()
+    {
+        int skillIdx = Random.Range(0, SkillList.Count);
+        SkillBase currentSkill = SkillList[skillIdx];
+        int targetIdx;
+
+        if (currentSkill.tTarget == TargetType.Enemies) { targetIdx = Random.Range(0, ctx.enemies.Count); ctx.target = ctx.enemies[targetIdx]; }
+        else { targetIdx = Random.Range(0, ctx.allies.Count); ctx.target = ctx.allies[targetIdx]; }
+
+        yield return StartCoroutine(currentSkill.Execute(ctx));
+    }
     void Start()
     {
         

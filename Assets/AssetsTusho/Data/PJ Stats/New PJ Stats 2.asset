@@ -1,0 +1,23 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7b8d410c909c7d94999e501242598960, type: 3}
+  m_Name: New PJ Stats 2
+  m_EditorClassIdentifier: Assembly-CSharp::PJStats
+  Name: NPC random 3
+  strength: 1
+  dexterity: 2
+  vigor: 3
+  inteligence: 4
+  knowledge: 5
+  faith: 6
+  skills:
+  - {fileID: 11400000, guid: bce1a0d9445805043b871bbc39ae1b7d, type: 2}
