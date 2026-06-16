@@ -33,7 +33,6 @@ public abstract class Character : MonoBehaviour
         Fai = stats.faith;
         LifeCurrent = LifeMax;
         ManaCurrent = ManaMax;
-        Debug.Log($" {Name} | {Str} | {Dex} | {Vig} | {Int} | {Kno} | {Fai}");
     }
 
     public virtual void GetNewStats(BaseStats stats)

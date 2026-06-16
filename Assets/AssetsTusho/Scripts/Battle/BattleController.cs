@@ -5,6 +5,8 @@ using System.Linq;
 
 public class BattleController : MonoBehaviour
 {
+    public BattleHUDManager battleHUD;
+    public BattleCameraController battleCam;
     [SerializeField] Transform[] alliesSlots;
     [SerializeField] Transform[] enemiesSlots;
     [SerializeField] GameObject enemyPref, playerPref;
@@ -13,6 +15,7 @@ public class BattleController : MonoBehaviour
     [SerializeField] List<BattleCharacter> Allies = new();
     [SerializeField] List<BattleCharacter> Enemies = new();
     [SerializeField] List<BattleCharacter> TurnOrder = new();
+    
     public int currentRound = 1;
     int currentTurnIndex = 0;
 
@@ -80,6 +83,7 @@ public class BattleController : MonoBehaviour
         {
             BattleCharacter current = TurnOrder[currentTurnIndex];
 
+            if(current is  PJController pj) { battleHUD.SubEvent(pj);}
             yield return StartCoroutine(current.ExecuteTurn());
             NextTurn();
         }
@@ -97,7 +101,6 @@ public class BattleController : MonoBehaviour
         
     }
 
-    // Update is called once per frame
     void Update()
     {
         if (Input.GetKeyDown(KeyCode.Q))

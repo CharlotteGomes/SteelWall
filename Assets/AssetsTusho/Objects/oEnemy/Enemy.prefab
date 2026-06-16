@@ -108,3 +108,9 @@ MonoBehaviour:
   Name: 
   LifeCurrent: 0
   ManaCurrent: 0
+  ctx:
+    user: {fileID: 0}
+    target: {fileID: 0}
+    allies: []
+    enemies: []
+  SkillList: []
