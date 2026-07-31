@@ -2,19 +2,25 @@ using UnityEngine;
 using System;
 using System.Collections;
 using System.Collections.Generic;
-using UnityEngine;
 
-[Serializable]
-public struct Dialogue
-{
-    public string name;
-    public Sprite portrait;
-    [TextArea(5, 10)]
-    public string text;
-}
-
-[CreateAssetMenu(fileName = "DialogueData", menuName = "ScriptableObjects/TalkScript", order = 1)]
+[CreateAssetMenu(fileName = "DialogueData", menuName = "ScriptableObjects/DialogueData", order = 1)]
 public class DialogueData : ScriptableObject
 {
-    public List<Dialogue> talkScript;
+    public DialogueLine[] lines;
+}
+
+public enum SpeakerType
+{
+    Player, NPC
+}
+
+[System.Serializable]
+public class DialogueLine
+{
+    public SpeakerType speaker;
+    public CharacterData character;
+    public Expression expression;
+
+    [TextArea(3, 5)]
+    public string text;
 }

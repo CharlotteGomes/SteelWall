@@ -12,10 +12,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1cf9bd07b1e28b54fa6b9826ddc6299f, type: 3}
   m_Name: DialogueData
   m_EditorClassIdentifier: Assembly-CSharp::DialogueData
-  talkScript:
-  - name: Melchior
-    portrait: {fileID: 3834130547961285933, guid: 6d758dc6c62ccb64cb6e2e5c0b49bccb, type: 3}
-    text: "Boa tarde, voc\xEA poderia me ajudar a procurar algo?"
-  - name: Hiroshi
-    portrait: {fileID: 3782347158915576563, guid: 0d2d38dcc3d84ee42a63a5e1e795ebb6, type: 3}
-    text: "? Ah! Eu vi voc\xEA chegando, voc\xEA \xE9 a nova pessoa que acabou aqui."
+  lines:
+  - speaker: 0
+    character: {fileID: 11400000, guid: af74d111b22f13b45a35071ac8fdd3fc, type: 2}
+    expression: 0
+    text: Ah, bom dia
+  - speaker: 0
+    character: {fileID: 11400000, guid: af74d111b22f13b45a35071ac8fdd3fc, type: 2}
+    expression: 1
+    text: Bom dia tambem
