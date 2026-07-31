@@ -1,4 +1,5 @@
 using System;
+using System.Collections;
 using UnityEngine;
 
 public class GM : MonoBehaviour
@@ -29,4 +30,11 @@ public class GM : MonoBehaviour
         game_state?.Invoke(); //game_state exists? Play Event
     }
 
+    public void RunCoroutine(IEnumerator coroutine) //Static classes cannot run coroutines, so I created this method
+    {
+        if (coroutine != null)
+        {
+            StartCoroutine(coroutine);
+        }
+    }
 }

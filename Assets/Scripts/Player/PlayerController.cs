@@ -1,4 +1,5 @@
 using System;
+using System.Collections;
 using UnityEngine;
 
 public class PlayerController : MonoBehaviour
@@ -10,14 +11,13 @@ public class PlayerController : MonoBehaviour
         player_state = new PlayerWalk(this);   
     }
 
-    // Update is called once per frame
     void Update()
     {
-        if(player_state != null) { player_state.Execute(); Debug.Log(player_state); }
+        if(player_state != null) { player_state.Execute(); Debug.Log(player_state); } //Run the method of current state
     }
 
     public void ChangeState(PlayerState state)
     {
-        player_state = state;
+        player_state = state; 
     }
 }

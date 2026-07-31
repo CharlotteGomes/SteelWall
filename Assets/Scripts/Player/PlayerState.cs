@@ -22,24 +22,12 @@ public class PlayerWalk : PlayerState
     public override void Execute()
     {
         InputManager.GetInputs();
-        if (CheckHorizontals()){ MoveTo(new Vector2(InputManager.horizontal, 0)); return; }
-        if (CheckVerticals()) { MoveTo(new Vector2(0, InputManager.vertical)); return; }
+
     }
 
-    bool CheckHorizontals()
+    IEnumerator Walk(Vector3 dir)
     {
-        if(InputManager.horizontal != 0) { return true; }
-        return false;
-    }
-
-    bool CheckVerticals()
-    {
-        if (InputManager.vertical != 0) { return true; }
-        return false;
-    }
-
-    void MoveTo(Vector2 dir)
-    {
-
+        Vector3 final_position = controller.transform.position + dir;
+        yield return null;
     }
 }
