@@ -23,8 +23,9 @@ public class PlayerWalk : PlayerState //State from Explorer Mode, make player wa
     public override void Execute()
     {
         InputManager.GetInputs();
-        if (GenericTools.CheckHorizontal()) GM.instance.RunCoroutine(Walk(new Vector2(InputManager.horizontal, 0)));
-        if (GenericTools.CheckVertical()) GM.instance.RunCoroutine(Walk(new Vector2(0, InputManager.vertical))); 
+        if(GenericTools.CheckHorizontal()) GM.instance.RunCoroutine(Walk(new Vector2(InputManager.horizontal, 0)));
+        if(GenericTools.CheckVertical()) GM.instance.RunCoroutine(Walk(new Vector2(0, InputManager.vertical)));
+        if (InputManager.interact) PlayerFunctions.OnInteract();
     }
 
     IEnumerator Walk(Vector3 dir)
