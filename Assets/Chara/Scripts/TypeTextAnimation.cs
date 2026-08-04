@@ -9,12 +9,12 @@ public class TypeTextAnimation : MonoBehaviour
 
     public string fullText;
 
-    void Start()
+    public void StartTyping()
     {
-        StartCoroutine(TypeText());
+        StartCoroutine(typeText());
     }
 
-    IEnumerator TypeText()
+    IEnumerator typeText()
     {
         textObject.text = fullText;
         textObject.maxVisibleCharacters = 0;

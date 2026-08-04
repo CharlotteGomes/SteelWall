@@ -12,12 +12,4 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1cf9bd07b1e28b54fa6b9826ddc6299f, type: 3}
   m_Name: DialogueData
   m_EditorClassIdentifier: Assembly-CSharp::DialogueData
-  lines:
-  - speaker: 0
-    character: {fileID: 11400000, guid: af74d111b22f13b45a35071ac8fdd3fc, type: 2}
-    expression: 0
-    text: Ah, bom dia
-  - speaker: 0
-    character: {fileID: 11400000, guid: af74d111b22f13b45a35071ac8fdd3fc, type: 2}
-    expression: 1
-    text: Bom dia tambem
+  lines: []
