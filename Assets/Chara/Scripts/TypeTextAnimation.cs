@@ -25,6 +25,7 @@ public class TypeTextAnimation : MonoBehaviour
             yield return new WaitForSeconds(typeDelay);
         }
 
+        TypeFinished();
 
     }
 
