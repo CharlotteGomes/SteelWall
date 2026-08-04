@@ -5,7 +5,7 @@ using UnityEngine;
 public class GM : MonoBehaviour
 {
     public static GM instance { get; private set; } //Singleton
-    private Action game_state; //Current State
+    [SerializeField] Action game_state; //Current State
 
     private void Awake()
     {
