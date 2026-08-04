@@ -12,4 +12,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1cf9bd07b1e28b54fa6b9826ddc6299f, type: 3}
   m_Name: DialogueData
   m_EditorClassIdentifier: Assembly-CSharp::DialogueData
-  lines: []
+  talkScript:
+  - name: Pipipi
+    text: weggwhrtehr

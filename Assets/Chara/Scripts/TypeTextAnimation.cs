@@ -1,9 +1,10 @@
 using UnityEngine;
 using TMPro;
 using System.Collections;
-
 public class TypeTextAnimation : MonoBehaviour
 {
+    public Action TypeFinished;
+
     public float typeDelay = 0.05f;
     public TextMeshProUGUI textObject;
 
