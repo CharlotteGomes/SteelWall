@@ -5,10 +5,8 @@ using UnityEngine;
 public class PlayerController : MonoBehaviour
 {
     public PlayerState player_state = null; //Current State
-
     private void Awake()
     {
-        PlayerFunctions.player_ref = this;
     }
     void Start()
     {
