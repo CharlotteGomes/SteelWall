@@ -61,11 +61,11 @@ public abstract class BattleChar : MonoBehaviour
     {
         if(amount > 0)
         {
-            int dmg = (amount * 100) / Resistences(type);
-            Debug.Log($"Dano Pós Calculo: {dmg} {amount}");
+            float dmg = (float)amount * (1 - (float)Resistences(type) / 100);
+            Debug.Log($"Dano Pós Calculo: {dmg} / {amount} / {Resistences(type)}");
             if(dmg > 0)
             {
-                life_current = Mathf.Clamp(life_current -= dmg, 0, 1000);
+                life_current = Mathf.Clamp(life_current -= (int)dmg, 0, 1000);
             }
         }
     }
