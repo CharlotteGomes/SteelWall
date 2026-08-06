@@ -12,8 +12,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ac778172b17d83b4385e777b352e8b32, type: 3}
   m_Name: CharacterData
   m_EditorClassIdentifier: Assembly-CSharp::CharacterData
-  characterName: 
-  normal: {fileID: 0}
+  characterName: Melchior
+  normal: {fileID: 3834130547961285933, guid: 6d758dc6c62ccb64cb6e2e5c0b49bccb, type: 3}
   happy: {fileID: 0}
   angry: {fileID: 0}
   sad: {fileID: 0}
