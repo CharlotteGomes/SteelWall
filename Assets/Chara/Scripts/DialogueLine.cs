@@ -3,11 +3,10 @@ using System;
 [Serializable]
 public class DialogueLine 
 {
-    
-    public string speakerName;
+
+    public CharacterData speaker;
     [TextArea]
     public string text;
-    public Sprite portrait;
     public Expression expression;
 
     public bool isPlayer;
