@@ -9,9 +9,11 @@ MonoBehaviour:
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 1cf9bd07b1e28b54fa6b9826ddc6299f, type: 3}
-  m_Name: DialogueData
-  m_EditorClassIdentifier: Assembly-CSharp::DialogueData
-  talkScript:
-  - name: Pipipi
-    text: weggwhrtehr
+  m_Script: {fileID: 11500000, guid: ac778172b17d83b4385e777b352e8b32, type: 3}
+  m_Name: CharacterData
+  m_EditorClassIdentifier: Assembly-CSharp::CharacterData
+  characterName: 
+  normal: {fileID: 0}
+  happy: {fileID: 0}
+  angry: {fileID: 0}
+  sad: {fileID: 0}
