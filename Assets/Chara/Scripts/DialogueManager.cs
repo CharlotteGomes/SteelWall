@@ -18,7 +18,7 @@ public class DialogueManager : MonoBehaviour
     int currentIndex; //Guarda a linha de dialogo
     Dialogue currentDialogue; //mostra os dialogos de acordo com a linha
 
-    IEnumerator TypeText(string text)
+    IEnumerator TypeText(string text) //Aparição das letras do dialogo aos poucos
     {
         dialogueText.text = "";
 
@@ -29,7 +29,7 @@ public class DialogueManager : MonoBehaviour
         }
     }
 
-    void Update()
+    void Update() 
     {
         if (!dialogueActive)
         {
@@ -74,7 +74,7 @@ public class DialogueManager : MonoBehaviour
                                                    
         Sprite sprite = line.speaker.GetExpression(line.expression); //expressão atual
 
-        if (line.isPlayer)
+        if (line.isPlayer) //Se o player estiver falando ficará com a cor inteira, caso contrario ficara acinzentado. Vice versa ao NPC
         {
             middlePortrait.sprite = sprite;
 
