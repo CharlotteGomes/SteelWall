@@ -2,10 +2,12 @@ using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
 using System.Collections;
+using UnityEngine.InputSystem;
 
 public class DialogueManager : MonoBehaviour
 {
     private Coroutine typingCoroutine;
+    private bool dialogueActive;
 
     public TMP_Text nameText;
     public TMP_Text dialogueText;
@@ -27,8 +29,24 @@ public class DialogueManager : MonoBehaviour
         }
     }
 
-    void StartDialogue(Dialogue dialogue)
+    void Update()
     {
+        if (!dialogueActive)
+        {
+            return;
+        }
+
+        if (Input.GetKeyDown(KeyCode.Space) || Input.GetMouseButtonDown(0))
+        {
+            NextLine();
+        }
+        
+
+    }
+
+    public void StartDialogue(Dialogue dialogue)
+    {
+        dialogueActive = true;
         currentDialogue = dialogue;
         currentIndex = 0;
 
@@ -52,8 +70,8 @@ public class DialogueManager : MonoBehaviour
     {
         DialogueLine line = currentDialogue.lines[currentIndex]; //linha de dialogo
 
-        nameText.text = line.speaker.characterName; //noem de quem fala
-
+        nameText.text = line.speaker.characterName; //nome de quem fala
+                                                   
         Sprite sprite = line.speaker.GetExpression(line.expression); //expressão atual
 
         if (line.isPlayer)
@@ -81,6 +99,8 @@ public class DialogueManager : MonoBehaviour
 
     public void EndDialogue()
     {
+        dialogueActive = false;
+        currentDialogue = null;
         Debug.Log("Cabou");
     }
 }

@@ -14,6 +14,18 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::Dialogue
   lines:
   - speaker: {fileID: 11400000, guid: d357be7c19400b342a949e3400665830, type: 2}
-    text: 
     expression: 0
     isPlayer: 0
+    text: Bom dia
+  - speaker: {fileID: 11400000, guid: d357be7c19400b342a949e3400665830, type: 2}
+    expression: 1
+    isPlayer: 1
+    text: "Est\xE1 um belo dia!"
+  - speaker: {fileID: 11400000, guid: d357be7c19400b342a949e3400665830, type: 2}
+    expression: 1
+    isPlayer: 1
+    text: Realmente
+  - speaker: {fileID: 11400000, guid: d357be7c19400b342a949e3400665830, type: 2}
+    expression: 0
+    isPlayer: 0
+    text: "E como voc\xEA est\xE1?"

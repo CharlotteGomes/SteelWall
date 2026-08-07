@@ -14,6 +14,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::CharacterData
   characterName: Melchior
   normal: {fileID: 3834130547961285933, guid: 6d758dc6c62ccb64cb6e2e5c0b49bccb, type: 3}
-  happy: {fileID: 0}
+  happy: {fileID: -3602462885196012121, guid: 28a8497820f80fc43892da62c96e71b0, type: 3}
   angry: {fileID: 0}
   sad: {fileID: 0}
