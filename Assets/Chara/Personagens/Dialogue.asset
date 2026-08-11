@@ -15,17 +15,17 @@ MonoBehaviour:
   lines:
   - speaker: {fileID: 11400000, guid: d357be7c19400b342a949e3400665830, type: 2}
     expression: 0
-    isPlayer: 0
+    player: 1
     text: Bom dia
-  - speaker: {fileID: 11400000, guid: d357be7c19400b342a949e3400665830, type: 2}
-    expression: 1
-    isPlayer: 1
+  - speaker: {fileID: 11400000, guid: 91d1e5803cfbcf84ebac1c89c695c978, type: 2}
+    expression: 0
+    player: 0
     text: "Est\xE1 um belo dia!"
   - speaker: {fileID: 11400000, guid: d357be7c19400b342a949e3400665830, type: 2}
     expression: 1
-    isPlayer: 1
+    player: 1
     text: Realmente
   - speaker: {fileID: 11400000, guid: d357be7c19400b342a949e3400665830, type: 2}
     expression: 0
-    isPlayer: 0
+    player: 1
     text: "E como voc\xEA est\xE1?"

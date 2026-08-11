@@ -6,7 +6,7 @@ public class DialogueLine
     
     public CharacterData speaker;
     public Expression expression;
-    public bool isPlayer;
+    public bool player = true;
 
     [TextArea]
     public string text;

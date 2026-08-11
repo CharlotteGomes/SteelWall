@@ -74,7 +74,7 @@ public class DialogueManager : MonoBehaviour
                                                    
         Sprite sprite = line.speaker.GetExpression(line.expression); //expressão atual
 
-        if (line.isPlayer) //Se o player estiver falando ficará com a cor inteira, caso contrario ficara acinzentado. Vice versa ao NPC
+        if (line.player) //Se o player estiver falando ficará com a cor inteira, caso contrario ficara acinzentado. Vice versa ao NPC
         {
             middlePortrait.sprite = sprite;
 
