@@ -7,7 +7,7 @@ public class NPC : MonoBehaviour
     public Dialogue dialogue;
     public DialogueManager manager;
 
-    void Start() 
+    public void StartDialogue() 
     {
         manager.StartDialogue(dialogue);
     }
