@@ -20,3 +20,10 @@ MonoBehaviour:
   precision: 0
   effects:
   - {fileID: 11400000, guid: 24803404c83c4bd44af1c4985b2318c5, type: 2}
+  finisher:
+  - {fileID: 11400000, guid: 24803404c83c4bd44af1c4985b2318c5, type: 2}
+  - {fileID: 11400000, guid: 24803404c83c4bd44af1c4985b2318c5, type: 2}
+  skill_duration_time: 2
+  criticable: 0
+  min_finisher_time: 1
+  max_finisher_time: 2
