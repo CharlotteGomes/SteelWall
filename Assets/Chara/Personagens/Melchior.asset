@@ -1,0 +1,19 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ac778172b17d83b4385e777b352e8b32, type: 3}
+  m_Name: Melchior
+  m_EditorClassIdentifier: Assembly-CSharp::CharacterData
+  characterName: Melchior Shemesh
+  normal: {fileID: 3834130547961285933, guid: 6d758dc6c62ccb64cb6e2e5c0b49bccb, type: 3}
+  happy: {fileID: -3602462885196012121, guid: 28a8497820f80fc43892da62c96e71b0, type: 3}
+  angry: {fileID: 0}
+  sad: {fileID: 0}
