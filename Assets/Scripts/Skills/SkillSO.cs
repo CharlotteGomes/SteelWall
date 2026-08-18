@@ -12,6 +12,11 @@ public class SkillSO : ScriptableObject
     public int precision;
     public SkillEffectSO[] effects;
     public SkillEffectSO[] finisher;
+    public AnimationClip clip;
+    public float qte_start = 0;
+    public float qte_end = 0;
+
+    /*
     public float skill_duration_time = 0;
     public bool criticable = false;
     public float min_finisher_time = 0;
@@ -66,5 +71,5 @@ public class SkillSO : ScriptableObject
                 yield return null;
         }
         ExecuteEffect(ctx);
-    }
+    }*/
 }
