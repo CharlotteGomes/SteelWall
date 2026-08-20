@@ -1,10 +1,14 @@
 using System.Reflection;
 using UnityEngine;
+using System.Collections;
 
 public abstract class BattleChar : MonoBehaviour
 {
     [SerializeField] protected BattleCharSO battle_char;
     [SerializeField] protected BattleContext ctx;
+    [SerializeField] protected SkillSO[] skills;
+    [SerializeField] protected SkillSO skill_current;
+    [SerializeField] Animator animator;
     [SerializeField] protected int strength, dexterity, constitution, intelligence, mind;
     [SerializeField] protected int life_max, life_current, mana_max, mana_current;
     public int Resistences(TypeDmg dmg)
@@ -64,8 +68,26 @@ public abstract class BattleChar : MonoBehaviour
             float dmg = (float)amount * (1 - (float)Resistences(type) / 100);
             if(dmg > 0)
             {
+                Debug.Log($"Tomou {dmg} de dano");
                 life_current = Mathf.Clamp(life_current -= (int)dmg, 0, 1000);
             }
         }
     }
+
+    public virtual IEnumerator StartSkill()
+    {
+        if (skill_current == null) yield break;
+        //animator.Play(skill_current.clip.name);
+    }
+
+    public virtual void ExecuteSkillsEffects()
+    {
+        if (skill_current == null) return;
+        foreach(SkillEffectSO f in skill_current.effects)
+        {
+            f.Execute(ctx);
+        }
+    }
+
+    
 }
