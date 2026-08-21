@@ -1,13 +1,23 @@
 using UnityEngine;
 using System.Collections.Generic;
 using System;
+using System.Linq;
 public class BattleManager : MonoBehaviour
 {
-    [SerializeField] BattleChar[] initiative;
-    [SerializeField] PjController[] pj_on_battle;
-    [SerializeField] EnemyController[] enemy_on_battle;
-    [SerializeField] Transform[] pj_spawn, enemy_spawn;
+    public static Action<List<PJSO>, List<EnemySO>> start_battle;
+    [SerializeField] List<BattleChar> initiative = new List<BattleChar>();
+    [SerializeField] List<PjController> pj_on_battle =  new List<PjController>();
+    [SerializeField] List<EnemyController> enemy_on_battle = new List<EnemyController>();
+    [SerializeField] List<Transform> pj_spawn, enemy_spawn = new List<Transform>();
     [SerializeField] GameObject pj_prefab, enemy_prefab;
+    [SerializeField] List<PJSO> test1 = new List<PJSO>();
+    [SerializeField] List<EnemySO> test2 = new List<EnemySO>();
+
+    private void Awake()
+    {
+        start_battle += SpawnCharacters;
+    }
+
     void Start()
     {
         
@@ -16,17 +26,42 @@ public class BattleManager : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        
+        if(Input.GetKeyDown(KeyCode.L)) { start_battle?.Invoke(test1, test2);}
     }
 
-    void PjSpawn()
+    void SpawnCharacters(List<PJSO> pjs, List<EnemySO> enemies)
     {
-        PjController[] pjs = new PjController[4];
-        GM.instance.party_manager.party_list_read.CopyTo(pjs, 0);
-        for(int i = 0; i < pjs.Length; i++)
+        for(int i = 0; i < pjs.Count; i++)
         {
             GameObject pj = Instantiate(pj_prefab, pj_spawn[i]);
             PjController ctrl = pj.GetComponent<PjController>();
+            ctrl.SetBattleChar(pjs[i]);
+            ctrl.InitStats();
+            pj_on_battle.Add(ctrl);
         }
+
+        for(int i = 0; i < enemies.Count; i++)
+        {
+            GameObject n = Instantiate(enemy_prefab, enemy_spawn[i]);
+            EnemyController ctrl = n.GetComponent<EnemyController>();
+            ctrl.SetBattleChar(enemies[i]);
+            ctrl.InitStats();
+            enemy_on_battle.Add(ctrl);
+        }
+        SetInitiative();
+    }
+
+    void SetInitiative()
+    {
+        List<BattleChar> battle = new List<BattleChar>();
+        foreach(EnemyController enemy in enemy_on_battle)
+        {
+            battle.Add(enemy);
+        }
+        foreach(PjController pj in pj_on_battle)
+        {
+            battle.Add(pj);
+        }
+        initiative = battle.OrderBy(a => a.ReadStats(Stats.Dexterity)).ToList();   
     }
 }

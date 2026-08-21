@@ -33,7 +33,7 @@ public abstract class BattleChar : MonoBehaviour
                 return 0;
         }
     }//Function for make something stats more easy to access
-    public int Stats(Stats stats)
+    public int ReadStats(Stats stats)
     {
         switch (stats) 
         {

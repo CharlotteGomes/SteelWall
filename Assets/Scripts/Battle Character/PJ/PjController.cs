@@ -8,7 +8,6 @@ public class PjController : BattleChar
     {
         ctx = new BattleContext(this);
         ctx.Target = this;
-        InitStats();
     }
 
     void Start()
