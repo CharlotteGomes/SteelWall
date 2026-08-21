@@ -149,6 +149,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::PjController
   battle_char: {fileID: 11400000, guid: 8793b1378da11344eadbeb65320693a8, type: 2}
+  skills: []
+  skill_current: {fileID: 0}
+  animator: {fileID: 0}
   strength: 0
   dexterity: 0
   constitution: 0

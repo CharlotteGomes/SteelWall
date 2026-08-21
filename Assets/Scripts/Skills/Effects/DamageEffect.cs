@@ -4,7 +4,7 @@ using UnityEngine;
 public class DamageTarget: SkillEffectSO
 {
     public TypeDmg type;
-    public Scaling[] stats;
+    public Stats[] stats;
     public int[] scaling;
     public int damage;
 
