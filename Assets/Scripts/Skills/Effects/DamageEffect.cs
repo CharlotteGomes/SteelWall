@@ -4,7 +4,7 @@ using UnityEngine;
 public class DamageTarget: SkillEffectSO
 {
     public TypeDmg type;
-    public Scaling[] stats;
+    public Stats[] stats;
     public int[] scaling;
     public int damage;
 
@@ -13,7 +13,7 @@ public class DamageTarget: SkillEffectSO
         int dmg = damage;
         for(int i = 0; i < stats.Length; i++)
         {
-            dmg += (ctx.Self.Stats(stats[i]) * 100) / scaling[i];
+            dmg += (ctx.Self.ReadStats(stats[i]) * 100) / scaling[i];
             Debug.Log(dmg);
         }
         ctx.Target.TakeDamage(type, dmg);

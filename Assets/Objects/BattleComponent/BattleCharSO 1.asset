@@ -9,11 +9,11 @@ MonoBehaviour:
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 52050b7bbcf4a4241b5cc1c9cd54dbf6, type: 3}
-  m_Name: BattleCharSO
-  m_EditorClassIdentifier: Assembly-CSharp::BattleCharSO
+  m_Script: {fileID: 11500000, guid: 28137ed61fa8be54292ee8e5964522a3, type: 3}
+  m_Name: BattleCharSO 1
+  m_EditorClassIdentifier: Assembly-CSharp::PJSO
   Cons: 5
-  Str: 5
-  Dex: 5
-  Int: 5
-  Mnd: 5
+  Str: 4
+  Dex: 3
+  Int: 2
+  Mnd: 1

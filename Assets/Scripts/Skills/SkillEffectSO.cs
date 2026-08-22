@@ -11,7 +11,7 @@ public enum TypeDmg
     Purity
 }
 
-public enum Scaling 
+public enum Stats
 {
     Strength,
     Dexterity,

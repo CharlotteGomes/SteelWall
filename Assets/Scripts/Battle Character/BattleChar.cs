@@ -33,25 +33,29 @@ public abstract class BattleChar : MonoBehaviour
                 return 0;
         }
     }//Function for make something stats more easy to access
-    public int Stats(Scaling stats)
+    public int ReadStats(Stats stats)
     {
         switch (stats) 
         {
-            case Scaling.Strength:
+            case Stats.Strength:
                 return strength;
-            case Scaling.Dexterity:
+            case Stats.Dexterity:
                 return dexterity;
-            case Scaling.Constitution:
+            case Stats.Constitution:
                 return constitution;
-            case Scaling.Mind:
+            case Stats.Mind:
                 return mind;
-            case Scaling.Int:
+            case Stats.Int:
                 return intelligence;
             default:
                 return 0;
 
         }
     }//Function for make something stats more easy to access
+    public void SetBattleChar(BattleCharSO battle_char)
+    {
+        this.battle_char = battle_char; 
+    }
     public virtual void InitStats()
     {
         strength = battle_char.Str;
