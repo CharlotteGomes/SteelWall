@@ -13,6 +13,6 @@ MonoBehaviour:
   m_Name: DamageEffect
   m_EditorClassIdentifier: Assembly-CSharp::DamageEffect
   type: 0
-  stats: 
-  scaling: 
-  damage: 5
+  scaling:
+  - {fileID: 11400000, guid: b7f8d70dc6357154a9e5b7e3cc7d669a, type: 2}
+  damage: 6

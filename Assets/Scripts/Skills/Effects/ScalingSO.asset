@@ -13,4 +13,4 @@ MonoBehaviour:
   m_Name: ScalingSO
   m_EditorClassIdentifier: Assembly-CSharp::ScalingSO
   stat: 0
-  value: 0
+  value: 100
