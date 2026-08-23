@@ -4,16 +4,15 @@ using UnityEngine;
 public class DamageTarget: SkillEffectSO
 {
     public TypeDmg type;
-    public Stats[] stats;
-    public int[] scaling;
+    public ScalingSO[] scaling;
     public int damage;
 
     public override void Execute(BattleContext ctx)
     {
         int dmg = damage;
-        for(int i = 0; i < stats.Length; i++)
+        for(int i = 0; i < scaling.Length; i++)
         {
-            dmg += (ctx.Self.ReadStats(stats[i]) * 100) / scaling[i];
+            dmg += (ctx.Self.ReadStats(scaling[i].stat) * scaling[i].value) / 100;
             Debug.Log(dmg);
         }
         ctx.Target.TakeDamage(type, dmg);

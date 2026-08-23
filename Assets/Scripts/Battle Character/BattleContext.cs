@@ -1,12 +1,19 @@
 using UnityEngine;
+using System.Collections.Generic;
 
+public enum TypeTarget
+{
+    Self,
+    OneTarget,
+    AllEnemy,
+    OneParty,
+    AllParty,
+}
+
+[System.Serializable]
 public class BattleContext
 {
     public BattleChar Self, Target;
-    public BattleChar[] Party;
-    public BattleChar[] Enemies;
-    public BattleContext(BattleChar self)
-    {
-        Self = self;
-    }
+    public List<BattleChar> Party;
+    public List<BattleChar> Enemies;
 }

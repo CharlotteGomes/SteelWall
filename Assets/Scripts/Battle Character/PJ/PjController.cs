@@ -3,11 +3,8 @@ using UnityEngine;
 
 public class PjController : BattleChar
 {
-    [SerializeField] SkillSO test;
     private void Awake()
     {
-        ctx = new BattleContext(this);
-        ctx.Target = this;
     }
 
     void Start()
@@ -28,7 +25,7 @@ public class PjController : BattleChar
         ExecuteSkillsEffects();
     }
 
-    public IEnumerator OnGoingSkill()
+    public override IEnumerator OnGoingSkill()
     {
         float time = Time.time;
         float qte_start = skill_current.qte_start + time;

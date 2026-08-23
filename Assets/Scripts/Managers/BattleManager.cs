@@ -4,10 +4,12 @@ using System;
 using System.Linq;
 public class BattleManager : MonoBehaviour
 {
-    public static Action<List<PJSO>, List<EnemySO>> start_battle;
+    //public static Action<List<PJSO>, List<EnemySO>> start_battle;
+
     [SerializeField] List<BattleChar> initiative = new List<BattleChar>();
     [SerializeField] List<PjController> pj_on_battle =  new List<PjController>();
     [SerializeField] List<EnemyController> enemy_on_battle = new List<EnemyController>();
+
     [SerializeField] List<Transform> pj_spawn, enemy_spawn = new List<Transform>();
     [SerializeField] GameObject pj_prefab, enemy_prefab;
     [SerializeField] List<PJSO> test1 = new List<PJSO>();
@@ -15,7 +17,7 @@ public class BattleManager : MonoBehaviour
 
     private void Awake()
     {
-        start_battle += SpawnCharacters;
+        //start_battle += SpawnCharacters;
     }
 
     void Start()
@@ -26,7 +28,7 @@ public class BattleManager : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        if(Input.GetKeyDown(KeyCode.L)) { start_battle?.Invoke(test1, test2);}
+        if(Input.GetKeyDown(KeyCode.L)) { SpawnCharacters(test1, test2);}
     }
 
     void SpawnCharacters(List<PJSO> pjs, List<EnemySO> enemies)
@@ -49,6 +51,7 @@ public class BattleManager : MonoBehaviour
             enemy_on_battle.Add(ctrl);
         }
         SetInitiative();
+        SetContext();
     }
 
     void SetInitiative()
@@ -62,6 +65,21 @@ public class BattleManager : MonoBehaviour
         {
             battle.Add(pj);
         }
-        initiative = battle.OrderBy(a => a.ReadStats(Stats.Dexterity)).ToList();   
+        initiative = battle.OrderByDescending(a => a.ReadStats(Stats.Dexterity)).ToList();   
+    }
+
+    void SetContext()
+    {
+        foreach(BattleChar c in initiative)
+        {
+            if (pj_on_battle.Contains(c))
+            {
+                c.CreateContext(pj_on_battle.Cast<BattleChar>().ToList(), enemy_on_battle.Cast<BattleChar>().ToList());
+            }
+        }
+    }
+    void InitiativeRemove(BattleChar b)
+    {
+        if (initiative.Contains(b)) { initiative.Remove(b); }
     }
 }
