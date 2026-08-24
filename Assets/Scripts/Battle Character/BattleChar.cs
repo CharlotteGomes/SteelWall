@@ -4,6 +4,9 @@ using System.Collections;
 using System;
 using NUnit.Framework;
 using System.Collections.Generic;
+using UnityEditor.Animations;
+using UnityEditor.Playables;
+using UnityEditor.UI;
 
 public abstract class BattleChar : MonoBehaviour
 {
@@ -102,11 +105,19 @@ public abstract class BattleChar : MonoBehaviour
     public virtual IEnumerator StartSkill()
     {
         if (skill_current == null) yield break;
-        //animator.Play(skill_current.clip.name);
+        StartCoroutine(GenericTools.ForceAnimation(animator, skill_current.clip));
+        yield return StartCoroutine(OnGoingSkill());
+        
     }
 
     public virtual IEnumerator OnGoingSkill()
     {
+        yield return null;
+    }
+
+    public virtual IEnumerator FinishingSkill()
+    {
+        ExecuteSkillsEffects();
         yield return null;
     }
 
@@ -122,6 +133,7 @@ public abstract class BattleChar : MonoBehaviour
     public void CreateContext(List<BattleChar> allies, List<BattleChar> enemies)
     {
         ctx = new BattleContext();
+        ctx.Target = this;  //debug
         ctx.Self = this;
         ctx.Party = allies;
         ctx.Enemies = enemies;

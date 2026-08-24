@@ -11,6 +11,7 @@ GameObject:
   - component: {fileID: 5468499750618803084}
   - component: {fileID: 4008533514988991853}
   - component: {fileID: 880773031608702503}
+  - component: {fileID: -2216162057273552004}
   m_Layer: 0
   m_Name: PJ
   m_TagString: Untagged
@@ -105,9 +106,14 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::PjController
   battle_char: {fileID: 0}
+  ctx:
+    Self: {fileID: 0}
+    Target: {fileID: 0}
+    Party: []
+    Enemies: []
   skills: []
-  skill_current: {fileID: 0}
-  animator: {fileID: 0}
+  skill_current: {fileID: 11400000, guid: 80680ba7e2f22f945a0f9e67c6aa4ed0, type: 2}
+  is_my_turn: 0
   strength: 0
   dexterity: 0
   constitution: 0
@@ -117,4 +123,26 @@ MonoBehaviour:
   life_current: 0
   mana_max: 0
   mana_current: 0
-  test: {fileID: 0}
+  animator: {fileID: -2216162057273552004}
+--- !u!95 &-2216162057273552004
+Animator:
+  serializedVersion: 7
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2813120227586499364}
+  m_Enabled: 1
+  m_Avatar: {fileID: 0}
+  m_Controller: {fileID: 9100000, guid: d36848d62815d0e459a3a00be404fab7, type: 2}
+  m_CullingMode: 0
+  m_UpdateMode: 0
+  m_ApplyRootMotion: 0
+  m_LinearVelocityBlending: 0
+  m_StabilizeFeet: 0
+  m_AnimatePhysics: 0
+  m_WarningMessage: 
+  m_HasTransformHierarchy: 1
+  m_AllowConstantClipSamplingOptimization: 1
+  m_KeepAnimatorStateOnDisable: 0
+  m_WriteDefaultValuesOnDisable: 0

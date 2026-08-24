@@ -13,7 +13,7 @@ public class DamageTarget: SkillEffectSO
         for(int i = 0; i < scaling.Length; i++)
         {
             dmg += (ctx.Self.ReadStats(scaling[i].stat) * scaling[i].value) / 100;
-            Debug.Log(dmg);
+            //Debug.Log(dmg);
         }
         ctx.Target.TakeDamage(type, dmg);
     }

@@ -17,29 +17,22 @@ public class PjController : BattleChar
         if (Input.GetKeyDown(KeyCode.J)) { StartCoroutine(StartSkill()); }
     }
 
-    public override IEnumerator StartSkill()
-    {
-        base.StartSkill();
-        Debug.Log($"Inicializando {skill_current.Name}");
-        yield return StartCoroutine(OnGoingSkill());
-        ExecuteSkillsEffects();
-    }
-
     public override IEnumerator OnGoingSkill()
     {
         float time = Time.time;
         float qte_start = skill_current.qte_start + time;
         float qte_end = skill_current.qte_end + time;
         bool crit = false;
-        while (Time.time < qte_end && crit == false)
+        while (Time.time < skill_current.clip.length + time)
         {
             InputManager.GetInputs();
-            if (Time.time > qte_start)
+            if (Time.time > qte_start && crit == false)
             {
                 if (InputManager.finisher) { ExecuteFinisher(); Debug.Log("Critou"); crit = true; }
             }
             yield return null;
          }
+        yield return StartCoroutine(FinishingSkill());
     }
 
     void ExecuteFinisher()
