@@ -9,13 +9,10 @@ public class SkillSO : ScriptableObject
     public Sprite spr;
     public int cooldown;
     public int cost;
-    public int precision;
     public TypeTarget target;
     public SkillEffectSO[] effects;
-    public SkillEffectSO[] finisher;
     public AnimationClip clip;
-    public float qte_start = 0;
-    public float qte_end = 0;
-
-   
+    //public SkillEffectSO[] finisher;
+    //public float qte_start = 0;
+    //public float qte_end = 0;
 }

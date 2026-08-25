@@ -15,15 +15,9 @@ MonoBehaviour:
   Name: 
   Description: 
   spr: {fileID: 0}
-  cooldown: 0
+  cooldown: 3
   cost: 0
-  precision: 0
   target: 0
   effects:
   - {fileID: 11400000, guid: 24803404c83c4bd44af1c4985b2318c5, type: 2}
-  finisher:
-  - {fileID: 11400000, guid: 24803404c83c4bd44af1c4985b2318c5, type: 2}
-  - {fileID: 11400000, guid: 24803404c83c4bd44af1c4985b2318c5, type: 2}
   clip: {fileID: 7400000, guid: 654d2fb91ad5add429c9eda2fa56d6b1, type: 2}
-  qte_start: 0
-  qte_end: 0

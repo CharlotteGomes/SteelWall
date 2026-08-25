@@ -111,9 +111,12 @@ MonoBehaviour:
     Target: {fileID: 0}
     Party: []
     Enemies: []
-  skills: []
-  skill_current: {fileID: 11400000, guid: 80680ba7e2f22f945a0f9e67c6aa4ed0, type: 2}
+  skill_current:
+    skill: {fileID: 0}
+    cooldown: 0
   is_my_turn: 0
+  skills_unlocked: []
+  skill_equipped: []
   strength: 0
   dexterity: 0
   constitution: 0
@@ -123,7 +126,15 @@ MonoBehaviour:
   life_current: 0
   mana_max: 0
   mana_current: 0
+  r_slashing: 0
+  r_bludgeoning: 0
+  r_pierce: 0
+  r_fire: 0
+  r_ice: 0
+  r_lightning: 0
+  r_purity: 0
   animator: {fileID: -2216162057273552004}
+  test: {fileID: 11400000, guid: 80680ba7e2f22f945a0f9e67c6aa4ed0, type: 2}
 --- !u!95 &-2216162057273552004
 Animator:
   serializedVersion: 7

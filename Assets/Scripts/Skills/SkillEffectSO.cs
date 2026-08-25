@@ -17,7 +17,14 @@ public enum Stats
     Dexterity,
     Constitution,
     Mind,
-    Int
+    Int,
+    Slahing,
+    Bludgeoning,
+    Pierce,
+    Fire,
+    Ice,
+    Lightning,
+    Purity
 }
 
 public abstract class SkillEffectSO : ScriptableObject
