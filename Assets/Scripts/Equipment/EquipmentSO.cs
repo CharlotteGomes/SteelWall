@@ -1,11 +1,5 @@
 using UnityEngine;
 
-public enum EquipmentType
-{
-    Weapon,
-    Armor
-}
-
 public enum ArmorType
 {
     Helmet,
@@ -26,7 +20,6 @@ public enum WeaponType
 }
 public abstract class EquipmentSO : ScriptableObject
 {
-    public EquipmentType e_type;
     public Sprite icon;
     public string Name;
     public BonusStatsSO[] bonus_stats;
@@ -45,6 +38,14 @@ public abstract class EquipmentSO : ScriptableObject
     }
     public void Remove(PjController pj) 
     {
-    
+        foreach (PassiveSO p in passives)
+        {
+            p.Remove(pj);
+        }
+
+        foreach (BonusStatsSO s in bonus_stats)
+        {
+            pj.RemoveStat(s.stat, s.bonus);
+        }
     }
 }

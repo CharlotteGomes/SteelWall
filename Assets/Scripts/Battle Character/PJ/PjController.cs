@@ -22,14 +22,15 @@ public class PjController : BattleChar
     {
         if (Input.GetKeyDown(KeyCode.J))
         {
-            Equip(weapon);
+            Equip(test);
         }
         if (Input.GetKeyDown(KeyCode.K)) { start_turn?.Invoke(this); }
-        if (Input.GetKeyDown(KeyCode.DownArrow)) ReduceCooldown();
+        if (Input.GetKeyDown(KeyCode.DownArrow)) Unequip(weapon);
     }
 
     public void AddStat(Stats stats, int value)
     {
+        if (value < 0) return;
         switch (stats)
         {
             case Stats.Strength:
@@ -58,38 +59,107 @@ public class PjController : BattleChar
                 r_purity += value; break;
         }
     }
+    public void RemoveStat(Stats stats, int value)
+    {
+        if (value < 0) return;
+        switch (stats)
+        {
+            case Stats.Strength:
+                strength -= value; break;
+            case Stats.Dexterity:
+                dexterity -= value; break;
+            case Stats.Constitution:
+                constitution -= value; break;
+            case Stats.Int:
+                intelligence -= value; break;
+            case Stats.Mind:
+                mind -= value; break;
+            case Stats.Slashing:
+                r_slashing -= value; break;
+            case Stats.Bludgeoning:
+                r_bludgeoning -= value; break;
+            case Stats.Pierce:
+                r_pierce -= value; break;
+            case Stats.Fire:
+                r_fire -= value; break;
+            case Stats.Ice:
+                r_ice -= value; break;
+            case Stats.Lightning:
+                r_lightning -= value; break;
+            case Stats.Purity:
+                r_purity -= value; break;
+        }
+    }
 
     #region Equipment 
     public void Equip(EquipmentSO eq)
     {
-        if(eq.e_type == EquipmentType.Weapon)
+        switch (eq)
         {
-            var armor = eq as WeaponSO;
-            weapon = armor;
-            weapon.Apply(this);
-        }
+            case WeaponSO weaponSO:
+                weapon = weaponSO;
+                weapon.Apply(this);
+                break;
 
-        if(eq.e_type == EquipmentType.Armor)
-        {
-            var armor = eq as ArmorSO;
-            switch (armor.a_type) 
-            {
-                case ArmorType.Helmet:
-                    helmet = armor; break;
-                case ArmorType.Chestplate:
-                    chestplate = armor; break;
-                case ArmorType.Bracelet:
-                    bracelet = armor; break;
-                case ArmorType.Gloves:
-                    gloves = armor; break;
-                case ArmorType.Legs:
-                    legs = armor; break;
-                case ArmorType.Greaves:
-                    greaves = armor; break;
-            }
-            armor.Apply(this);
+            case ArmorSO armorSO:
+                switch (armorSO.a_type)
+                {
+                    case ArmorType.Helmet:
+                        helmet = armorSO;break;
+                    case ArmorType.Chestplate:
+                        chestplate = armorSO;break;
+                    case ArmorType.Bracelet:
+                        bracelet = armorSO;break;
+                    case ArmorType.Gloves:
+                        gloves = armorSO;break; 
+                    case ArmorType.Legs:
+                        legs = armorSO;break;
+                    case ArmorType.Greaves:
+                        greaves = armorSO;break;
+                }
+                armorSO.Apply(this);
+                break;
         }
     }
+
+    public bool Unequip(EquipmentSO eq)
+    {
+        if (eq == null) return false;
+        switch (eq)
+        {
+            case WeaponSO weaponSO:
+                if (weapon != weaponSO) return false;
+                weapon.Remove(this); weapon = null;
+                break;
+
+            case ArmorSO armorSO:
+                switch (armorSO.a_type)
+                {
+                    case ArmorType.Helmet:
+                        if (helmet != armorSO) return false;
+                        armorSO.Remove(this); helmet = null; break;
+                    case ArmorType.Chestplate:
+                        if (chestplate != armorSO) return false;
+                        armorSO.Remove(this); chestplate = null; break;
+                    case ArmorType.Bracelet:
+                        if (bracelet != armorSO) return false;
+                        armorSO.Remove(this); bracelet = null; break;
+                    case ArmorType.Gloves:
+                        if (gloves != armorSO) return false;
+                        armorSO.Remove(this); gloves = null; break;
+                    case ArmorType.Legs:
+                        if (legs != armorSO) return false;
+                        armorSO.Remove(this); legs = null; break;
+                    case ArmorType.Greaves:
+                        if (greaves != armorSO) return false;
+                        armorSO.Remove(this); greaves = null; break;
+                }
+                break;
+        }
+
+        return true;
+    }
+
     #endregion
 
     #region Skill Functions
