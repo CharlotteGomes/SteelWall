@@ -18,7 +18,7 @@ public enum Stats
     Constitution,
     Mind,
     Int,
-    Slahing,
+    Slashing,
     Bludgeoning,
     Pierce,
     Fire,
