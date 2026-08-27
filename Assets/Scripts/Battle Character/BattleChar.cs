@@ -16,8 +16,6 @@ public abstract class BattleChar : MonoBehaviour
     [SerializeField] protected BattleContext ctx;
     [SerializeField] protected SkillData skill_current;
     [SerializeField] protected TurnStep step;
-
-    [Header("Sheet")]
     
     [SerializeField] protected int strength, dexterity, constitution, intelligence, mind;
     [SerializeField] protected int life_max, life_current, mana_max, mana_current;

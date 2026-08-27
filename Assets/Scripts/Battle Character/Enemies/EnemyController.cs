@@ -77,9 +77,8 @@ public class EnemyController : BattleChar
                                 ctx.Target = ctx.Party[p_rand]; break;
 
                             case TypeTarget.OtherParty:
-                                List<EnemyController> p = ctx.Party.Cast<EnemyController>().ToList();
-                                foreach(EnemyController n in p) {if(n == this) p.Remove(n); }
-                                if(p.Count == 0)
+                                List<BattleChar> p = ctx.Party.Where(n => n != this).ToList();
+                                if (p.Count == 0)
                                 {
                                     behaviour_index++;
                                     ctx.Target = null;
