@@ -97,6 +97,7 @@ public class PjController : BattleChar
         switch (eq)
         {
             case WeaponSO weaponSO:
+                if (weapon != null) weapon.Remove(this);
                 weapon = weaponSO;
                 weapon.Apply(this);
                 break;
@@ -105,16 +106,22 @@ public class PjController : BattleChar
                 switch (armorSO.a_type)
                 {
                     case ArmorType.Helmet:
+                        if (helmet != null) helmet.Remove(this);
                         helmet = armorSO;break;
                     case ArmorType.Chestplate:
+                        if (chestplate != null) chestplate.Remove(this);
                         chestplate = armorSO;break;
                     case ArmorType.Bracelet:
+                        if (bracelet != null) bracelet.Remove(this);
                         bracelet = armorSO;break;
                     case ArmorType.Gloves:
+                        if (gloves != null) gloves.Remove(this);
                         gloves = armorSO;break; 
                     case ArmorType.Legs:
+                        if (legs != null) legs.Remove(this);
                         legs = armorSO;break;
                     case ArmorType.Greaves:
+                        if (greaves != null) greaves.Remove(this);
                         greaves = armorSO;break;
                 }
                 armorSO.Apply(this);
