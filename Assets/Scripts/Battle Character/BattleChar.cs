@@ -16,10 +16,9 @@ public abstract class BattleChar : MonoBehaviour
     [SerializeField] protected BattleContext ctx;
     [SerializeField] protected SkillData skill_current;
     [SerializeField] protected bool is_my_turn = false;
-
+    [SerializeField] public readonly bool imune;
     [Header("Sheet")]
-    [SerializeField] protected List<SkillData> skills_unlocked = new List<SkillData>();
-    [SerializeField] protected List<SkillData> skill_equipped = new List<SkillData>();
+    
     [SerializeField] protected int strength, dexterity, constitution, intelligence, mind;
     [SerializeField] protected int life_max, life_current, mana_max, mana_current;
     [SerializeField] protected int r_slashing, r_bludgeoning, r_pierce, r_fire, r_ice, r_lightning, r_purity;
@@ -78,6 +77,68 @@ public abstract class BattleChar : MonoBehaviour
 
         }
     }//Function for make something stats more easy to access
+    public void AddStat(Stats stats, int value)
+    {
+        if (value < 0) return;
+        switch (stats)
+        {
+            case Stats.Strength:
+                strength += value; break;
+            case Stats.Dexterity:
+                dexterity += value; break;
+            case Stats.Constitution:
+                constitution += value; break;
+            case Stats.Int:
+                intelligence += value; break;
+            case Stats.Mind:
+                mind += value; break;
+            case Stats.Slashing:
+                r_slashing += value; break;
+            case Stats.Bludgeoning:
+                r_bludgeoning += value; break;
+            case Stats.Pierce:
+                r_pierce += value; break;
+            case Stats.Fire:
+                r_fire += value; break;
+            case Stats.Ice:
+                r_ice += value; break;
+            case Stats.Lightning:
+                r_lightning += value; break;
+            case Stats.Purity:
+                r_purity += value; break;
+        }
+    }
+    public void RemoveStat(Stats stats, int value)
+    {
+        if (value < 0) return;
+        switch (stats)
+        {
+            case Stats.Strength:
+                strength -= value; break;
+            case Stats.Dexterity:
+                dexterity -= value; break;
+            case Stats.Constitution:
+                constitution -= value; break;
+            case Stats.Int:
+                intelligence -= value; break;
+            case Stats.Mind:
+                mind -= value; break;
+            case Stats.Slashing:
+                r_slashing -= value; break;
+            case Stats.Bludgeoning:
+                r_bludgeoning -= value; break;
+            case Stats.Pierce:
+                r_pierce -= value; break;
+            case Stats.Fire:
+                r_fire -= value; break;
+            case Stats.Ice:
+                r_ice -= value; break;
+            case Stats.Lightning:
+                r_lightning -= value; break;
+            case Stats.Purity:
+                r_purity -= value; break;
+        }
+    }
     public void SetBattleChar(BattleCharSO battle_char)
     {
         this.battle_char = battle_char; 
@@ -144,33 +205,6 @@ public abstract class BattleChar : MonoBehaviour
         {
             f.Execute(ctx);
         }
-    }
-
-    protected void ReduceCooldown()
-    {
-        foreach(SkillData dt in skill_equipped)
-        {
-            dt.cooldown = Mathf.Clamp(dt.cooldown - 1, 0, 99);
-        }
-    }
-
-    public void AddSkill(SkillSO skill)
-    {
-        SkillData data = new SkillData(skill);
-
-        skills_unlocked.Add(data);
-    }
-
-    public void EquipSkill(SkillData data)
-    {
-        if(skill_equipped.Contains(data)) return;
-        data.cooldown = 0;
-        skill_equipped.Add(data);
-    }
-    public void UnequipSkill(SkillData data)
-    {
-        if (!skill_equipped.Contains(data)) return;
-        skill_equipped.Remove(data);
     }
     #endregion
 

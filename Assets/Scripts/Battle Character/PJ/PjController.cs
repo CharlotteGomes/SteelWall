@@ -1,14 +1,22 @@
+using System;
 using System.Collections;
+using System.Collections.Generic;
+using System.Linq;
 using UnityEditor.Search;
 using UnityEngine;
-using System;
-using System.Linq;
 public class PjController : BattleChar
 {
     [SerializeField] WeaponSO test;
 
     [SerializeField] WeaponSO weapon;
     [SerializeField] ArmorSO helmet, chestplate, bracelet, gloves, legs, greaves;
+
+    [SerializeField] protected List<SkillData> skills_unlocked = new List<SkillData>();
+    [SerializeField] protected List<SkillData> skill_equipped = new List<SkillData>();
+    [SerializeField] protected List<SkillData> weapon_skills = new List<SkillData>();
+
+    [SerializeField] int option_index = 0;
+    [SerializeField] int skill_index = 0;
     private void Awake()
     {
     }
@@ -28,68 +36,30 @@ public class PjController : BattleChar
         if (Input.GetKeyDown(KeyCode.DownArrow)) Unequip(weapon);
     }
 
-    public void AddStat(Stats stats, int value)
+    #region Init
+    public override void InitStats()
     {
-        if (value < 0) return;
-        switch (stats)
+        base.InitStats();
+    }
+
+    public void InitWeaponSkills()
+    {
+        if (weapon == null) return;
+        foreach(SkillSO so in weapon.w_skills.weapon_skills)
         {
-            case Stats.Strength:
-                strength += value; break;
-            case Stats.Dexterity:
-                dexterity += value; break;
-            case Stats.Constitution:
-                constitution += value; break;
-            case Stats.Int:
-                intelligence += value; break;
-            case Stats.Mind:
-                mind += value; break;
-            case Stats.Slashing:
-                r_slashing += value; break;
-            case Stats.Bludgeoning:
-                r_bludgeoning += value; break;
-            case Stats.Pierce:
-                r_pierce += value; break;
-            case Stats.Fire:
-                r_fire += value; break;
-            case Stats.Ice:
-                r_ice += value; break;
-            case Stats.Lightning:
-                r_lightning += value; break;
-            case Stats.Purity:
-                r_purity += value; break;
+            SkillData data = new SkillData(so);
+            weapon_skills.Add(data);
         }
     }
-    public void RemoveStat(Stats stats, int value)
+    #endregion
+
+    #region Clear
+    public void ClearWeaponSkill()
     {
-        if (value < 0) return;
-        switch (stats)
-        {
-            case Stats.Strength:
-                strength -= value; break;
-            case Stats.Dexterity:
-                dexterity -= value; break;
-            case Stats.Constitution:
-                constitution -= value; break;
-            case Stats.Int:
-                intelligence -= value; break;
-            case Stats.Mind:
-                mind -= value; break;
-            case Stats.Slashing:
-                r_slashing -= value; break;
-            case Stats.Bludgeoning:
-                r_bludgeoning -= value; break;
-            case Stats.Pierce:
-                r_pierce -= value; break;
-            case Stats.Fire:
-                r_fire -= value; break;
-            case Stats.Ice:
-                r_ice -= value; break;
-            case Stats.Lightning:
-                r_lightning -= value; break;
-            case Stats.Purity:
-                r_purity -= value; break;
-        }
+        if(weapon == null) return;
+        weapon_skills.Clear();
     }
+    #endregion
 
     #region Equipment 
     public void Equip(EquipmentSO eq)
@@ -203,5 +173,33 @@ public class PjController : BattleChar
             f.Execute(ctx);
         }*/
     }
+
+    protected void ReduceCooldown()
+    {
+        foreach (SkillData dt in skill_equipped)
+        {
+            dt.cooldown = Mathf.Clamp(dt.cooldown - 1, 0, 99);
+        }
+    }
+
+    public void AddSkill(SkillSO skill)
+    {
+        SkillData data = new SkillData(skill);
+
+        skills_unlocked.Add(data);
+    }
+
+    public void EquipSkill(SkillData data)
+    {
+        if (skill_equipped.Contains(data)) return;
+        data.cooldown = 0;
+        skill_equipped.Add(data);
+    }
+    public void UnequipSkill(SkillData data)
+    {
+        if (!skill_equipped.Contains(data)) return;
+        skill_equipped.Remove(data);
+    }
+
     #endregion
 }

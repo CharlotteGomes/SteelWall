@@ -5,6 +5,7 @@ public enum TypeTarget
 {
     Self,
     OneTarget,
+    AdjacentTarget,
     AllEnemy,
     OneParty,
     AllParty,
