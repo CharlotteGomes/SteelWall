@@ -15,8 +15,8 @@ public abstract class BattleChar : MonoBehaviour
     [SerializeField] protected BattleCharSO battle_char;
     [SerializeField] protected BattleContext ctx;
     [SerializeField] protected SkillData skill_current;
-    [SerializeField] protected bool is_my_turn = false;
-    [SerializeField] public readonly bool imune;
+    [SerializeField] protected TurnStep step;
+
     [Header("Sheet")]
     
     [SerializeField] protected int strength, dexterity, constitution, intelligence, mind;
@@ -162,7 +162,6 @@ public abstract class BattleChar : MonoBehaviour
             float dmg = (float)amount * (1 - Resistences(type) / 100);
             if(dmg > 0)
             {
-                Debug.Log($"Tomou {dmg} de dano");
                 life_current = Mathf.Clamp(life_current -= (int)dmg, 0, 1000);
             }
         }
@@ -181,14 +180,13 @@ public abstract class BattleChar : MonoBehaviour
     #region Skill functions
     public virtual IEnumerator StartSkill()
     {
-        if (skill_current == null) yield break;
         StartCoroutine(GenericTools.ForceAnimation(animator, skill_current.skill.clip));
         yield return StartCoroutine(OnGoingSkill());
     }
 
     public virtual IEnumerator OnGoingSkill()
     {
-        yield return null;
+        yield return StartCoroutine(FinishingSkill());
     }
 
     public virtual IEnumerator FinishingSkill()

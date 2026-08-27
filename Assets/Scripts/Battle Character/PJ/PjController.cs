@@ -19,6 +19,7 @@ public class PjController : BattleChar
     [SerializeField] int skill_index = 0;
     private void Awake()
     {
+        life_current = 1000;
     }
 
     void Start()

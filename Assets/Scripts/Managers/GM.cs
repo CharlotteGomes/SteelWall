@@ -6,6 +6,7 @@ public class GM : MonoBehaviour
 {
     public static GM instance { get; private set; } //Singleton
     public PartyManager party_manager;
+    public BattleManager battle_manager;
     [SerializeField] Action game_state; //Current State
 
     private void Awake()

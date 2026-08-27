@@ -16,5 +16,6 @@ public class DamageTarget: SkillEffectSO
             //Debug.Log(dmg);
         }
         ctx.Target.TakeDamage(type, dmg);
+        Debug.Log($"{ctx.Self} deu dano em {ctx.Target}");
     }
 }

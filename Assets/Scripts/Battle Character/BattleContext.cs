@@ -4,11 +4,9 @@ using System.Collections.Generic;
 public enum TypeTarget
 {
     Self,
-    OneTarget,
-    AdjacentTarget,
-    AllEnemy,
-    OneParty,
-    AllParty,
+    EnemyTarget,
+    PartyTarget,
+    OtherParty
 }
 
 [System.Serializable]

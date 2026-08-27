@@ -12,8 +12,18 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 90cdd82a7ce306d4d904a63b93f66185, type: 3}
   m_Name: BattleCharSO 3
   m_EditorClassIdentifier: Assembly-CSharp::EnemySO
+  Name: Inimigo A
   Cons: 1
   Str: 2
   Dex: 3
   Int: 4
   Mnd: 5
+  life_max: 20
+  r_slashing: 0
+  r_bludgeoning: 0
+  r_pierce: 0
+  r_fire: 0
+  r_ice: 0
+  r_lightning: 0
+  r_purity: 0
+  behaviour: {fileID: 11400000, guid: 1295117b36dc8324c80d648feb6b9fdc, type: 2}

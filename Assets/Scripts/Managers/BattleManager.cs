@@ -2,6 +2,16 @@ using UnityEngine;
 using System.Collections.Generic;
 using System;
 using System.Linq;
+
+public enum TurnStep
+{
+    ChooseAction,
+    ChooseSkill,
+    ChooseTarget,
+    ExecutingSkill,
+    Finish
+}
+
 public class BattleManager : MonoBehaviour
 {
     //public static Action<List<PJSO>, List<EnemySO>> start_battle;
@@ -14,6 +24,8 @@ public class BattleManager : MonoBehaviour
     [SerializeField] GameObject pj_prefab, enemy_prefab;
     [SerializeField] List<PJSO> test1 = new List<PJSO>();
     [SerializeField] List<EnemySO> test2 = new List<EnemySO>();
+
+    public readonly int turn = 1;
 
     private void Awake()
     {
@@ -36,6 +48,7 @@ public class BattleManager : MonoBehaviour
         for(int i = 0; i < pjs.Count; i++)
         {
             GameObject pj = Instantiate(pj_prefab, pj_spawn[i]);
+            pj.name = pjs[i].Name;
             PjController ctrl = pj.GetComponent<PjController>();
             ctrl.SetBattleChar(pjs[i]);
             ctrl.InitStats();
@@ -45,6 +58,7 @@ public class BattleManager : MonoBehaviour
         for(int i = 0; i < enemies.Count; i++)
         {
             GameObject n = Instantiate(enemy_prefab, enemy_spawn[i]);
+            n.name = enemies[i].Name;
             EnemyController ctrl = n.GetComponent<EnemyController>();
             ctrl.SetBattleChar(enemies[i]);
             ctrl.InitStats();
@@ -75,6 +89,10 @@ public class BattleManager : MonoBehaviour
             if (pj_on_battle.Contains(c))
             {
                 c.CreateContext(pj_on_battle.Cast<BattleChar>().ToList(), enemy_on_battle.Cast<BattleChar>().ToList());
+            }
+            if (enemy_on_battle.Contains(c))
+            {
+                c.CreateContext(enemy_on_battle.Cast<BattleChar>().ToList(), pj_on_battle.Cast<BattleChar>().ToList());
             }
         }
     }

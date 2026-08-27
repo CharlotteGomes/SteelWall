@@ -12,6 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 28137ed61fa8be54292ee8e5964522a3, type: 3}
   m_Name: BattleCharSO
   m_EditorClassIdentifier: Assembly-CSharp::PJSO
+  Name: PJ A
   Cons: 1
   Str: 2
   Dex: 3
