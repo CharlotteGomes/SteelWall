@@ -11,7 +11,6 @@ GameObject:
   - component: {fileID: 3085384902943926256}
   - component: {fileID: 1644163034527216552}
   - component: {fileID: 4092405471353485593}
-  - component: {fileID: 3013120016034197946}
   m_Layer: 0
   m_Name: ENEMY
   m_TagString: Untagged
@@ -111,9 +110,10 @@ MonoBehaviour:
     Target: {fileID: 0}
     Party: []
     Enemies: []
-  skills: []
-  skill_current: {fileID: 0}
-  is_my_turn: 0
+  skill_current:
+    skill: {fileID: 0}
+    cooldown: 0
+  step: 0
   strength: 0
   dexterity: 0
   constitution: 0
@@ -123,26 +123,13 @@ MonoBehaviour:
   life_current: 0
   mana_max: 0
   mana_current: 0
-  animator: {fileID: 3013120016034197946}
---- !u!95 &3013120016034197946
-Animator:
-  serializedVersion: 7
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1574995437504366707}
-  m_Enabled: 1
-  m_Avatar: {fileID: 0}
-  m_Controller: {fileID: 9100000, guid: 5bb939e77dec3f341a98cdb65452e94d, type: 2}
-  m_CullingMode: 0
-  m_UpdateMode: 0
-  m_ApplyRootMotion: 0
-  m_LinearVelocityBlending: 0
-  m_StabilizeFeet: 0
-  m_AnimatePhysics: 0
-  m_WarningMessage: 
-  m_HasTransformHierarchy: 1
-  m_AllowConstantClipSamplingOptimization: 1
-  m_KeepAnimatorStateOnDisable: 0
-  m_WriteDefaultValuesOnDisable: 0
+  r_slashing: 0
+  r_bludgeoning: 0
+  r_pierce: 0
+  r_fire: 0
+  r_ice: 0
+  r_lightning: 0
+  r_purity: 0
+  animator: {fileID: 0}
+  behaviourSO: {fileID: 0}
+  behaviour_index: 0

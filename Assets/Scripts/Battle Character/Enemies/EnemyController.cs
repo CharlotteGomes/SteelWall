@@ -14,7 +14,7 @@ public class EnemyController : BattleChar
     }
     void Update()
     {
-        if (Input.GetKeyDown(KeyCode.H)) { StartCoroutine(OnGoingTurn()); }
+        //if (Input.GetKeyDown(KeyCode.H)) { StartCoroutine(OnGoingTurn()); }
     }
 
     #region Init
@@ -37,7 +37,7 @@ public class EnemyController : BattleChar
 
     #region Turn
 
-    public IEnumerator OnGoingTurn()
+    public override IEnumerator OnGoingTurn()
     {
         start_turn?.Invoke(this);
         step = TurnStep.ChooseSkill;
@@ -47,8 +47,29 @@ public class EnemyController : BattleChar
             switch (step)
             {
                 case TurnStep.ChooseSkill:
-                    Debug.Log($"{this} ChooseSkill");
-                    /*foreach (ConditionalSkillSO so in behaviourSO.conditional)
+                    ChoosingSkill();
+                    break;
+
+                case TurnStep.ChooseTarget:
+                    {
+                        ChoosingTarget();
+                        break;
+                    }
+
+                case TurnStep.ExecutingSkill:
+                    yield return StartCoroutine(StartSkill());
+                    end_turn?.Invoke(this);
+                    behaviour_index++;
+                    step = TurnStep.Finish;
+                    break;
+            }
+            yield return null;
+        }
+    }
+
+    void ChoosingSkill()
+    {
+        /*foreach (ConditionalSkillSO so in behaviourSO.conditional)
                     {
                         if(behaviour_index > behaviourSO.behaviour.Count - 1) { behaviour_index = 0; }
                         if (so.Check())
@@ -58,49 +79,36 @@ public class EnemyController : BattleChar
                             break;
                         }
                     }*/
-                    skill_current = new SkillData(behaviourSO.behaviour[behaviour_index]); step = TurnStep.ChooseTarget; break;
+        skill_current = new SkillData(behaviourSO.behaviour[behaviour_index]); step = TurnStep.ChooseTarget;
+    }
 
-                case TurnStep.ChooseTarget:
-                    {
-                        Debug.Log($"{this} ChooseTarget");
-                        switch (skill_current.skill.target)
-                        {
-                            case TypeTarget.Self:
-                                ctx.Target = ctx.Self; break;
+    void ChoosingTarget()
+    {
+        switch (skill_current.skill.target)
+        {
+            case TypeTarget.Self:
+                ctx.Target = ctx.Self; break;
 
-                            case TypeTarget.EnemyTarget:
-                                int e_rand = Random.Range(0, ctx.Enemies.Count);
-                                ctx.Target = ctx.Enemies[e_rand]; break;
+            case TypeTarget.EnemyTarget:
+                int e_rand = Random.Range(0, ctx.Enemies.Count);
+                ctx.Target = ctx.Enemies[e_rand]; break;
 
-                            case TypeTarget.PartyTarget:
-                                int p_rand = Random.Range(0, ctx.Party.Count);
-                                ctx.Target = ctx.Party[p_rand]; break;
+            case TypeTarget.PartyTarget:
+                int p_rand = Random.Range(0, ctx.Party.Count);
+                ctx.Target = ctx.Party[p_rand]; break;
 
-                            case TypeTarget.OtherParty:
-                                List<BattleChar> p = ctx.Party.Where(n => n != this).ToList();
-                                if (p.Count == 0)
-                                {
-                                    behaviour_index++;
-                                    ctx.Target = null;
-                                    step = TurnStep.ChooseSkill; break;
-                                }
-                                int op_rand = Random.Range(0, p.Count);
-                                ctx.Target = p[op_rand]; break;
-                        }
-                        step = TurnStep.ExecutingSkill;
-                        break;
-                    }
-
-                case TurnStep.ExecutingSkill:
-                    Debug.Log($"{this} ExecutingSKill");
-                    yield return StartCoroutine(StartSkill());
-                    end_turn?.Invoke(this);
+            case TypeTarget.OtherParty:
+                List<BattleChar> p = ctx.Party.Where(n => n != this).ToList();
+                if (p.Count == 0)
+                {
                     behaviour_index++;
-                    step = TurnStep.Finish;
-                    break;
-            }
-            yield return null;
+                    ctx.Target = null;
+                    step = TurnStep.ChooseSkill; break;
+                }
+                int op_rand = Random.Range(0, p.Count);
+                ctx.Target = p[op_rand]; break;
         }
+        step = TurnStep.ExecutingSkill;
     }
     #endregion
 }

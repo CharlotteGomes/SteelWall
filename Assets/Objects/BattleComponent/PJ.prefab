@@ -11,7 +11,6 @@ GameObject:
   - component: {fileID: 5468499750618803084}
   - component: {fileID: 4008533514988991853}
   - component: {fileID: 880773031608702503}
-  - component: {fileID: -2216162057273552004}
   m_Layer: 0
   m_Name: PJ
   m_TagString: Untagged
@@ -114,9 +113,7 @@ MonoBehaviour:
   skill_current:
     skill: {fileID: 0}
     cooldown: 0
-  is_my_turn: 0
-  skills_unlocked: []
-  skill_equipped: []
+  step: 0
   strength: 0
   dexterity: 0
   constitution: 0
@@ -133,27 +130,22 @@ MonoBehaviour:
   r_ice: 0
   r_lightning: 0
   r_purity: 0
-  animator: {fileID: -2216162057273552004}
-  test: {fileID: 11400000, guid: 80680ba7e2f22f945a0f9e67c6aa4ed0, type: 2}
---- !u!95 &-2216162057273552004
-Animator:
-  serializedVersion: 7
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2813120227586499364}
-  m_Enabled: 1
-  m_Avatar: {fileID: 0}
-  m_Controller: {fileID: 9100000, guid: d36848d62815d0e459a3a00be404fab7, type: 2}
-  m_CullingMode: 0
-  m_UpdateMode: 0
-  m_ApplyRootMotion: 0
-  m_LinearVelocityBlending: 0
-  m_StabilizeFeet: 0
-  m_AnimatePhysics: 0
-  m_WarningMessage: 
-  m_HasTransformHierarchy: 1
-  m_AllowConstantClipSamplingOptimization: 1
-  m_KeepAnimatorStateOnDisable: 0
-  m_WriteDefaultValuesOnDisable: 0
+  animator: {fileID: 0}
+  test:
+  - {fileID: 11400000, guid: 79962291d56c0d346b28c0de426ba936, type: 2}
+  - {fileID: 11400000, guid: 0e6baf26106d6204f8484fe7bc203e39, type: 2}
+  - {fileID: 11400000, guid: 0180c36900014164596a966a99d070f6, type: 2}
+  - {fileID: 11400000, guid: 755f86cc91fa8e349b0187ce092b9c66, type: 2}
+  weapon: {fileID: 11400000, guid: 8a6739ac2424eef44b1933e707659b33, type: 2}
+  helmet: {fileID: 0}
+  chestplate: {fileID: 0}
+  bracelet: {fileID: 0}
+  gloves: {fileID: 0}
+  legs: {fileID: 0}
+  greaves: {fileID: 0}
+  skills_unlocked: []
+  skills_equipped: []
+  weapon_skills: []
+  battle_options: 0
+  option_index: 0
+  skill_index: 0

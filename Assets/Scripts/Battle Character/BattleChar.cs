@@ -9,6 +9,11 @@ using UnityEditor.Playables;
 using UnityEditor.UI;
 using Unity.VisualScripting;
 
+public enum BattleOptions 
+{ 
+    Attack = 0,
+    Skill = 1,
+}
 public abstract class BattleChar : MonoBehaviour
 {
     [Header("BattleInfo")]
@@ -34,6 +39,8 @@ public abstract class BattleChar : MonoBehaviour
     public Action<BattleChar> receive_heal;
     public Action<BattleChar> apply_status_effect;
     public Action<BattleChar> receive_status_effect;
+
+    #region Stats
     public int Resistences(TypeDmg dmg)
     {
         switch (dmg) 
@@ -141,6 +148,9 @@ public abstract class BattleChar : MonoBehaviour
     {
         this.battle_char = battle_char; 
     }
+
+    #endregion
+
     #region Init
     public virtual void InitStats()
     {
@@ -204,6 +214,9 @@ public abstract class BattleChar : MonoBehaviour
     }
     #endregion
 
+    #region Turn
+    public abstract IEnumerator OnGoingTurn();
+    #endregion
     public void CreateContext(List<BattleChar> allies, List<BattleChar> enemies)
     {
         ctx = new BattleContext();
