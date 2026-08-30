@@ -14,7 +14,8 @@ public enum TurnStep
 
 public class BattleManager : MonoBehaviour
 {
-    //public static Action<List<PJSO>, List<EnemySO>> start_battle;
+    public BattlePresentation battle_presentation { get; private set; }
+    [SerializeField] BattleChar pj, enemy;
 
     [SerializeField] List<BattleChar> initiative = new List<BattleChar>();
     [SerializeField] List<PjController> pj_on_battle =  new List<PjController>();
@@ -25,10 +26,13 @@ public class BattleManager : MonoBehaviour
     [SerializeField] List<PJSO> test1 = new List<PJSO>();
     [SerializeField] List<EnemySO> test2 = new List<EnemySO>();
 
+
+
     public readonly int turn = 1;
 
     private void Awake()
     {
+        battle_presentation = GetComponent<BattlePresentation>();
         //start_battle += SpawnCharacters;
     }
 
@@ -41,6 +45,7 @@ public class BattleManager : MonoBehaviour
     void Update()
     {
         if(Input.GetKeyDown(KeyCode.L)) { SpawnCharacters(test1, test2);}
+        if (Input.GetKeyDown(KeyCode.Space)) { StartCoroutine(battle_presentation.StartPresentation(pj_on_battle[0], enemy_on_battle[0])); }
     }
 
     void SpawnCharacters(List<PJSO> pjs, List<EnemySO> enemies)
@@ -48,6 +53,8 @@ public class BattleManager : MonoBehaviour
         for(int i = 0; i < pjs.Count; i++)
         {
             GameObject pj = Instantiate(pj_prefab, pj_spawn[i]);
+            SpriteRenderer pj_rend = pj.GetComponent<SpriteRenderer>();
+            pj_rend.sortingOrder = -1 * i;
             pj.name = pjs[i].Name;
             PjController ctrl = pj.GetComponent<PjController>();
             ctrl.SetBattleChar(pjs[i]);
@@ -58,6 +65,9 @@ public class BattleManager : MonoBehaviour
         for(int i = 0; i < enemies.Count; i++)
         {
             GameObject n = Instantiate(enemy_prefab, enemy_spawn[i]);
+            SpriteRenderer spr = n.GetComponent<SpriteRenderer>();
+            spr.flipX = true;
+            spr.sortingOrder = -1 * i;
             n.name = enemies[i].Name;
             EnemyController ctrl = n.GetComponent<EnemyController>();
             ctrl.SetBattleChar(enemies[i]);
