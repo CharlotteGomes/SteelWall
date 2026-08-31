@@ -188,29 +188,41 @@ public abstract class BattleChar : MonoBehaviour
     #region Skill functions
     public virtual IEnumerator StartSkill()
     {
-        StartCoroutine(GenericTools.ForceAnimation(animator, skill_current.skill.clip));
         yield return StartCoroutine(OnGoingSkill());
     }
 
     public virtual IEnumerator OnGoingSkill()
     {
+        List<BattleChar> Targets = new();
+        switch (skill_current.skill.target)
+        {
+            case TypeTarget.ChooseParty:
+                Targets.Add(ctx.Target);break;
+
+            case TypeTarget.ChooseEnemy:
+                Targets.Add(ctx.Target);break;
+
+            case TypeTarget.Enemy:
+                foreach(int i in skill_current.skill.pos)
+                {
+                    Targets.Add(ctx.Enemies[i]);
+                }break;
+            case TypeTarget.Party:
+                foreach (int i in skill_current.skill.pos)
+                {
+                    Targets.Add(ctx.Party[i]);
+                }
+                break;
+        }
+        Debug.Log($"{ctx.Self.name} {Targets.Count} {skill_current.skill.name}");
+        StartCoroutine(GM.instance.battle_manager.battle_presentation.StartPresentation(ctx.Self, Targets, skill_current.skill.presentation));
         yield return StartCoroutine(FinishingSkill());
     }
 
     public virtual IEnumerator FinishingSkill()
     {
-        ExecuteSkillsEffects();
-        skill_current.cooldown = skill_current.skill.cooldown;
+        skill_current.skill.Execute(ctx);
         yield return null;
-    }
-
-    public virtual void ExecuteSkillsEffects()
-    {
-        if (skill_current == null) return;
-        foreach(SkillEffectSO f in skill_current.skill.effects)
-        {
-            f.Execute(ctx);
-        }
     }
     #endregion
 
@@ -220,7 +232,6 @@ public abstract class BattleChar : MonoBehaviour
     public void CreateContext(List<BattleChar> allies, List<BattleChar> enemies)
     {
         ctx = new BattleContext();
-        ctx.Target = this;  //debug
         ctx.Self = this;
         ctx.Party = allies;
         ctx.Enemies = enemies;

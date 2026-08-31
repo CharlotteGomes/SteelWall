@@ -84,7 +84,7 @@ public class EnemyController : BattleChar
 
     void ChoosingTarget()
     {
-        switch (skill_current.skill.target)
+        /*switch (skill_current.skill.target)
         {
             case TypeTarget.Self:
                 ctx.Target = ctx.Self; break;
@@ -108,7 +108,7 @@ public class EnemyController : BattleChar
                 int op_rand = Random.Range(0, p.Count);
                 ctx.Target = p[op_rand]; break;
         }
-        step = TurnStep.ExecutingSkill;
+        step = TurnStep.ExecutingSkill;*/
     }
     #endregion
 }

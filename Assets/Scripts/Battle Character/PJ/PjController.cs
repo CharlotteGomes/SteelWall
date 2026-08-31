@@ -39,12 +39,9 @@ public class PjController : BattleChar
     // Update is called once per frame
     void Update()
     {
-        /*if (Input.GetKeyDown(KeyCode.J))
-        {
-            Equip(test);
-        }
+        
         if (Input.GetKeyDown(KeyCode.K)) { start_turn?.Invoke(this); }
-        if (Input.GetKeyDown(KeyCode.DownArrow)) Unequip(weapon);*/
+        if (Input.GetKeyDown(KeyCode.DownArrow)) Unequip(weapon);
         if (Input.GetKeyDown(KeyCode.H)) { StartCoroutine(OnGoingTurn()); }
     }
 
@@ -152,40 +149,6 @@ public class PjController : BattleChar
     #endregion
 
     #region Skill Functions
-    public override IEnumerator StartSkill()
-    {
-        if(skill_current.cooldown != 0) { yield break; }
-        yield return base.StartSkill();
-    }
-
-    public override IEnumerator OnGoingSkill()
-    {
-        /*
-        float time = Time.time;
-        float qte_start = skill_current.qte_start + time;
-        float qte_end = skill_current.qte_end + time;
-        bool crit = false;
-        while (Time.time < skill_current.clip.length + time)
-        {
-            InputManager.GetInputs();
-            if (Time.time > qte_start && crit == false)
-            {
-                if (InputManager.finisher) { ExecuteFinisher(); Debug.Log("Critou"); crit = true; }
-            }
-            yield return null;
-         }*/
-        yield return StartCoroutine(FinishingSkill());
-    }
-
-    void ExecuteFinisher()
-    {
-        /*if(skill_current == null) { return;}
-        foreach (SkillEffectSO f in skill_current.finisher)
-        {
-            f.Execute(ctx);
-        }*/
-    }
-
     protected void ReduceCooldown()
     {
         foreach (SkillData dt in skills_equipped)
@@ -225,7 +188,6 @@ public class PjController : BattleChar
         battle_options = 0;
         while(step != TurnStep.Finish)
         {
-            InputManager.GetInputs();
             switch(step)
             {
                 case TurnStep.ChooseAction:
@@ -243,6 +205,7 @@ public class PjController : BattleChar
 
     void ChoosingAction()
     {
+        InputManager.GetInputs();
         option_index = Mathf.Clamp(option_index + InputManager.hud_horizontal, 0, Enum.GetValues(typeof(BattleOptions)).Length - 1);
         battle_options = (BattleOptions)option_index;
         if (InputManager.interact) { SelectOption(battle_options); }
@@ -250,6 +213,7 @@ public class PjController : BattleChar
 
     void ChoosingSkill()
     {
+        InputManager.GetInputs();
         switch (battle_options)
         {
             case BattleOptions.Attack:

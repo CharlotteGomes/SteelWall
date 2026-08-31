@@ -4,56 +4,116 @@ using System.Collections;
 using UnityEngine;
 using UnityEngine.Playables;
 using UnityEngine.UIElements;
-using TMPro;
+using System.Collections.Generic;
 public class BattlePresentation : MonoBehaviour
 {
     PlayableGraph graph;
     [SerializeField] Camera cam;
-    [SerializeField] TMP_Text text;
-    public IEnumerator StartPresentation(BattleChar pj, BattleChar enemy)
+    public IEnumerator StartPresentation(BattleChar User, List<BattleChar> Targets, PresentationSO so)
     {
+        Debug.Log("START PRESENTATION");
+
         graph = PlayableGraph.Create();
 
-        SpriteRenderer pj_render = pj.GetComponent<SpriteRenderer>();
-        SpriteRenderer enemy_render = enemy.GetComponent<SpriteRenderer>();
-        Sprite pj_idle = pj_render.sprite;
-        Sprite enemy_idle = enemy_render.sprite;
-        Transform pj_transform = pj.GetComponent<Transform>();
-        Transform enemy_transform = enemy.GetComponent<Transform>();
-        Vector2 pj_start_pos = pj_transform.position;
-        Vector2 enemy_start_pos = enemy_transform.position;
-        Vector2 pj_end_pos = Vector2.right;
-        Vector2 enemy_end_pos = Vector2.right * 4;
-        
-        var pj_facing = CreateFacing(2, pj_transform, 1.5f);
-        var enemy_facing = CreateFacing(2, enemy_transform, 1.5f);
+        List<BattleChar> chars = new();
+        List<Vector2> original_positions = new();
 
-        var pj_move_in = CreateMove(2, pj_transform, Vector2.left * 3, pj_end_pos);
-        var enemy_move_in = CreateMove(2, enemy_transform, Vector2.right * 3.75f, enemy_end_pos);
+        SetParticipants(chars, User, Targets);
+        SetOriginalPositions(chars, original_positions);
 
-        var zoom_in = CreateZoom(0.1f, 7, 5.3f, .33f);
-        var zoom_out = CreateZoom(0.2f, 5.3f, 7f);
+        FirstAct(chars, so);
 
-        var rotate_in = CreateRotate(2, 0, 5, 0.33f);
-        var rotate_out = CreateRotate(0.2f, 5, 0);
+        Debug.Log($"Graph valid: {graph.IsValid()}");
 
-        var pj_move_out = CreateMove(0.2f, pj_transform, pj_end_pos, pj_start_pos);
-        var enemy_move_out = CreateMove(0.2f, enemy_transform, enemy_end_pos, enemy_start_pos);
-
-        var pj_facing_out = CreateFacing(0.2f, pj_transform, 1f);
-        var enemy_facing_out = CreateFacing(0.2f, enemy_transform, 1f);
-
-        var mixer_end = CreateMixer(new Playable[] { pj_move_out, enemy_move_out, pj_facing_out, enemy_facing_out, zoom_out, rotate_out}, new double[] { 0, 0, 0, 0, 0, 0}, 6);
-        var mixer = CreateMixer(new Playable[] { pj_facing, enemy_facing, pj_move_in, enemy_move_in, zoom_in, rotate_in, mixer_end }, new double[] {0, 0, 0, 0, 0, 0, 2}, 7);
-        var output = ScriptPlayableOutput.Create(graph, "first");
-        output.SetSourcePlayable(mixer);
         graph.Play();
 
+        Debug.Log($"Graph playing: {graph.IsPlaying()}");
 
-        yield return new WaitUntil(() => mixer.GetTime() >= mixer.GetDuration());
-        if (graph.IsValid()) { graph.Destroy(); Debug.Log("Deletou o graph"); }
+        yield return new WaitForSeconds(3);
+
+        if (graph.IsValid())
+        {
+            graph.Destroy();
+            Debug.Log("Deletou o graph");
+        }
+    }
+    void SetParticipants(List<BattleChar> participants, BattleChar user, List<BattleChar> targets)
+    {
+        Debug.Log($"User: Settado {user.name}");
+        participants.Add(user);
+        if(targets.Count == 0) { return; }
+        foreach (BattleChar c in targets){
+            Debug.Log($"Target: Settado {c.name}");
+            participants.Add(c);
+        }
     }
 
+    void SetOriginalPositions(List<BattleChar> ch, List<Vector2> pos)
+    {
+        foreach (BattleChar c in ch)
+        {
+            Debug.Log($"Original Position: Settado {c.name}");
+            pos.Add(c.transform.localPosition);
+        }
+    }
+
+    void FirstAct(List<BattleChar> c, PresentationSO so)
+    {
+
+        int i = 0;
+        List<Playable> bh = new List<Playable>();
+        List<Vector2> all_end_pos = new List<Vector2>();
+        List<double> delays = new List<double>();
+        all_end_pos.Add(so.self_end_pos);
+
+        foreach (Vector2 v in so.targets_end_pos)
+        {
+            all_end_pos.Add(v);
+        }
+
+        foreach (BattleChar ch in c)
+        {
+            Transform tf = ch.GetComponent<Transform>();
+            Vector2 start = tf.localPosition;
+            Vector2 end = all_end_pos[i];
+            bh.Add(CreateMove(2, tf, start, end));
+            bh.Add(CreateFacing(2, tf, 1.5f));
+            delays.Add(0);
+            delays.Add(0);
+            i++;
+        }
+        bh.Add(CreateZoom(.1f, 7f, 5.3f, 0.33f));
+        bh.Add(CreateRotate(2f, 0, 5, 0.33f));
+        bh.Add(SecondAct(c, so));
+        delays.Add(0);
+        delays.Add(0);
+        delays.Add(2);
+        var mixer = CreateMixer(bh, delays, bh.Count);
+        var output = ScriptPlayableOutput.Create(graph, "first");
+        output.SetSourcePlayable(mixer);
+    }
+
+    ScriptPlayable<PlayableMixerBehaviour> SecondAct(List<BattleChar> c, PresentationSO so)
+    {
+
+        int i = 0;
+        List<Playable> bh = new List<Playable>();
+        List<double> delays = new List<double>();
+
+
+        foreach (BattleChar ch in c)
+        {
+            Transform tf = ch.GetComponent<Transform>();
+            bh.Add(CreateReturn(0.3f, 1.5f, tf.transform.localPosition, tf));
+            delays.Add(0f);
+            i++;
+        }
+        bh.Add(CreateZoom(0.5f, 5.3f, 7f));
+        bh.Add(CreateRotate(0.5f, 5, 0));
+        delays.Add(0);
+        delays.Add(0);
+        return CreateMixer(bh, delays, bh.Count);
+    }
     ScriptPlayable<CharacterFacingBehaviour> CreateFacing(float duration, Transform tf, float scale)
     {
         var playable = ScriptPlayable<CharacterFacingBehaviour>.Create(graph);
@@ -99,19 +159,30 @@ public class BattlePresentation : MonoBehaviour
         behaviour.start_progress = start_progress;
         return playable;
     }
-    ScriptPlayable<PlayableMixerBehaviour> CreateMixer(Playable[] inputs, double[] start_times, int inp)
+
+    ScriptPlayable<CharacterReturn> CreateReturn(float duration, float scale, Vector2 pos, Transform tf)
     {
-        if (inputs.Length != start_times.Length)
+        var playable = ScriptPlayable<CharacterReturn>.Create(graph);
+        var behaviour = playable.GetBehaviour();
+        playable.SetDuration(duration);
+        behaviour.scale = scale;
+        behaviour.tf = tf;
+        behaviour.pos = pos;
+        return playable; 
+    }
+
+    ScriptPlayable<PlayableMixerBehaviour> CreateMixer(List<Playable> inputs, List<double> start_times, int inp)
+    {
+        if (inputs.Count != start_times.Count)
         {
-            Debug.LogError("Inputs e start_times precisam ter o mesmo tamanho.");
+            Debug.LogError($"Inputs e start_times precisam ter o mesmo tamanho. {start_times.Count} | {inp}");
             return default;
         }
-        var mixer = ScriptPlayable<PlayableMixerBehaviour>.Create(graph, inputs.Length);
+        var mixer = ScriptPlayable<PlayableMixerBehaviour>.Create(graph, inputs.Count);
         var behaviour = mixer.GetBehaviour();
         behaviour.startTimes = start_times;
-        behaviour.text = text;
         double duration = 0;
-        for (int i = 0; i < inputs.Length; i++)
+        for (int i = 0; i < inputs.Count; i++)
         {
             graph.Connect(inputs[i], 0, mixer, i);
             double endTime = start_times[i] + inputs[i].GetDuration();

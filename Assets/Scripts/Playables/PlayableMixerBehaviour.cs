@@ -1,11 +1,11 @@
 using UnityEngine;
 using UnityEngine.Playables;
 using TMPro;
+using System.Collections.Generic;
 // A behaviour that is attached to a playable
 public class PlayableMixerBehaviour : PlayableBehaviour
 {
-    public double[] startTimes;
-    public TMP_Text text;
+    public List<double> startTimes;
     public override void OnGraphStart(Playable playable)
     {
         for (int i = 0; i < playable.GetInputCount(); i++)
@@ -36,7 +36,6 @@ public class PlayableMixerBehaviour : PlayableBehaviour
     public override void ProcessFrame(Playable playable, FrameData info, object playerData)
     {
         double mixerTime = playable.GetTime();
-        text.text = $"{mixerTime}";
         for (int i = 0; i < playable.GetInputCount(); i++)
         {
             Playable input = playable.GetInput(i);

@@ -4,9 +4,10 @@ using System.Collections.Generic;
 public enum TypeTarget
 {
     Self,
-    EnemyTarget,
-    PartyTarget,
-    OtherParty
+    Enemy,
+    Party,
+    ChooseEnemy,
+    ChooseParty
 }
 
 [System.Serializable]

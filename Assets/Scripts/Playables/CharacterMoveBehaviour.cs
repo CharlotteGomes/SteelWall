@@ -25,18 +25,18 @@ public class CharacterMoveBehaviour : PlayableBehaviour
     public override void OnBehaviourPlay(Playable playable, FrameData info)
     {
         smooth_time = (float)playable.GetDuration();
-        tf.position = start_pos;
+        tf.localPosition = start_pos;
     }
 
     // Called when the state of the playable is set to Paused
     public override void OnBehaviourPause(Playable playable, FrameData info)
     {
-
+        
     }
 
     public override void ProcessFrame(Playable playable, FrameData info, object playerData)
     {
-        tf.position = Vector2.SmoothDamp(tf.position, target_pos, ref velocity, smooth_time);
+        tf.localPosition = Vector2.SmoothDamp(tf.localPosition, target_pos, ref velocity, smooth_time);
     }
 
     // Called each frame while the state is set to Play

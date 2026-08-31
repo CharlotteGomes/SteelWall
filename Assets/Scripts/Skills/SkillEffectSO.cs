@@ -29,5 +29,5 @@ public enum Stats
 
 public abstract class SkillEffectSO : ScriptableObject
 {
-    public abstract void Execute(BattleContext ctx);
+    public abstract void Execute(BattleContext ctx, int[] pos, TypeTarget target);
 }

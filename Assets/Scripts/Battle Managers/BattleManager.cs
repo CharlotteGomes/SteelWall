@@ -45,7 +45,11 @@ public class BattleManager : MonoBehaviour
     void Update()
     {
         if(Input.GetKeyDown(KeyCode.L)) { SpawnCharacters(test1, test2);}
-        if (Input.GetKeyDown(KeyCode.Space)) { StartCoroutine(battle_presentation.StartPresentation(pj_on_battle[0], enemy_on_battle[0])); }
+        if (Input.GetKeyDown(KeyCode.J))
+        {
+            StartCoroutine(pj_on_battle[0].StartSkill());
+        }
+        //if (Input.GetKeyDown(KeyCode.Space)) { StartCoroutine(battle_presentation.StartPresentation(pj_on_battle[0], enemy_on_battle[0])); }
     }
 
     void SpawnCharacters(List<PJSO> pjs, List<EnemySO> enemies)

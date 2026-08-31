@@ -18,6 +18,8 @@ MonoBehaviour:
   cooldown: 0
   cost: 0
   target: 1
+  pos: 000000000100000002000000
   effects:
   - {fileID: 11400000, guid: 1f0fb7ca2bffd7344b95a83b8d3fef70, type: 2}
-  clip: {fileID: 7400000, guid: 654d2fb91ad5add429c9eda2fa56d6b1, type: 2}
+  self_effects: []
+  presentation: {fileID: 11400000, guid: 1c5cd7816f2c9924a8d39ceee50a2223, type: 2}
