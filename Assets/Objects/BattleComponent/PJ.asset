@@ -1,0 +1,21 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4f25ae167da133e4fbcec3907c264d40, type: 3}
+  m_Name: PJ
+  m_EditorClassIdentifier: Assembly-CSharp::CharacterSpriteSO
+  idle: {fileID: 1507314909356490653, guid: 25dcad9a46499144aa52502a813b3d02, type: 3}
+  slash: {fileID: -424891100725802670, guid: e73df4912812c1d4eb34af5a9746f448, type: 3}
+  pierce: {fileID: 0}
+  bludgeoning: {fileID: 0}
+  casting: {fileID: 0}
+  ranged: {fileID: 0}
+  hurt: {fileID: -8708079298816080326, guid: 51de171735fac2444b31cfc6273e04e8, type: 3}

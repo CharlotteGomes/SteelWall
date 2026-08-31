@@ -21,10 +21,11 @@ public abstract class BattleChar : MonoBehaviour
     [SerializeField] protected BattleContext ctx;
     [SerializeField] protected SkillData skill_current;
     [SerializeField] protected TurnStep step;
+    public CharacterSpriteSO spriteSO { get; private set; }
     
-    [SerializeField] protected int strength, dexterity, constitution, intelligence, mind;
-    [SerializeField] protected int life_max, life_current, mana_max, mana_current;
-    [SerializeField] protected int r_slashing, r_bludgeoning, r_pierce, r_fire, r_ice, r_lightning, r_purity;
+    protected int strength, dexterity, constitution, intelligence, mind;
+    [SerializeField] protected int life_max, life_current;
+    protected int r_slashing, r_bludgeoning, r_pierce, r_fire, r_ice, r_lightning, r_purity;
 
     [Header("Ref")]
     [SerializeField] Animator animator;
@@ -154,6 +155,7 @@ public abstract class BattleChar : MonoBehaviour
     #region Init
     public virtual void InitStats()
     {
+        spriteSO = battle_char.sprites;
         strength = battle_char.Str;
         dexterity = battle_char.Dex;
         constitution = battle_char.Cons;

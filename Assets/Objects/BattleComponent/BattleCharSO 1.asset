@@ -13,6 +13,7 @@ MonoBehaviour:
   m_Name: BattleCharSO 1
   m_EditorClassIdentifier: Assembly-CSharp::PJSO
   Name: PJ B
+  sprites: {fileID: 11400000, guid: ea00853d930d22d47991be5e1b19c595, type: 2}
   Cons: 5
   Str: 4
   Dex: 3

@@ -9,9 +9,6 @@ public class PjController : BattleChar
 {
     [SerializeField] List<SkillSO> test = new List<SkillSO>();
 
-    [SerializeField] WeaponSO weapon;
-    [SerializeField] ArmorSO helmet, chestplate, bracelet, gloves, legs, greaves;
-
     [SerializeField] protected List<SkillData> skills_unlocked = new List<SkillData>();
     [SerializeField] protected List<SkillData> skills_equipped = new List<SkillData>();
     [SerializeField] protected List<SkillData> weapon_skills = new List<SkillData>();
@@ -32,7 +29,7 @@ public class PjController : BattleChar
         {
             AddSkill(so);
         }
-        InitWeaponSkills();
+        //InitWeaponSkills();
         skills_equipped = skills_unlocked;
     }
 
@@ -41,7 +38,7 @@ public class PjController : BattleChar
     {
         
         if (Input.GetKeyDown(KeyCode.K)) { start_turn?.Invoke(this); }
-        if (Input.GetKeyDown(KeyCode.DownArrow)) Unequip(weapon);
+        //if (Input.GetKeyDown(KeyCode.DownArrow)) Unequip(weapon);
         if (Input.GetKeyDown(KeyCode.H)) { StartCoroutine(OnGoingTurn()); }
     }
 
@@ -50,7 +47,7 @@ public class PjController : BattleChar
     {
         base.InitStats();
     }
-
+    /*
     public void InitWeaponSkills()
     {
         if (weapon == null) return;
@@ -59,18 +56,20 @@ public class PjController : BattleChar
             SkillData data = new SkillData(so);
             weapon_skills.Add(data);
         }
-    }
+    }*/
     #endregion
 
     #region Clear
+    /*
     public void ClearWeaponSkill()
     {
         if(weapon == null) return;
         weapon_skills.Clear();
-    }
+    }*/
     #endregion
 
     #region Equipment 
+    /*
     public void Equip(EquipmentSO eq)
     {
         switch (eq)
@@ -145,7 +144,7 @@ public class PjController : BattleChar
 
         return true;
     }
-
+    */
     #endregion
 
     #region Skill Functions

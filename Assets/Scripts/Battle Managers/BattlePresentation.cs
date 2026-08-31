@@ -9,19 +9,20 @@ public class BattlePresentation : MonoBehaviour
 {
     PlayableGraph graph;
     [SerializeField] Camera cam;
+    BattleChar User;
+    List<BattleChar> Targets = new();
+    Sprite user_spr;
+    List<Sprite> target_spr = new();
     public IEnumerator StartPresentation(BattleChar User, List<BattleChar> Targets, PresentationSO so)
     {
         Debug.Log("START PRESENTATION");
 
         graph = PlayableGraph.Create();
 
-        List<BattleChar> chars = new();
-        List<Vector2> original_positions = new();
-
-        SetParticipants(chars, User, Targets);
-        SetOriginalPositions(chars, original_positions);
-
-        FirstAct(chars, so);
+        this.User = User;
+        this.Targets = Targets;
+        SetSprites(so);
+        var mixer = FirstAct(so);
 
         Debug.Log($"Graph valid: {graph.IsValid()}");
 
@@ -29,7 +30,7 @@ public class BattlePresentation : MonoBehaviour
 
         Debug.Log($"Graph playing: {graph.IsPlaying()}");
 
-        yield return new WaitForSeconds(3);
+        yield return new WaitForSeconds((float)mixer.GetDuration());
 
         if (graph.IsValid())
         {
@@ -37,73 +38,64 @@ public class BattlePresentation : MonoBehaviour
             Debug.Log("Deletou o graph");
         }
     }
-    void SetParticipants(List<BattleChar> participants, BattleChar user, List<BattleChar> targets)
-    {
-        Debug.Log($"User: Settado {user.name}");
-        participants.Add(user);
-        if(targets.Count == 0) { return; }
-        foreach (BattleChar c in targets){
-            Debug.Log($"Target: Settado {c.name}");
-            participants.Add(c);
-        }
-    }
 
-    void SetOriginalPositions(List<BattleChar> ch, List<Vector2> pos)
+    ScriptPlayable<PlayableMixerBehaviour> FirstAct(PresentationSO so)
     {
-        foreach (BattleChar c in ch)
-        {
-            Debug.Log($"Original Position: Settado {c.name}");
-            pos.Add(c.transform.localPosition);
-        }
-    }
-
-    void FirstAct(List<BattleChar> c, PresentationSO so)
-    {
-
         int i = 0;
         List<Playable> bh = new List<Playable>();
-        List<Vector2> all_end_pos = new List<Vector2>();
         List<double> delays = new List<double>();
-        all_end_pos.Add(so.self_end_pos);
-
-        foreach (Vector2 v in so.targets_end_pos)
-        {
-            all_end_pos.Add(v);
-        }
-
-        foreach (BattleChar ch in c)
+        Transform user_tf = User.GetComponent<Transform>();
+        SpriteRenderer user_sr = User.GetComponent<SpriteRenderer>();
+        bh.Add(CreateMove(2, user_tf, so.self_start_pos, so.self_end_pos));
+        bh.Add(CreateFacing(2, user_tf, 1.5f));
+        bh.Add(CreateSprite(user_sr, user_spr));
+        delays.Add(0);
+        delays.Add(0);
+        delays.Add(0);
+        foreach (BattleChar ch in Targets)
         {
             Transform tf = ch.GetComponent<Transform>();
+            SpriteRenderer sprRender = ch.GetComponent<SpriteRenderer>();
             Vector2 start = tf.localPosition;
-            Vector2 end = all_end_pos[i];
+            Vector2 end = so.targets_end_pos;
             bh.Add(CreateMove(2, tf, start, end));
             bh.Add(CreateFacing(2, tf, 1.5f));
+            bh.Add(CreateSprite(sprRender, target_spr[0]));
+            delays.Add(0);
             delays.Add(0);
             delays.Add(0);
             i++;
         }
         bh.Add(CreateZoom(.1f, 7f, 5.3f, 0.33f));
         bh.Add(CreateRotate(2f, 0, 5, 0.33f));
-        bh.Add(SecondAct(c, so));
+        bh.Add(SecondAct(so));
         delays.Add(0);
         delays.Add(0);
         delays.Add(2);
         var mixer = CreateMixer(bh, delays, bh.Count);
         var output = ScriptPlayableOutput.Create(graph, "first");
         output.SetSourcePlayable(mixer);
+        return mixer;
     }
 
-    ScriptPlayable<PlayableMixerBehaviour> SecondAct(List<BattleChar> c, PresentationSO so)
+    ScriptPlayable<PlayableMixerBehaviour> SecondAct(PresentationSO so)
     {
-
         int i = 0;
         List<Playable> bh = new List<Playable>();
         List<double> delays = new List<double>();
+        Transform user_tf = User.GetComponent<Transform>();
+        SpriteRenderer user_sr = User.GetComponent<SpriteRenderer>();
+        bh.Add(CreateReturn(0.3f, 1.5f, user_tf.transform.localPosition, user_tf));
+        bh.Add(CreateSprite(user_sr, User.spriteSO.idle));
+        delays.Add(0);
+        delays.Add(0.4f);
 
-
-        foreach (BattleChar ch in c)
+        foreach (BattleChar ch in Targets)
         {
             Transform tf = ch.GetComponent<Transform>();
+            SpriteRenderer sprRender = ch.GetComponent<SpriteRenderer>();
+            bh.Add(CreateSprite(sprRender, Targets[i].spriteSO.idle));
+            delays.Add(0.4f);
             bh.Add(CreateReturn(0.3f, 1.5f, tf.transform.localPosition, tf));
             delays.Add(0f);
             i++;
@@ -160,6 +152,16 @@ public class BattlePresentation : MonoBehaviour
         return playable;
     }
 
+    ScriptPlayable<CharacterChangeSpriteBehaviour> CreateSprite(SpriteRenderer spriteRenderer, Sprite spr)
+    {
+        var playable = ScriptPlayable<CharacterChangeSpriteBehaviour>.Create(graph);
+        var behaviour = playable.GetBehaviour();
+        playable.SetDuration(0.1f);
+        behaviour.spriteRenderer = spriteRenderer;
+        behaviour.spr = spr;
+        return playable;
+    }
+
     ScriptPlayable<CharacterReturn> CreateReturn(float duration, float scale, Vector2 pos, Transform tf)
     {
         var playable = ScriptPlayable<CharacterReturn>.Create(graph);
@@ -191,6 +193,67 @@ public class BattlePresentation : MonoBehaviour
         mixer.SetDuration(duration);
         return mixer;
     }
+
+    void SetSprites(PresentationSO so)
+    {
+        switch (so.self)
+        {
+            case BattleSprites.Slash:
+                user_spr = User.spriteSO.slash;
+                break;
+
+            case BattleSprites.Pierce:
+                user_spr = User.spriteSO.pierce;
+                break;
+
+            case BattleSprites.Bludgeoning:
+                user_spr = User.spriteSO.bludgeoning;
+                break;
+
+            case BattleSprites.Casting:
+                user_spr = User.spriteSO.casting;
+                break;
+
+            case BattleSprites.Ranged:
+                user_spr = User.spriteSO.ranged;
+                break;
+
+            case BattleSprites.Hurt:
+                user_spr = User.spriteSO.hurt;
+                break;
+        }
+
+        foreach (BattleChar ch in Targets)
+        {
+            switch (so.targets)
+            {
+                case BattleSprites.Slash:
+                    target_spr.Add(ch.spriteSO.slash);
+                    break;
+
+                case BattleSprites.Pierce:
+                    target_spr.Add(ch.spriteSO.pierce);
+                    break;
+
+                case BattleSprites.Bludgeoning:
+                    target_spr.Add(ch.spriteSO.bludgeoning);
+                    break;
+
+                case BattleSprites.Casting:
+                    target_spr.Add(ch.spriteSO.casting);
+                    break;
+
+                case BattleSprites.Ranged:
+                    target_spr.Add(ch.spriteSO.ranged);
+                    break;
+
+                case BattleSprites.Hurt:
+                    target_spr.Add(ch.spriteSO.hurt);
+                    break;
+            }
+        }
+    }
+
     void Start()
     {
         

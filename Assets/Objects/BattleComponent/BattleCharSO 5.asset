@@ -13,6 +13,7 @@ MonoBehaviour:
   m_Name: BattleCharSO 5
   m_EditorClassIdentifier: Assembly-CSharp::EnemySO
   Name: Inimigo C
+  sprites: {fileID: 11400000, guid: 6dd98634dc6ea904292f4549dfaadd4e, type: 2}
   Cons: 0
   Str: 0
   Dex: 0

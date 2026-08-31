@@ -1,6 +1,6 @@
 using UnityEngine;
 
-[CreateAssetMenu(fileName = "BattleCharSO", menuName = "Scriptable Objects/Enemy/EnemyBase")]
+[CreateAssetMenu(fileName = "BattleCharSO", menuName = "Scriptable Objects/Char/Enemy/EnemyBase")]
 public class EnemySO : BattleCharSO
 {
     public int life_max;

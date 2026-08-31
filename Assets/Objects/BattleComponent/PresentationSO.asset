@@ -12,15 +12,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c49ff62b96f80974d9c301a527eb24f0, type: 3}
   m_Name: PresentationSO
   m_EditorClassIdentifier: Assembly-CSharp::PresentationSO
+  self: 1
+  targets: 6
   self_start_pos: {x: 1, y: 0}
   self_end_pos: {x: -3, y: 0}
-  targets_start_pos:
-  - {x: 1, y: 0}
-  - {x: 1, y: 0}
-  - {x: 1, y: 0}
-  - {x: 1, y: 0}
-  targets_end_pos:
-  - {x: -3, y: 0}
-  - {x: -3, y: 0}
-  - {x: -3, y: 0}
-  - {x: -3, y: 0}
+  targets_start_pos: {x: 0, y: 0}
+  targets_end_pos: {x: 0, y: 0}
