@@ -15,27 +15,19 @@ public class BattlePresentation : MonoBehaviour
     [SerializeField]List<Sprite> target_spr = new();
     public IEnumerator StartPresentation(BattleChar User, List<BattleChar> Targets, PresentationSO so)
     {
-        Debug.Log("START PRESENTATION");
-
         graph = PlayableGraph.Create();
 
         this.User = User;
-        this.Targets = Targets;
+        this.Targets = new List<BattleChar>(Targets);
         SetSprites(so);
         var mixer = FirstAct(so);
 
-        Debug.Log($"Graph valid: {graph.IsValid()}");
-
         graph.Play();
-
-        Debug.Log($"Graph playing: {graph.IsPlaying()}");
-
         yield return new WaitForSeconds((float)mixer.GetDuration());
 
         if (graph.IsValid())
         {
             graph.Destroy();
-            Debug.Log("Deletou o graph");
         }
         this.User = null;
         this.Targets.Clear();

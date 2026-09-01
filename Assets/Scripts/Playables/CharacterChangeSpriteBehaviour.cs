@@ -22,7 +22,6 @@ public class CharacterChangeSpriteBehaviour : PlayableBehaviour
     // Called when the state of the playable is set to Play
     public override void OnBehaviourPlay(Playable playable, FrameData info)
     {
-        Debug.Log($"Changing sprite to {spr.name}");
         spriteRenderer.sprite = spr;
         spriteRenderer.sortingOrder += 10;
     }

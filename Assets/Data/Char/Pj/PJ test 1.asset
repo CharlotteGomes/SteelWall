@@ -19,3 +19,6 @@ MonoBehaviour:
   Dex: 3
   Int: 4
   Mnd: 5
+  Resists:
+  - resistence_type: {fileID: 11400000, guid: ed37d09286d42f845a0a212856defd4d, type: 2}
+    value: 0

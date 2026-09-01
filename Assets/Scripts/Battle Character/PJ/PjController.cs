@@ -22,11 +22,14 @@ public class PjController : BattleChar
 
     void Start()
     {
-        foreach (SkillSO so in test)
+        foreach (SkillSO wo in test)
         {
-            AddSkill(so);
+            AddSkill(wo);
         }
         skills_equipped = skills_unlocked;
+        StatusEffectSO so = ScriptableObject.CreateInstance<StatusEffectSO>();
+        so.stacks = 10;
+        ApplyStatus(new PoisonEffect(this, this, so, 1));
     }
 
     // Update is called once per frame
@@ -101,6 +104,7 @@ public class PjController : BattleChar
         InputManager.GetInputs();
         if (InputManager.hud_horizontal != 0)
         {
+            Debug.Log("Trocou de Skill");
             skill_index = Mathf.Clamp(skill_index + InputManager.hud_horizontal, 0, skills_equipped.Count - 1);
             skill_current = skills_equipped[skill_index];
         }

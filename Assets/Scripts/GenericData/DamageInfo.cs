@@ -1,5 +1,6 @@
 using UnityEngine;
 
+[System.Serializable]
 public class DamageInfo
 {
     public BattleChar dealer { get; private set; }

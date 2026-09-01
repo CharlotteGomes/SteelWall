@@ -301,8 +301,6 @@ MonoBehaviour:
   enemy_prefab: {fileID: 1574995437504366707, guid: 2ba2f2b7e18d7404c8a37ebb4d11473a, type: 3}
   test1:
   - {fileID: 11400000, guid: eb62ec11013488044b653913cf7bf190, type: 2}
-  - {fileID: 11400000, guid: 259cb2d259e8a36459ea02b56bdb6c41, type: 2}
-  - {fileID: 11400000, guid: 554927b8abf935b45bf3016710121f2a, type: 2}
   test2:
   - {fileID: 11400000, guid: 8a4f46d4c0e488744bce85ef183e6d7a, type: 2}
   - {fileID: 11400000, guid: 49f29ddd1180df641bb948092fdcbc5a, type: 2}
@@ -321,6 +319,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::BattleApresentation
   cam: {fileID: 1710920871}
+  target_spr: []
 --- !u!1 &688666636
 GameObject:
   m_ObjectHideFlags: 0
@@ -771,7 +770,7 @@ MonoBehaviour:
   m_BlockingObjects: 0
   m_BlockingMask:
     serializedVersion: 2
-    m_Bits: 1079
+    m_Bits: 4294967295
 --- !u!114 &1740078899
 MonoBehaviour:
   m_ObjectHideFlags: 0

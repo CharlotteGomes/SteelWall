@@ -17,7 +17,7 @@ public class SkillSO : ScriptableObject
     {
         foreach(var effect in effects)
         {
-            effect.Execute(ctx, pos);
+            effect.Execute(ctx);
         }
     }
 }

@@ -6,9 +6,9 @@ public class DamageTarget: SkillEffectSO
 {
     public DamageType type;
     public int damage;
-    public override void Execute(BattleContext ctx, int[] pos)
+    public override void Execute(BattleContext ctx)
     {
-        foreach (var target in ctx.Target)
+        foreach (BattleChar target in ctx.Target)
         {
             DamageInfo info = new DamageInfo(ctx.Self, target, damage, type);
             ctx.Self.DealDamage(info);
