@@ -7,27 +7,17 @@ public class SkillSO : ScriptableObject
 {
     public string Name, Description;
     public Sprite spr;
-    public int cooldown;
-    public int cost;
-    public TypeTarget target;
+    public bool affect_enemy = true;
+    public bool chose = false;
     public int[] pos;
     public SkillEffectSO[] effects;
-    public SkillEffectSO[] self_effects;
     public PresentationSO presentation;
-    //public SkillEffectSO[] finisher;
-    //public float qte_start = 0;
-    //public float qte_end = 0;
     
     public void Execute(BattleContext ctx)
     {
-        foreach (var effect in self_effects) 
-        {
-            effect.Execute(ctx, new int[] { }, TypeTarget.Self);
-        }
-
         foreach(var effect in effects)
         {
-            effect.Execute(ctx, pos, target);
+            effect.Execute(ctx, pos);
         }
     }
 }

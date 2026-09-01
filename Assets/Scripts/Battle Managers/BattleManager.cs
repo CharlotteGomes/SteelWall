@@ -4,8 +4,6 @@ using System;
 using System.Linq;
 using NUnit.Framework;
 using System.Collections;
-using Sirenix.OdinInspector;
-
 public enum TurnStep
 {
     ChooseSkill,
@@ -25,7 +23,6 @@ public class BattleManager : MonoBehaviour
     [SerializeField] List<PJSO> test1 = new List<PJSO>();
     [SerializeField] List<EnemySO> test2 = new List<EnemySO>();
 
-    [ShowInInspector]
     public BattleChar current { get; private set; }
 
     public int turn { get; private set; } = 1;
@@ -33,12 +30,12 @@ public class BattleManager : MonoBehaviour
     private void Awake()
     {
         battle_presentation = GetComponent<BattlePresentation>();
-        //start_battle += SpawnCharacters;
+        StartBattle(test1, test2);
     }
 
     void Start()
     {
-        StartBattle(test1, test2);
+        
     }
 
     // Update is called once per frame
@@ -101,7 +98,7 @@ public class BattleManager : MonoBehaviour
 
     void SetInitiative()
     {
-        initiative = initiative.OrderByDescending(a => a.ReadStats(Stats.Dexterity)).ToList();   
+        initiative = initiative.OrderByDescending(a => a.dexterity).ToList();   
     }
 
     void SetContext(List<BattleChar> pjs, List<BattleChar> enemies)

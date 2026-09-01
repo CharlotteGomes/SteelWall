@@ -6,17 +6,17 @@ public class CharacterChangeSpriteBehaviour : PlayableBehaviour
 {
     public SpriteRenderer spriteRenderer;
     public Sprite spr;
-
+    public int original_sort;
     // Called when the owning graph starts playing
     public override void OnGraphStart(Playable playable)
     {
-        
+        original_sort = spriteRenderer.sortingOrder;
     }
 
     // Called when the owning graph stops playing
     public override void OnGraphStop(Playable playable)
     {
-        
+        spriteRenderer.sortingOrder = original_sort;
     }
 
     // Called when the state of the playable is set to Play
@@ -24,6 +24,7 @@ public class CharacterChangeSpriteBehaviour : PlayableBehaviour
     {
         Debug.Log($"Changing sprite to {spr.name}");
         spriteRenderer.sprite = spr;
+        spriteRenderer.sortingOrder += 10;
     }
 
     // Called when the state of the playable is set to Paused

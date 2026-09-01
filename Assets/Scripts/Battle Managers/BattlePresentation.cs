@@ -12,7 +12,7 @@ public class BattlePresentation : MonoBehaviour
     BattleChar User;
     List<BattleChar> Targets = new();
     Sprite user_spr;
-    List<Sprite> target_spr = new();
+    [SerializeField]List<Sprite> target_spr = new();
     public IEnumerator StartPresentation(BattleChar User, List<BattleChar> Targets, PresentationSO so)
     {
         Debug.Log("START PRESENTATION");
@@ -37,6 +37,10 @@ public class BattlePresentation : MonoBehaviour
             graph.Destroy();
             Debug.Log("Deletou o graph");
         }
+        this.User = null;
+        this.Targets.Clear();
+        user_spr = null;
+        target_spr.Clear();
     }
 
     ScriptPlayable<PlayableMixerBehaviour> FirstAct(PresentationSO so)

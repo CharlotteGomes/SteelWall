@@ -39,9 +39,7 @@ public class EnemyController : BattleChar
 
     public override IEnumerator OnGoingTurn()
     {
-        start_turn?.Invoke(this);
-        step = TurnStep.ChooseSkill;
-
+        SetRound();
         if(behaviour_index > behaviourSO.behaviour.Count - 1) { behaviour_index = 0; }
 
         while (step != TurnStep.Finish)
@@ -62,7 +60,6 @@ public class EnemyController : BattleChar
 
                 case TurnStep.ExecutingSkill:
                     yield return StartCoroutine(StartSkill());
-                    end_turn?.Invoke(this);
                     behaviour_index++;
                     step = TurnStep.Finish;
                     break;
@@ -87,25 +84,49 @@ public class EnemyController : BattleChar
 
     void ChoosingTarget()
     {
-        switch(skill_current.target)
+        if (!skill_current.chose)
         {
-            case TypeTarget.Self:
-                ctx.Target = ctx.Self;
-                break;
-            case TypeTarget.Enemy:
-                ctx.Target = ctx.RandomChar(ctx.Enemies, skill_current.pos);
-                break;
-            case TypeTarget.Party:
-                ctx.Target = ctx.RandomChar(ctx.Party, skill_current.pos);
-                break;
-            case TypeTarget.ChooseEnemy:
-                ctx.Target = ctx.RandomChar(ctx.Enemies, skill_current.pos);
-                break;
-            case TypeTarget.ChooseParty:
-                ctx.Target = ctx.RandomChar(ctx.Party, skill_current.pos);
-                break;
+            if (skill_current.affect_enemy)
+            {
+                foreach (int p in skill_current.pos)
+                {
+                    SetTarget(ctx.Enemies[p]);
+                }
+                step = TurnStep.ExecutingSkill; return;
+            }
+
+            foreach (int p in skill_current.pos)
+            {
+                SetTarget(ctx.Party[p]);
+            }
+            step = TurnStep.ExecutingSkill; return;
         }
+
+        if(skill_current.affect_enemy)
+        {
+            int erand = 0;
+            foreach (int p in skill_current.pos)
+            {
+                erand = Random.Range(0, skill_current.pos.Length);
+            }
+            ctx.Target.Add(ctx.Enemies[erand]);
+            step = TurnStep.ExecutingSkill; return;
+        }
+
+        int rand = 0;
+        foreach (int p in skill_current.pos)
+        {
+            rand = Random.Range(0, skill_current.pos.Length);
+        }
+        ctx.Target.Add(ctx.Party[rand]);
         step = TurnStep.ExecutingSkill;
     }
     #endregion
+
+    public override void SetRound()
+    {
+        base.SetRound();
+        behaviour_index = 0;
+        step = TurnStep.ChooseSkill;
+    }
 }
