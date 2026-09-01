@@ -104,20 +104,24 @@ public class EnemyController : BattleChar
 
         if(skill_current.affect_enemy)
         {
-            int erand = 0;
+            List<BattleChar> elist = new List<BattleChar>();
             foreach (int p in skill_current.pos)
             {
-                erand = Random.Range(0, skill_current.pos.Length);
+                if(p < ctx.Enemies.Count) { elist.Add(ctx.Enemies[p]); }
             }
+            if(elist.Count <= 0) { step = TurnStep.ChooseSkill; behaviour_index++; return; }
+            int erand = Random.Range(0, elist.Count); 
             ctx.Target.Add(ctx.Enemies[erand]);
             step = TurnStep.ExecutingSkill; return;
         }
 
-        int rand = 0;
+        List<BattleChar> list = new List<BattleChar>();
         foreach (int p in skill_current.pos)
         {
-            rand = Random.Range(0, skill_current.pos.Length);
+            if (p < ctx.Party.Count) { list.Add(ctx.Party[p]); }
         }
+        if (list.Count <= 0) { step = TurnStep.ChooseSkill; behaviour_index++; return; }
+        int rand = Random.Range(0, list.Count);
         ctx.Target.Add(ctx.Party[rand]);
         step = TurnStep.ExecutingSkill;
     }

@@ -128,6 +128,7 @@ public class PjController : BattleChar
         }
         
         InputManager.GetInputs();
+        if (InputManager.interact) step = TurnStep.ExecutingSkill;
         if (!(InputManager.hud_horizontal != 0)) { return; }
         if (skill_current.affect_enemy)
         {
@@ -139,6 +140,7 @@ public class PjController : BattleChar
             intent_index = Mathf.Clamp(intent_index + InputManager.hud_horizontal, 0, ctx.Party.Count - 1);
             ctx.Target.Clear();
             SetTarget(ctx.Party[intent_index]);
+        
     }
     public override void SetRound()
     {
