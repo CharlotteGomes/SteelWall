@@ -16,7 +16,7 @@ MonoBehaviour:
   sprites: {fileID: 11400000, guid: 6dd98634dc6ea904292f4549dfaadd4e, type: 2}
   Cons: 0
   Str: 0
-  Dex: 0
+  Dex: 6
   Int: 0
   Mnd: 0
   life_max: 40

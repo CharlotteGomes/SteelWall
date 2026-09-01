@@ -17,8 +17,8 @@ MonoBehaviour:
   spr: {fileID: 0}
   cooldown: 0
   cost: 0
-  target: 2
-  pos: 0000000001000000
+  target: 4
+  pos: 0000000002000000
   effects:
   - {fileID: 11400000, guid: 1f0fb7ca2bffd7344b95a83b8d3fef70, type: 2}
   self_effects: []

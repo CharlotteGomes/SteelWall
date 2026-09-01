@@ -13,7 +13,7 @@ MonoBehaviour:
   m_Name: ENEMY
   m_EditorClassIdentifier: Assembly-CSharp::CharacterSpriteSO
   idle: {fileID: 1717801165756742034, guid: 6d5326b2635359741995a665e214fe2e, type: 3}
-  slash: {fileID: 0}
+  slash: {fileID: -8708079298816080326, guid: 51de171735fac2444b31cfc6273e04e8, type: 3}
   pierce: {fileID: 0}
   bludgeoning: {fileID: 0}
   casting: {fileID: 0}

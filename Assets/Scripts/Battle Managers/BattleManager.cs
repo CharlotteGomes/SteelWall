@@ -2,10 +2,12 @@ using UnityEngine;
 using System.Collections.Generic;
 using System;
 using System.Linq;
+using NUnit.Framework;
+using System.Collections;
+using Sirenix.OdinInspector;
 
 public enum TurnStep
 {
-    ChooseAction,
     ChooseSkill,
     ChooseTarget,
     ExecutingSkill,
@@ -15,21 +17,19 @@ public enum TurnStep
 public class BattleManager : MonoBehaviour
 {
     public BattlePresentation battle_presentation { get; private set; }
-    [SerializeField] BattleChar pj, enemy;
 
     [SerializeField] List<BattleChar> initiative = new List<BattleChar>();
-    [SerializeField] List<PjController> pj_on_battle =  new List<PjController>();
-    [SerializeField] List<EnemyController> enemy_on_battle = new List<EnemyController>();
 
     [SerializeField] List<Transform> pj_spawn, enemy_spawn = new List<Transform>();
     [SerializeField] GameObject pj_prefab, enemy_prefab;
     [SerializeField] List<PJSO> test1 = new List<PJSO>();
     [SerializeField] List<EnemySO> test2 = new List<EnemySO>();
 
+    [ShowInInspector]
+    public BattleChar current { get; private set; }
 
-
-    public readonly int turn = 1;
-
+    public int turn { get; private set; } = 1;
+    [SerializeField] int initiative_index = 0;
     private void Awake()
     {
         battle_presentation = GetComponent<BattlePresentation>();
@@ -38,23 +38,38 @@ public class BattleManager : MonoBehaviour
 
     void Start()
     {
-        
+        StartBattle(test1, test2);
     }
 
     // Update is called once per frame
     void Update()
     {
-        if(Input.GetKeyDown(KeyCode.L)) { SpawnCharacters(test1, test2);}
-        if (Input.GetKeyDown(KeyCode.J))
+       
+    }
+
+    public void StartBattle(List<PJSO> pjs, List<EnemySO> enemies)
+    {
+        SpawnCharacters(pjs, enemies);
+        initiative_index = 0;
+        StartCoroutine(TurnOrder());
+    }
+
+    IEnumerator TurnOrder()
+    {
+        while (true)
         {
-            StartCoroutine(pj_on_battle[0].StartSkill());
+            current = initiative[initiative_index];
+            yield return StartCoroutine(current.OnGoingTurn());
+            initiative_index++;
+            if (initiative_index > initiative.Count - 1) { initiative_index = 0; turn++; }
         }
-        //if (Input.GetKeyDown(KeyCode.Space)) { StartCoroutine(battle_presentation.StartPresentation(pj_on_battle[0], enemy_on_battle[0])); }
     }
 
     void SpawnCharacters(List<PJSO> pjs, List<EnemySO> enemies)
     {
-        for(int i = 0; i < pjs.Count; i++)
+        List<BattleChar> PJS = new List<BattleChar>();  
+        List<BattleChar> ENEMIES = new List<BattleChar>();
+        for (int i = 0; i < pjs.Count; i++)
         {
             GameObject pj = Instantiate(pj_prefab, pj_spawn[i]);
             SpriteRenderer pj_rend = pj.GetComponent<SpriteRenderer>();
@@ -63,7 +78,8 @@ public class BattleManager : MonoBehaviour
             PjController ctrl = pj.GetComponent<PjController>();
             ctrl.SetBattleChar(pjs[i]);
             ctrl.InitStats();
-            pj_on_battle.Add(ctrl);
+            initiative.Add(ctrl);
+            PJS.Add(ctrl);
         }
 
         for(int i = 0; i < enemies.Count; i++)
@@ -76,37 +92,42 @@ public class BattleManager : MonoBehaviour
             EnemyController ctrl = n.GetComponent<EnemyController>();
             ctrl.SetBattleChar(enemies[i]);
             ctrl.InitStats();
-            enemy_on_battle.Add(ctrl);
+            initiative.Add(ctrl);
+            ENEMIES.Add(ctrl);
         }
         SetInitiative();
-        SetContext();
+        SetContext(PJS, ENEMIES);
     }
 
     void SetInitiative()
     {
-        List<BattleChar> battle = new List<BattleChar>();
-        foreach(EnemyController enemy in enemy_on_battle)
-        {
-            battle.Add(enemy);
-        }
-        foreach(PjController pj in pj_on_battle)
-        {
-            battle.Add(pj);
-        }
-        initiative = battle.OrderByDescending(a => a.ReadStats(Stats.Dexterity)).ToList();   
+        initiative = initiative.OrderByDescending(a => a.ReadStats(Stats.Dexterity)).ToList();   
     }
 
-    void SetContext()
+    void SetContext(List<BattleChar> pjs, List<BattleChar> enemies)
     {
-        foreach(BattleChar c in initiative)
+        List<BattleChar> PJS = new List<BattleChar>();
+        List<BattleChar> ENEMIES = new List<BattleChar>();
+
+        foreach(BattleChar pj in pjs)
         {
-            if (pj_on_battle.Contains(c))
+            PJS.Add(pj);
+        }
+        foreach(BattleChar enemy in enemies)
+        {
+            ENEMIES.Add(enemy);
+        }
+
+        foreach(BattleChar b in initiative)
+        {
+            switch (b)
             {
-                c.CreateContext(pj_on_battle.Cast<BattleChar>().ToList(), enemy_on_battle.Cast<BattleChar>().ToList());
-            }
-            if (enemy_on_battle.Contains(c))
-            {
-                c.CreateContext(enemy_on_battle.Cast<BattleChar>().ToList(), pj_on_battle.Cast<BattleChar>().ToList());
+                case PjController pj:
+                    pj.CreateContext(PJS, ENEMIES);
+                    break;
+                case EnemyController enemy:
+                    enemy.CreateContext(ENEMIES, PJS);
+                    break;
             }
         }
     }

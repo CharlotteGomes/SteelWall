@@ -42,17 +42,21 @@ public class EnemyController : BattleChar
         start_turn?.Invoke(this);
         step = TurnStep.ChooseSkill;
 
-        while(step != TurnStep.Finish)
+        if(behaviour_index > behaviourSO.behaviour.Count - 1) { behaviour_index = 0; }
+
+        while (step != TurnStep.Finish)
         {
             switch (step)
             {
                 case TurnStep.ChooseSkill:
                     ChoosingSkill();
+                    yield return null;
                     break;
 
                 case TurnStep.ChooseTarget:
                     {
                         ChoosingTarget();
+                        yield return null;
                         break;
                     }
 
@@ -63,7 +67,6 @@ public class EnemyController : BattleChar
                     step = TurnStep.Finish;
                     break;
             }
-            yield return null;
         }
     }
 
@@ -79,36 +82,30 @@ public class EnemyController : BattleChar
                             break;
                         }
                     }*/
-        skill_current = new SkillData(behaviourSO.behaviour[behaviour_index]); step = TurnStep.ChooseTarget;
+        skill_current = behaviourSO.behaviour[behaviour_index]; step = TurnStep.ChooseTarget;
     }
 
     void ChoosingTarget()
     {
-        /*switch (skill_current.skill.target)
+        switch(skill_current.target)
         {
             case TypeTarget.Self:
-                ctx.Target = ctx.Self; break;
-
-            case TypeTarget.EnemyTarget:
-                int e_rand = Random.Range(0, ctx.Enemies.Count);
-                ctx.Target = ctx.Enemies[e_rand]; break;
-
-            case TypeTarget.PartyTarget:
-                int p_rand = Random.Range(0, ctx.Party.Count);
-                ctx.Target = ctx.Party[p_rand]; break;
-
-            case TypeTarget.OtherParty:
-                List<BattleChar> p = ctx.Party.Where(n => n != this).ToList();
-                if (p.Count == 0)
-                {
-                    behaviour_index++;
-                    ctx.Target = null;
-                    step = TurnStep.ChooseSkill; break;
-                }
-                int op_rand = Random.Range(0, p.Count);
-                ctx.Target = p[op_rand]; break;
+                ctx.Target = ctx.Self;
+                break;
+            case TypeTarget.Enemy:
+                ctx.Target = ctx.RandomChar(ctx.Enemies, skill_current.pos);
+                break;
+            case TypeTarget.Party:
+                ctx.Target = ctx.RandomChar(ctx.Party, skill_current.pos);
+                break;
+            case TypeTarget.ChooseEnemy:
+                ctx.Target = ctx.RandomChar(ctx.Enemies, skill_current.pos);
+                break;
+            case TypeTarget.ChooseParty:
+                ctx.Target = ctx.RandomChar(ctx.Party, skill_current.pos);
+                break;
         }
-        step = TurnStep.ExecutingSkill;*/
+        step = TurnStep.ExecutingSkill;
     }
     #endregion
 }

@@ -1,3 +1,4 @@
+using Sirenix.OdinInspector;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -9,15 +10,16 @@ public class PjController : BattleChar
 {
     [SerializeField] List<SkillSO> test = new List<SkillSO>();
 
-    [SerializeField] protected List<SkillData> skills_unlocked = new List<SkillData>();
-    [SerializeField] protected List<SkillData> skills_equipped = new List<SkillData>();
-    [SerializeField] protected List<SkillData> weapon_skills = new List<SkillData>();
-    public IReadOnlyList<SkillData> read_skills => skills_equipped;
-    public IReadOnlyList<SkillData> read_weapon_skills => weapon_skills;
+    [SerializeField] protected List<SkillSO> skills_unlocked = new List<SkillSO>();
+    [SerializeField] protected List<SkillSO> skills_equipped = new List<SkillSO>();
+    //[SerializeField] protected List<SkillSO> weapon_skills = new List<SkillSO>();
+    public IReadOnlyList<SkillSO> read_skills => skills_equipped;
+    //public IReadOnlyList<SkillSO> read_weapon_skills => weapon_skills;
 
-    [SerializeField] BattleOptions battle_options;
-    [SerializeField] int option_index = 0;
-    [SerializeField] int skill_index = 0;
+    [ShowInInspector]
+    public int skill_index { get; private set; } = 0;
+    [ShowInInspector]
+    public int intent_index { get; private set; } = 0;
     private void Awake()
     {
         life_current = 1000;
@@ -150,26 +152,24 @@ public class PjController : BattleChar
     #region Skill Functions
     protected void ReduceCooldown()
     {
-        foreach (SkillData dt in skills_equipped)
+        foreach (SkillSO dt in skills_equipped)
         {
             dt.cooldown = Mathf.Clamp(dt.cooldown - 1, 0, 99);
         }
     }
 
-    public void AddSkill(SkillSO skill)
+    public void AddSkill(SkillSO data)
     {
-        SkillData data = new SkillData(skill);
-
+        if(skills_unlocked.Contains(data)) return;
         skills_unlocked.Add(data);
     }
 
-    public void EquipSkill(SkillData data)
+    public void EquipSkill(SkillSO data)
     {
         if (skills_equipped.Contains(data)) return;
-        data.cooldown = 0;
         skills_equipped.Add(data);
     }
-    public void UnequipSkill(SkillData data)
+    public void UnequipSkill(SkillSO data)
     {
         if (!skills_equipped.Contains(data)) return;
         skills_equipped.Remove(data);
@@ -182,54 +182,59 @@ public class PjController : BattleChar
     public override IEnumerator OnGoingTurn()
     {
         start_turn?.Invoke(this);
-        step = TurnStep.ChooseAction;
-        option_index = 0;
-        battle_options = 0;
-        while(step != TurnStep.Finish)
+        step = TurnStep.ChooseSkill;
+        intent_index = 0;
+        skill_index = 0;
+        skill_current = skills_equipped[skill_index];
+        while (step != TurnStep.Finish)
         {
             switch(step)
             {
-                case TurnStep.ChooseAction:
-                    ChoosingAction();
-                    break;
-
                 case TurnStep.ChooseSkill:
                     ChoosingSkill();
+                    yield return null;
                     break;
 
-            }
-            yield return null;
-        }
-    }
+                case TurnStep.ChooseTarget:
+                    ChoosingTarget();
+                    yield return null;
+                    break;
 
-    void ChoosingAction()
-    {
-        InputManager.GetInputs();
-        option_index = Mathf.Clamp(option_index + InputManager.hud_horizontal, 0, Enum.GetValues(typeof(BattleOptions)).Length - 1);
-        battle_options = (BattleOptions)option_index;
-        if (InputManager.interact) { SelectOption(battle_options); }
+                case TurnStep.ExecutingSkill:
+                    yield return StartCoroutine(StartSkill());
+                    end_turn?.Invoke(this);
+                    step = TurnStep.Finish;
+                    break;
+            }
+            
+        }
     }
 
     void ChoosingSkill()
     {
         InputManager.GetInputs();
-        switch (battle_options)
+        if (InputManager.hud_horizontal != 0)
         {
-            case BattleOptions.Attack:
-                skill_index = Mathf.Clamp(skill_index + InputManager.hud_horizontal, 0, weapon_skills.Count - 1);
-                skill_current = weapon_skills[skill_index]; break;
-
-            case BattleOptions.Skill:
-                skill_index = Mathf.Clamp(skill_index + InputManager.hud_horizontal, 0, skills_equipped.Count - 1);
-                skill_current = skills_equipped[skill_index]; break;
+            skill_index = Mathf.Clamp(skill_index + InputManager.hud_horizontal, 0, skills_equipped.Count - 1);
+            skill_current = skills_equipped[skill_index];
         }
         if (InputManager.interact && skill_current != null) { step = TurnStep.ChooseTarget; }
-        if (InputManager.esc) { skill_index = 0; step = TurnStep.ChooseAction; }
     }
 
-    private void SelectOption(BattleOptions bp)
+    void ChoosingTarget()
     {
-        step = TurnStep.ChooseSkill;
+        InputManager.GetInputs();
+        if(skill_current.target == TypeTarget.Self) { ctx.Target = ctx.Self; step = TurnStep.ExecutingSkill; return; }
+        if(skill_current.target == TypeTarget.Enemy || skill_current.target == TypeTarget.Party)
+        {
+            ctx.Target = ctx.GetListChar(skill_current.target)[skill_current.pos[0]]; step = TurnStep.ExecutingSkill; return;
+        }
+        if (InputManager.hud_horizontal != 0)
+        {
+            intent_index = Mathf.Clamp(intent_index + InputManager.hud_horizontal, 0, skill_current.pos.Length - 1);
+            ctx.Target = ctx.GetListChar(skill_current.target)[skill_current.pos[intent_index]];
+        }
+        if (InputManager.interact && skill_current != null) { step = TurnStep.ExecutingSkill; }
     }
     #endregion
 }

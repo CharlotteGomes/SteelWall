@@ -9,17 +9,17 @@ using UnityEditor.Playables;
 using UnityEditor.UI;
 using Unity.VisualScripting;
 
-public enum BattleOptions 
+/*public enum BattleOptions 
 { 
     Attack = 0,
     Skill = 1,
-}
+}*/
 public abstract class BattleChar : MonoBehaviour
 {
     [Header("BattleInfo")]
     [SerializeField] protected BattleCharSO battle_char;
     [SerializeField] protected BattleContext ctx;
-    [SerializeField] protected SkillData skill_current;
+    [SerializeField] protected SkillSO skill_current;
     [SerializeField] protected TurnStep step;
     public CharacterSpriteSO spriteSO { get; private set; }
     
@@ -196,7 +196,7 @@ public abstract class BattleChar : MonoBehaviour
     public virtual IEnumerator OnGoingSkill()
     {
         List<BattleChar> Targets = new();
-        switch (skill_current.skill.target)
+        switch (skill_current.target)
         {
             case TypeTarget.ChooseParty:
                 Targets.Add(ctx.Target);break;
@@ -205,25 +205,25 @@ public abstract class BattleChar : MonoBehaviour
                 Targets.Add(ctx.Target);break;
 
             case TypeTarget.Enemy:
-                foreach(int i in skill_current.skill.pos)
+                foreach(int i in skill_current.pos)
                 {
                     Targets.Add(ctx.Enemies[i]);
                 }break;
             case TypeTarget.Party:
-                foreach (int i in skill_current.skill.pos)
+                foreach (int i in skill_current.pos)
                 {
                     Targets.Add(ctx.Party[i]);
                 }
                 break;
         }
-        Debug.Log($"{ctx.Self.name} {Targets.Count} {skill_current.skill.name}");
-        StartCoroutine(GM.instance.battle_manager.battle_presentation.StartPresentation(ctx.Self, Targets, skill_current.skill.presentation));
+        Debug.Log($"{ctx.Self.name} {Targets.Count} {skill_current.name}");
+        StartCoroutine(GM.instance.battle_manager.battle_presentation.StartPresentation(ctx.Self, Targets, skill_current.presentation));
         yield return StartCoroutine(FinishingSkill());
     }
 
     public virtual IEnumerator FinishingSkill()
     {
-        skill_current.skill.Execute(ctx);
+        skill_current.Execute(ctx);
         yield return null;
     }
     #endregion
