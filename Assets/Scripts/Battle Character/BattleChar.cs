@@ -23,6 +23,7 @@ public abstract class BattleChar : MonoBehaviour
     [SerializeField] protected int life_current;
     [SerializeField] protected BattleCharSO battle_char;
     [SerializeField] protected BattleContext ctx;
+    public BattleContext Context => ctx;
     [SerializeField] protected SkillSO skill_current;
     [SerializeField] protected List<StatusEffectData> StatusEffect = new();
     [SerializeField] protected TurnStep step;
@@ -95,7 +96,7 @@ public abstract class BattleChar : MonoBehaviour
         info.damageType.OnDamageTaken(info);
         if(info.damage>= 0)
         {
-            life_current -= (int)Mathf.Clamp(info.damage, 0, Mathf.Infinity);
+            life_current = (int)Mathf.Clamp(life_current - info.damage, 0, Mathf.Infinity);
         }
     }
 
@@ -116,7 +117,7 @@ public abstract class BattleChar : MonoBehaviour
         OnHealReceived(info);
         if(info.heal_amount >= 0)
         {
-            life_current += (int)Mathf.Clamp(info.heal_amount, 0, life_max);
+            life_current = (int)Mathf.Clamp(life_current + info.heal_amount, 0, life_max);
         }
     }
 
@@ -287,9 +288,14 @@ public abstract class BattleChar : MonoBehaviour
         ctx.Enemies = enemies;
     }
 
-    public void SetTarget(BattleChar target)
+    public void SetTarget(int pos, List<BattleChar> list)
     {
-        ctx.Target.Add(target);
+        if(pos > list.Count - 1)
+        {
+            Debug.LogError("Target position is out of range");
+            return;
+        }
+        ctx.Target.Add(list[pos]);
     }
 
     public virtual void SetRound()

@@ -117,14 +117,14 @@ public class PjController : BattleChar
             {
                 foreach(int p in skill_current.pos)
                 {
-                    if(p < ctx.Enemies.Count) SetTarget(ctx.Enemies[p]);
+                    if(p < ctx.Enemies.Count) SetTarget(p, ctx.Enemies);
                 }
                 step = TurnStep.ExecutingSkill; return;
             }
 
             foreach(int p in skill_current.pos)
             {
-                if (p < ctx.Party.Count) SetTarget(ctx.Party[p]);
+                if (p < ctx.Party.Count) SetTarget(p, ctx.Party);
             }
             step = TurnStep.ExecutingSkill; return;
         }
@@ -136,12 +136,12 @@ public class PjController : BattleChar
         {
             intent_index = Mathf.Clamp(intent_index + InputManager.hud_horizontal, 0, ctx.Enemies.Count - 1);
             ctx.Target.Clear();
-            SetTarget(ctx.Enemies[intent_index]);
+            SetTarget(intent_index, ctx.Enemies);
             return;
         }
             intent_index = Mathf.Clamp(intent_index + InputManager.hud_horizontal, 0, ctx.Party.Count - 1);
             ctx.Target.Clear();
-            SetTarget(ctx.Party[intent_index]);
+            SetTarget(intent_index, ctx.Party);
         
     }
     public override void SetRound()

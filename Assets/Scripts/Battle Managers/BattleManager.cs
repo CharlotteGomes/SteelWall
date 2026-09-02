@@ -57,7 +57,7 @@ public class BattleManager : MonoBehaviour
         {
             yield return new WaitForSeconds(1f);
             current = initiative[initiative_index];
-            if (!current.CheckAlive()) { InitiativeRemove(current); current = null; continue; }
+            if (!current.CheckAlive()) { StartCoroutine(CharacterDeath(current)); current = null; continue; }
             yield return StartCoroutine(current.OnGoingTurn());
             initiative_index++;
             if (initiative_index > initiative.Count - 1) { initiative_index = 0; turn++; }
@@ -135,11 +135,29 @@ public class BattleManager : MonoBehaviour
         if (initiative.Contains(b)) { initiative.Remove(b); }
     }
 
+    void UpdateContext(BattleContext ctx)
+    {
+        foreach(BattleChar b in ctx.Enemies)
+        {
+            if (!initiative.Contains(b)) { ctx.Enemies.Remove(b); }
+            
+        }
+
+        foreach(BattleChar b in ctx.Party)
+        {
+            if (!initiative.Contains(b)) { ctx.Party.Remove(b); }
+            
+        }
+    }
+
     IEnumerator CharacterDeath(BattleChar b)
     {
         b.OnCharacterDeath();
         InitiativeRemove(b);
-
+        foreach(BattleChar c in initiative)
+        {
+            UpdateContext(c.Context);
+        }
         yield return null;
     }
 

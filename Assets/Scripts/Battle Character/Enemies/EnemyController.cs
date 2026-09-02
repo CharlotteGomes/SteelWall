@@ -90,15 +90,17 @@ public class EnemyController : BattleChar
             {
                 foreach (int p in skill_current.pos)
                 {
-                    if(p < ctx.Enemies.Count) SetTarget(ctx.Enemies[p]);
+                    if(p < ctx.Enemies.Count) SetTarget(p, ctx.Enemies);
                 }
+                if (ctx.Target.Count == 0) { behaviour_index++; step = TurnStep.ChooseSkill; return; }
                 step = TurnStep.ExecutingSkill; return;
             }
 
             foreach (int p in skill_current.pos)
             {
-                if(p < ctx.Party.Count) SetTarget(ctx.Party[p]);
+                if (p < ctx.Party.Count) SetTarget(p, ctx.Party);
             }
+            if (ctx.Target.Count == 0) { behaviour_index++; step = TurnStep.ChooseSkill; return; }
             step = TurnStep.ExecutingSkill; return;
         }
 
@@ -109,9 +111,9 @@ public class EnemyController : BattleChar
             {
                 if(p < ctx.Enemies.Count) { elist.Add(ctx.Enemies[p]); }
             }
-            if(elist.Count <= 0) { step = TurnStep.ChooseSkill; behaviour_index++; return; }
-            int erand = Random.Range(0, elist.Count); 
-            ctx.Target.Add(ctx.Enemies[erand]);
+            int erand = Random.Range(0, elist.Count);
+            SetTarget(erand, ctx.Enemies);
+            if (ctx.Target.Count == 0) { behaviour_index++; step = TurnStep.ChooseSkill; return; }
             step = TurnStep.ExecutingSkill; return;
         }
 
@@ -120,9 +122,9 @@ public class EnemyController : BattleChar
         {
             if (p < ctx.Party.Count) { list.Add(ctx.Party[p]); }
         }
-        if (list.Count <= 0) { step = TurnStep.ChooseSkill; behaviour_index++; return; }
         int rand = Random.Range(0, list.Count);
-        ctx.Target.Add(ctx.Party[rand]);
+        SetTarget(rand, ctx.Party);
+        if(ctx.Target.Count == 0) { behaviour_index++; step = TurnStep.ChooseSkill; return; }
         step = TurnStep.ExecutingSkill;
     }
     #endregion
@@ -130,7 +132,6 @@ public class EnemyController : BattleChar
     public override void SetRound()
     {
         base.SetRound();
-        behaviour_index = 0;
         step = TurnStep.ChooseSkill;
     }
 }

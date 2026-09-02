@@ -15,11 +15,9 @@ MonoBehaviour:
   Name: 
   Description: 
   spr: {fileID: 0}
-  cooldown: 0
-  cost: 0
-  target: 3
+  affect_enemy: 0
+  chose: 0
   pos: 0000000001000000
   effects:
   - {fileID: 11400000, guid: 1f0fb7ca2bffd7344b95a83b8d3fef70, type: 2}
-  self_effects: []
   presentation: {fileID: 11400000, guid: 1c5cd7816f2c9924a8d39ceee50a2223, type: 2}
