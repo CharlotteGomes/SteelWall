@@ -10,16 +10,14 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 45d7d4bb2d4ace2438d3b000cc197d4e, type: 3}
-  m_Name: SkillSO 1
+  m_Name: Auto Cuidado
   m_EditorClassIdentifier: Assembly-CSharp::SkillSO
-  Name: 
+  Name: Auto Cuidado
   Description: 
   spr: {fileID: 0}
-  cooldown: 0
-  cost: 0
-  target: 1
-  pos: 0000000002000000
+  affect_enemy: 0
+  chose: 0
+  pos: 0000000001000000
   effects:
-  - {fileID: 11400000, guid: 1f0fb7ca2bffd7344b95a83b8d3fef70, type: 2}
-  self_effects: []
+  - {fileID: 11400000, guid: cd55f6db4e67bf24f961e0cb4e875dc7, type: 2}
   presentation: {fileID: 11400000, guid: 1c5cd7816f2c9924a8d39ceee50a2223, type: 2}

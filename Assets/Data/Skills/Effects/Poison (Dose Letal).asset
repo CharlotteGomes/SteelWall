@@ -9,8 +9,10 @@ MonoBehaviour:
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 70f03a3c0e9c7ef4ebfabc26c95b6848, type: 3}
-  m_Name: Damage Effect
-  m_EditorClassIdentifier: Assembly-CSharp::DamageTarget
-  type: {fileID: 11400000, guid: f1808f590117e4a4085bd31a36857bff, type: 2}
-  damage: 2
+  m_Script: {fileID: 11500000, guid: 2619762d4aa2716418a06c2283fc2c57, type: 3}
+  m_Name: Poison (Dose Letal)
+  m_EditorClassIdentifier: Assembly-CSharp::PoisonEffectSO
+  sfSO: {fileID: 0}
+  stacks: 3
+  timeRemaining: 0
+  tier: 2

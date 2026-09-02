@@ -50,12 +50,14 @@ public class BattleManager : MonoBehaviour
         initiative_index = 0;
         StartCoroutine(TurnOrder());
     }
-
+    
     IEnumerator TurnOrder()
     {
         while (true)
         {
+            yield return new WaitForSeconds(1f);
             current = initiative[initiative_index];
+            if (!current.CheckAlive()) { InitiativeRemove(current); current = null; continue; }
             yield return StartCoroutine(current.OnGoingTurn());
             initiative_index++;
             if (initiative_index > initiative.Count - 1) { initiative_index = 0; turn++; }
@@ -131,5 +133,18 @@ public class BattleManager : MonoBehaviour
     void InitiativeRemove(BattleChar b)
     {
         if (initiative.Contains(b)) { initiative.Remove(b); }
+    }
+
+    IEnumerator CharacterDeath(BattleChar b)
+    {
+        b.OnCharacterDeath();
+        InitiativeRemove(b);
+
+        yield return null;
+    }
+
+    void UpdatePos()
+    {
+
     }
 }

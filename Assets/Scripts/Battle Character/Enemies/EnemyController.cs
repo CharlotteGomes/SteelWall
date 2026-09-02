@@ -90,14 +90,14 @@ public class EnemyController : BattleChar
             {
                 foreach (int p in skill_current.pos)
                 {
-                    SetTarget(ctx.Enemies[p]);
+                    if(p < ctx.Enemies.Count) SetTarget(ctx.Enemies[p]);
                 }
                 step = TurnStep.ExecutingSkill; return;
             }
 
             foreach (int p in skill_current.pos)
             {
-                SetTarget(ctx.Party[p]);
+                if(p < ctx.Party.Count) SetTarget(ctx.Party[p]);
             }
             step = TurnStep.ExecutingSkill; return;
         }

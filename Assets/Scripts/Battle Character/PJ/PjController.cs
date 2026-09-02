@@ -17,7 +17,8 @@ public class PjController : BattleChar
     public int intent_index { get; private set; } = 0;
     private void Awake()
     {
-        life_current = 1000;
+        life_max = 1;
+        life_current = 1;
     }
 
     void Start()
@@ -27,9 +28,6 @@ public class PjController : BattleChar
             AddSkill(wo);
         }
         skills_equipped = skills_unlocked;
-        StatusEffectSO so = ScriptableObject.CreateInstance<StatusEffectSO>();
-        so.stacks = 10;
-        ApplyStatus(new PoisonEffect(this, this, so, 1));
     }
 
     // Update is called once per frame
@@ -119,14 +117,14 @@ public class PjController : BattleChar
             {
                 foreach(int p in skill_current.pos)
                 {
-                    SetTarget(ctx.Enemies[p]);
+                    if(p < ctx.Enemies.Count) SetTarget(ctx.Enemies[p]);
                 }
                 step = TurnStep.ExecutingSkill; return;
             }
 
             foreach(int p in skill_current.pos)
             {
-                SetTarget(ctx.Party[p]);
+                if (p < ctx.Party.Count) SetTarget(ctx.Party[p]);
             }
             step = TurnStep.ExecutingSkill; return;
         }

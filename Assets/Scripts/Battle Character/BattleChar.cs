@@ -79,9 +79,9 @@ public abstract class BattleChar : MonoBehaviour
     {
         foreach(ResistenseData dt in battle_char.Resists)
         {
-            if(dt.resistence_type == info.damageType)
+            if (dt.resistence_type == info.damageType)
             {
-                info.damage = info.damage * (1 - dt.value);
+                info.damage = Mathf.Clamp(info.damage * (1 - dt.value), 0, Mathf.Infinity);
                 Debug.Log(info.damage);
             }
         }
@@ -89,25 +89,88 @@ public abstract class BattleChar : MonoBehaviour
 
     public void TakeDamage(DamageInfo info)
     {
-        //ApplyResistences(info);
+        Debug.Log($"{info.receiver.battle_char.name} took {info.damage} damage from {info.dealer.battle_char.name}");
+        ApplyResistences(info);
         OnDamageTaken(info);
         info.damageType.OnDamageTaken(info);
-        if(info.damage> 0)
+        if(info.damage>= 0)
         {
-            life_current -= (int)info.damage;
+            life_current -= (int)Mathf.Clamp(info.damage, 0, Mathf.Infinity);
         }
     }
 
     public void DealDamage(DamageInfo info)
     {
+        Debug.Log($"{info.dealer.battle_char.name} dealt {info.damage} damage to {info.receiver.battle_char.name}");
         OnDamageDealt(info);
-        //info.damageType.OnDamageDealt(info);    
-        if(info.damage > 0)
+        info.damageType.OnDamageDealt(info);    
+        if(info.damage >= 0)
         {
             info.receiver.TakeDamage(info);
         }
     }
 
+    public void ReceiveHeal(HealInfo info)
+    {
+        Debug.Log($"{info.target.battle_char.name} received {info.heal_amount} healing from {info.healer.battle_char.name}");
+        OnHealReceived(info);
+        if(info.heal_amount >= 0)
+        {
+            life_current += (int)Mathf.Clamp(info.heal_amount, 0, life_max);
+        }
+    }
+
+    public void DealHeal(HealInfo info)
+    {
+        Debug.Log($"{info.healer.battle_char.name} healed {info.target.battle_char.name} for {info.heal_amount}");
+        OnHealGiven(info);
+        if(info.heal_amount >= 0)
+        {
+            info.target.ReceiveHeal(info);
+        }
+    }
+
+    public void GiveStatus(StatusEffectData data)
+    {
+        OnGiveStatus(data);
+        data.OnApply();
+        data.source = this;
+        data.owner.ReceiveStatus(data);
+    }
+
+    public void ReceiveStatus(StatusEffectData data)
+    {
+        OnReceiveStatus(data);
+        foreach (StatusEffectData dt in StatusEffect)
+        {
+            if (data.effectName == dt.effectName)
+            {
+                int amount = data.stacks > dt.stacks ? data.stacks : dt.stacks;
+                dt.stacks = amount;
+                continue;
+            }
+        }
+        StatusEffect.Add(data);
+        data.OnApply();
+    }
+
+    public void StatusRemove(StatusEffectData status)
+    {
+        if (StatusEffect.Contains(status))
+        {
+            StatusEffect.Remove(status);
+            status.OnRemove();
+        }
+        OnStatusRemoved(status);
+    }
+
+    public bool CheckAlive()
+    {
+        return life_current <= 0 ? false : true;
+    }
+    #endregion
+
+    #region Turn Events
     public void OnStartTurn()
     {
         foreach(StatusEffectData status in StatusEffect)
@@ -126,7 +189,6 @@ public abstract class BattleChar : MonoBehaviour
 
     public void OnDamageDealt(DamageInfo info)
     {
-        Debug.Log($"{this.name} deu {info.damage} de dano base em {info.receiver.name} | Procurando por passivas para aumentar o dano");
         foreach (StatusEffectData status in StatusEffect)
         {
             status.OnDamageDealt(info);
@@ -135,12 +197,10 @@ public abstract class BattleChar : MonoBehaviour
 
     public void OnDamageTaken(DamageInfo info)
     {
-        Debug.Log($"{this.name} recebeu {info.damage} de dano pós melhorias de {info.dealer.name} | Procurando por passivas para reduzir o dano");
         foreach (StatusEffectData status in StatusEffect)
         {
             status.OnDamageTaken(info);
         }
-        Debug.Log($"{this.name} recebeu {info.damage} de dano final de {info.dealer.name}");
     }
 
     public void OnHealGiven(HealInfo info)
@@ -164,13 +224,22 @@ public abstract class BattleChar : MonoBehaviour
             status.OnHealReceived(info);
         }
     }
-    public void OnStatusApplied(StatusEffectData status)
+    public void OnReceiveStatus(StatusEffectData status)
     {
         foreach(StatusEffectData s in StatusEffect)
         {
-            s.OnStatusApplied(status.sfSO);
+            s.OnReceiveStatus(status.sfSO);
         }
     }
+
+    public void OnGiveStatus(StatusEffectData status)
+    {
+        foreach(StatusEffectData s in StatusEffect)
+        {
+            s.OnGiveStatus(status.sfSO);
+        }
+    }   
+
     public void OnStatusRemoved(StatusEffectData status)
     {
         foreach(StatusEffectData s in StatusEffect)
@@ -179,31 +248,14 @@ public abstract class BattleChar : MonoBehaviour
         }
     }
 
-    public void ApplyStatus(StatusEffectData data)
-    {
-        OnStatusApplied(data);
-        foreach (StatusEffectData dt in data.owner.status_effects)
+    public void OnCharacterDeath() {
+        foreach(StatusEffectData status in StatusEffect)
         {
-            if (data.effectName == dt.effectName)
-            {
-                int amount = data.stacks > dt.stacks ? data.stacks : dt.stacks;
-                dt.stacks = amount;
-                continue;
-            }
+            status.OnCharacterDeath();
         }
-        StatusEffect.Add(data);
-    }
-
-    public void StatusRemove(StatusEffectData status)
-    {
-        if (StatusEffect.Contains(status))
-        {
-            StatusEffect.Remove(status);
-            status.OnRemove();
-        }
-        OnStatusRemoved(status);
     }
     #endregion
+
 
     #region Skill functions
     public virtual IEnumerator StartSkill()

@@ -27,6 +27,9 @@ public class StatusEffectData
     public virtual void OnDamageTaken(DamageInfo info) { }
     public virtual void OnHealGiven(HealInfo info) { }
     public virtual void OnHealReceived(HealInfo info) { }
-    public virtual void OnStatusApplied(StatusEffectSO status) { }
+    public virtual void OnGiveStatus(StatusEffectSO status) { }
+    public virtual void OnReceiveStatus(StatusEffectSO status) { }  
     public virtual void OnStatusRemoved(StatusEffectSO status) { }
+
+    public virtual void OnCharacterDeath() { }
 }
