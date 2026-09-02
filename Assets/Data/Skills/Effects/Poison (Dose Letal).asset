@@ -12,7 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2619762d4aa2716418a06c2283fc2c57, type: 3}
   m_Name: Poison (Dose Letal)
   m_EditorClassIdentifier: Assembly-CSharp::PoisonEffectSO
-  sfSO: {fileID: 0}
+  sfSO: {fileID: 11400000, guid: 88040aa66ac690c4ba39150fe9c6074c, type: 2}
   stacks: 3
   timeRemaining: 0
   tier: 2

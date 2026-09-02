@@ -145,6 +145,5 @@ public class BattleManager : MonoBehaviour
 
     void UpdatePos()
     {
-
     }
 }
