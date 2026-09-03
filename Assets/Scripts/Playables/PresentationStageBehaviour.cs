@@ -1,14 +1,13 @@
 using UnityEngine;
 using UnityEngine.Playables;
-
+using System.Collections.Generic;
 // A behaviour that is attached to a playable
-public class PatternPlayable : PlayableBehaviour
+public class PresentationStageBehaviour : PlayableBehaviour
 {
-    public float start_time = 0;
-
+    public List<double> startTimes = new();
     public override void OnGraphStart(Playable playable)
     {
-        playable.SetDuration(playable.GetDuration() + start_time);    
+        
     }
 
     // Called when the owning graph stops playing
@@ -32,10 +31,38 @@ public class PatternPlayable : PlayableBehaviour
     // Called each frame while the state is set to Play
     public override void PrepareFrame(Playable playable, FrameData info)
     {
-       
+        
     }
 
     public override void ProcessFrame(Playable playable, FrameData info, object playerData)
     {
+        double stageTime = playable.GetTime();
+        for (int i = 0; i < playable.GetInputCount(); i++)
+        {
+            var input = playable.GetInput(i);
+
+            double start = startTimes[i];
+            double duration = input.GetDuration();
+
+            double end = start + duration;
+
+            if (stageTime < start)
+            {
+                input.Pause();
+                continue;
+            }
+
+            if (stageTime >= end)
+            {
+                input.Pause();
+                continue;
+            }
+
+            // Está executando
+            input.Play();
+
+            playable.SetInputWeight(i, 1);
+        }
     }
 }
+

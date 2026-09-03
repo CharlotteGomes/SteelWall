@@ -2,7 +2,7 @@ using UnityEngine;
 using UnityEngine.Playables;
 
 // A behaviour that is attached to a playable
-public class CameraZoomBehaviour : PatternPlayable
+public class CameraZoomBehaviour : PlayableBehaviour
 {
     public Camera cam;
     public float start_size = 0;
@@ -10,7 +10,7 @@ public class CameraZoomBehaviour : PatternPlayable
     public float start_progress = 0;
     public override void OnGraphStart(Playable playable)
     {
-        base.OnGraphStart(playable);
+ 
     }
 
     // Called when the owning graph stops playing
@@ -38,8 +38,7 @@ public class CameraZoomBehaviour : PatternPlayable
 
     public override void ProcessFrame(Playable playable, FrameData info, object playerData)
     {
-        if (playable.GetTime() < start_time) { return; }
-        float t = (float)((playable.GetTime() - start_time) / playable.GetDuration());
+        float t = (float)((playable.GetTime()) / playable.GetDuration());
         float progress = Mathf.Lerp(start_progress, 1f, t);
         cam.orthographicSize = Mathf.Lerp(start_size, end_size, progress);
     }

@@ -9,88 +9,43 @@ public class BattlePresentation : MonoBehaviour
 {
     PlayableGraph graph;
     [SerializeField] Camera cam;
-    public IEnumerator StartPresentation(BattleChar User, List<BattleChar> Targets, PresentationSO so)
+    [SerializeField] BattleChar test_attacker;
+    [SerializeField] BattleChar[] test_defender;
+    public IEnumerator StartPresentation()
     {
         yield return null;
-        graph = PlayableGraph.Create();
 
         graph.Play();
         //yield return new WaitForSeconds((float)mixer.GetDuration());
-        //IDEIA: FAZER UM VOID QUE ACEITA 3 MIXERS, UM SENDO OPCIONAL, DEPOIS ELE MONTA A TIMELINE E RODA
+        
         if (graph.IsValid())
         {
             graph.Destroy();
         }
     }
-    /*
-    ScriptPlayable<PlayableMixerBehaviour> FirstAct(PresentationSO so)
+
+    public void CreateGraph() 
     {
-        int i = 0;
-        List<Playable> bh = new List<Playable>();
-        List<double> delays = new List<double>();
-        Transform user_tf = User.GetComponent<Transform>();
-        SpriteRenderer user_sr = User.GetComponent<SpriteRenderer>();
-        bh.Add(CreateMove(2, user_tf, so.self_start_pos, so.self_end_pos));
-        bh.Add(CreateFacing(2, user_tf, 1.5f));
-        bh.Add(CreateSprite(user_sr, user_spr));
-        delays.Add(0);
-        delays.Add(0);
-        delays.Add(0);
-        foreach (BattleChar ch in Targets)
-        {
-            Transform tf = ch.GetComponent<Transform>();
-            SpriteRenderer sprRender = ch.GetComponent<SpriteRenderer>();
-            Vector2 start = tf.localPosition;
-            Vector2 end = so.targets_end_pos;
-            bh.Add(CreateMove(2, tf, start, end));
-            bh.Add(CreateFacing(2, tf, 1.5f));
-            bh.Add(CreateSprite(sprRender, target_spr[0]));
-            delays.Add(0);
-            delays.Add(0);
-            delays.Add(0);
-            i++;
-        }
-        bh.Add(CreateZoom(.1f, 7f, 5.3f, 0.33f));
-        bh.Add(CreateRotate(2f, 0, 5, 0.33f));
-        bh.Add(SecondAct(so));
-        delays.Add(0);
-        delays.Add(0);
-        delays.Add(2);
-        var mixer = CreateMixer(bh, delays, bh.Count);
-        var output = ScriptPlayableOutput.Create(graph, "first");
-        output.SetSourcePlayable(mixer);
-        return mixer;
+        if(graph.IsValid()) graph.Destroy();
+        graph = PlayableGraph.Create();
     }
 
-    ScriptPlayable<PlayableMixerBehaviour> SecondAct(PresentationSO so)
+    public ScriptPlayable<PresentationStageBehaviour> SetStageAsBehaviour(PresentationStage stage)
     {
-        int i = 0;
-        List<Playable> bh = new List<Playable>();
-        List<double> delays = new List<double>();
-        Transform user_tf = User.GetComponent<Transform>();
-        SpriteRenderer user_sr = User.GetComponent<SpriteRenderer>();
-        bh.Add(CreateReturn(0.3f, 1.5f, user_tf.transform.localPosition, user_tf));
-        bh.Add(CreateSprite(user_sr, User.spriteSO.idle));
-        delays.Add(0);
-        delays.Add(0.4f);
-
-        foreach (BattleChar ch in Targets)
+        var playable = ScriptPlayable<PresentationStageBehaviour>.Create(graph, stage.containers.Count);
+        var behaviour = playable.GetBehaviour();
+        double duration = Mathf.Infinity;
+       for(int i = 0; i < stage.containers.Count; i++)
         {
-            Transform tf = ch.GetComponent<Transform>();
-            SpriteRenderer sprRender = ch.GetComponent<SpriteRenderer>();
-            bh.Add(CreateSprite(sprRender, Targets[i].spriteSO.idle));
-            delays.Add(0.4f);
-            bh.Add(CreateReturn(0.3f, 1.5f, tf.transform.localPosition, tf));
-            delays.Add(0f);
-            i++;
+            graph.Connect(stage.containers[i].playable, 0, playable, i);
+            behaviour.startTimes.Add(stage.containers[i].start_time);
+            duration = duration > stage.containers[i].end_time ? duration : stage.containers[i].end_time;
         }
-        bh.Add(CreateZoom(0.5f, 5.3f, 7f));
-        bh.Add(CreateRotate(0.5f, 5, 0));
-        delays.Add(0);
-        delays.Add(0);
-        return CreateMixer(bh, delays, bh.Count);
+       playable.SetDuration(duration);
+        return playable;
     }
-    */
+
+    #region Creates
     public ScriptPlayable<CharacterFacingBehaviour> CreateFacing(float duration, Transform tf)
     {
         var playable = ScriptPlayable<CharacterFacingBehaviour>.Create(graph);
@@ -101,7 +56,7 @@ public class BattlePresentation : MonoBehaviour
         return playable;
     }
 
-    public ScriptPlayable<CharacterMoveBehaviour> CreateMove(float duration, float delay, Transform tf, Vector2 start_pos, Vector2 target_pos)
+    public ScriptPlayable<CharacterMoveBehaviour> CreateMove(float duration, Transform tf, Vector2 start_pos, Vector2 target_pos)
     {
         var playable = ScriptPlayable<CharacterMoveBehaviour>.Create(graph);
         var behaviour = playable.GetBehaviour();
@@ -109,11 +64,10 @@ public class BattlePresentation : MonoBehaviour
         behaviour.start_pos = start_pos;
         behaviour.target_pos = target_pos;
         behaviour.tf = tf;
-        behaviour.start_time = delay;
         return playable;
     }
 
-    public ScriptPlayable<CameraZoomBehaviour> CreateZoom(float duration, float delay, float start_size, float end_size, float start_progress = 0)
+    public ScriptPlayable<CameraZoomBehaviour> CreateZoom(float duration, float start_size, float end_size, float start_progress = 0)
     {
         var playable = ScriptPlayable<CameraZoomBehaviour>.Create(graph);
         var behaviour = playable.GetBehaviour();
@@ -122,11 +76,10 @@ public class BattlePresentation : MonoBehaviour
         behaviour.start_size = start_size;
         behaviour.end_size = end_size;
         behaviour.start_progress = start_progress;
-        behaviour.start_time = delay;
         return playable;
     }
 
-    public ScriptPlayable<CameraRotateBehaviour> CreateRotate(float duration, float delay, float start_rotate, float end_rotate, float start_progress = 0) 
+    public ScriptPlayable<CameraRotateBehaviour> CreateRotate(float duration, float start_rotate, float end_rotate, float start_progress = 0) 
     {
         var playable = ScriptPlayable<CameraRotateBehaviour>.Create(graph);
         var behaviour = playable.GetBehaviour();
@@ -134,7 +87,6 @@ public class BattlePresentation : MonoBehaviour
         behaviour.cam = cam;
         behaviour.start_rotate = start_rotate;
         behaviour.end_rotate = end_rotate;
-        behaviour.start_time = delay;
         behaviour.start_progress = start_progress;
         return playable;
     }
@@ -148,21 +100,8 @@ public class BattlePresentation : MonoBehaviour
         behaviour.spr = spr;
         return playable;
     }
-    public ScriptPlayable<PlayableMixerBehaviour> CreateMixer(List<Playable> inputs, float delay)
-    {
-        var mixer = ScriptPlayable<PlayableMixerBehaviour>.Create(graph, inputs.Count);
-        var behaviour = mixer.GetBehaviour();
-        behaviour.start_time = delay;
-        float duration = Mathf.Infinity;
-        for (int i = 0; i < inputs.Count; i++)
-        {
-            var bh = ((ScriptPlayable<PatternPlayable>)inputs[i]).GetBehaviour();
-            duration = Mathf.Max(duration, (float)inputs[i].GetDuration() + bh.start_time);
-            graph.Connect(inputs[i], 0, mixer, i);
-        }
-        mixer.SetDuration(duration);
-        return mixer;
-    }
+
+    #endregion
 
     public Sprite SetSprites(PresentationSO so, BattleChar b)
     {
@@ -198,6 +137,19 @@ public class BattlePresentation : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
+        if (Input.GetKeyDown(KeyCode.Space))
+        {
+            CreateGraph();
+            var zoom = CreateZoom(3, 7, 1);
+            var rotate = CreateRotate(3, 0, 15, .33f);
+            PresentationStage stage = new PresentationStage(2);
+            stage.Add(zoom, 3);
+            stage.Add(rotate, 0);
+            var presentation = SetStageAsBehaviour(stage);
+            var output = ScriptPlayableOutput.Create(graph, "presentation");
+            output.SetSourcePlayable(presentation);
+            graph.Play();
+        }
     }
 
     private void OnDestroy()

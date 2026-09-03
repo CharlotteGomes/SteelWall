@@ -18,8 +18,12 @@ public class PjController : BattleChar
     protected override void Awake()
     {
         base.Awake();
-        life_max = 1;
-        life_current = 1;
+        life_max = 1000;
+        life_current = 1000;
+        /*StatusEffectSO pois = new StatusEffectSO();
+        pois.stacks = 3;
+        StatusEffectData instance = new PoisonEffect(this, this, pois, 3);
+        GiveStatus(instance);*/
     }
 
     void Start()

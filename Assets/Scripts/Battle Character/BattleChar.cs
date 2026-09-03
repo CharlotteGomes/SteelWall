@@ -265,7 +265,7 @@ public abstract class BattleChar : MonoBehaviour
 
     public virtual IEnumerator OnGoingSkill()
     {
-        yield return StartCoroutine(GM.instance.battle_manager.battle_presentation.StartPresentation(ctx.Self, ctx.Target, skill_current.presentation));
+        //yield return StartCoroutine(GM.instance.battle_manager.battle_presentation.StartPresentation(ctx.Self, ctx.Target, skill_current.presentation));
         yield return StartCoroutine(FinishingSkill());
     }
 

@@ -17,8 +17,6 @@ public class BattleManager : MonoBehaviour
     public BattlePresentation battle_presentation { get; private set; }
 
     [SerializeField] List<BattleChar> initiative = new List<BattleChar>();
-
-    [SerializeField] List<Transform> pj_spawn, enemy_spawn = new List<Transform>();
     [SerializeField] GameObject pj_prefab, enemy_prefab;
     [SerializeField] List<PJSO> test1 = new List<PJSO>();
     [SerializeField] List<EnemySO> test2 = new List<EnemySO>();
@@ -86,7 +84,7 @@ public class BattleManager : MonoBehaviour
 
         for(int i = 0; i < enemies.Count; i++)
         {
-            GameObject n = Instantiate(enemy_prefab, enemy_spawn[i]);
+            GameObject n = Instantiate(enemy_prefab);
             EnemyController ctrl = n.GetComponent<EnemyController>();
             enemy_slot[i] = ctrl;
             ctrl.sprite_renderer.flipX = true;

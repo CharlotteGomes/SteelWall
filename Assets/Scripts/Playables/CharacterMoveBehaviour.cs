@@ -2,7 +2,7 @@ using UnityEngine;
 using UnityEngine.Playables;
 
 // A behaviour that is attached to a playable
-public class CharacterMoveBehaviour : PatternPlayable
+public class CharacterMoveBehaviour : PlayableBehaviour
 {
     public Transform tf;
     public Vector2 start_pos;
@@ -31,7 +31,7 @@ public class CharacterMoveBehaviour : PatternPlayable
 
     public override void ProcessFrame(Playable playable, FrameData info, object playerData)
     {
-        if (playable.GetTime() < start_time) { return; }
+
         tf.localPosition = Vector2.SmoothDamp(tf.localPosition, target_pos, ref velocity, smooth_time);
     }
 

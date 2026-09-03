@@ -2,7 +2,7 @@ using UnityEngine;
 using UnityEngine.Playables;
 
 // A behaviour that is attached to a playable
-public class CharacterFacingBehaviour : PatternPlayable
+public class CharacterFacingBehaviour : PlayableBehaviour
 {
     public Camera cam;
     public Transform tf;
@@ -25,7 +25,6 @@ public class CharacterFacingBehaviour : PatternPlayable
 
     public override void ProcessFrame(Playable playable, FrameData info, object playerData)
     {
-        if (playable.GetTime() < start_time) { return; }
         float angle = cam.transform.eulerAngles.z;
         tf.localRotation = Quaternion.Euler(0, 0, angle);
     }
