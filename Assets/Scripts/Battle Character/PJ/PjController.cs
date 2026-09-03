@@ -15,8 +15,9 @@ public class PjController : BattleChar
 
     public int skill_index { get; private set; } = 0;
     public int intent_index { get; private set; } = 0;
-    private void Awake()
+    protected override void Awake()
     {
+        base.Awake();
         life_max = 1;
         life_current = 1;
     }
@@ -33,7 +34,6 @@ public class PjController : BattleChar
     // Update is called once per frame
     void Update()
     {
-        if (Input.GetKeyDown(KeyCode.H)) { StartCoroutine(OnGoingTurn()); }
     }
 
     #region Init

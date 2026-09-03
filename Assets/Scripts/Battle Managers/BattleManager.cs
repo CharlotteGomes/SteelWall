@@ -23,6 +23,10 @@ public class BattleManager : MonoBehaviour
     [SerializeField] List<PJSO> test1 = new List<PJSO>();
     [SerializeField] List<EnemySO> test2 = new List<EnemySO>();
 
+    [SerializeField] BattleChar[] pj_slot = new BattleChar[4];
+    [SerializeField] BattleChar[] enemy_slot = new BattleChar[4];
+
+
     public BattleChar current { get; private set; }
 
     public int turn { get; private set; } = 1;
@@ -61,41 +65,42 @@ public class BattleManager : MonoBehaviour
             yield return StartCoroutine(current.OnGoingTurn());
             initiative_index++;
             if (initiative_index > initiative.Count - 1) { initiative_index = 0; turn++; }
+            Debug.Log("FIM DE TURNO");
         }
     }
 
     void SpawnCharacters(List<PJSO> pjs, List<EnemySO> enemies)
     {
-        List<BattleChar> PJS = new List<BattleChar>();  
-        List<BattleChar> ENEMIES = new List<BattleChar>();
         for (int i = 0; i < pjs.Count; i++)
         {
-            GameObject pj = Instantiate(pj_prefab, pj_spawn[i]);
-            SpriteRenderer pj_rend = pj.GetComponent<SpriteRenderer>();
-            pj_rend.sortingOrder = -1 * i;
-            pj.name = pjs[i].Name;
+            GameObject pj = Instantiate(pj_prefab);
             PjController ctrl = pj.GetComponent<PjController>();
+            pj_slot[i] = ctrl; 
+            ctrl.sprite_renderer.sortingOrder = -1 * i;
+            pj.name = pjs[i].Name;
+
             ctrl.SetBattleChar(pjs[i]);
             ctrl.InitStats();
             initiative.Add(ctrl);
-            PJS.Add(ctrl);
         }
 
         for(int i = 0; i < enemies.Count; i++)
         {
             GameObject n = Instantiate(enemy_prefab, enemy_spawn[i]);
-            SpriteRenderer spr = n.GetComponent<SpriteRenderer>();
-            spr.flipX = true;
-            spr.sortingOrder = -1 * i;
-            n.name = enemies[i].Name;
             EnemyController ctrl = n.GetComponent<EnemyController>();
+            enemy_slot[i] = ctrl;
+            ctrl.sprite_renderer.flipX = true;
+            ctrl.sprite_renderer.sortingOrder = -1 * i;
+            n.name = enemies[i].Name;
+
+            
             ctrl.SetBattleChar(enemies[i]);
             ctrl.InitStats();
             initiative.Add(ctrl);
-            ENEMIES.Add(ctrl);
         }
         SetInitiative();
-        SetContext(PJS, ENEMIES);
+        SetContext();
+        SetAllPosition();
     }
 
     void SetInitiative()
@@ -103,61 +108,65 @@ public class BattleManager : MonoBehaviour
         initiative = initiative.OrderByDescending(a => a.dexterity).ToList();   
     }
 
-    void SetContext(List<BattleChar> pjs, List<BattleChar> enemies)
+    void SetContext()
     {
-        List<BattleChar> PJS = new List<BattleChar>();
-        List<BattleChar> ENEMIES = new List<BattleChar>();
-
-        foreach(BattleChar pj in pjs)
+        foreach(BattleChar pj in pj_slot)
         {
-            PJS.Add(pj);
-        }
-        foreach(BattleChar enemy in enemies)
-        {
-            ENEMIES.Add(enemy);
-        }
-
-        foreach(BattleChar b in initiative)
-        {
-            switch (b)
+            if (pj != null)
             {
-                case PjController pj:
-                    pj.CreateContext(PJS, ENEMIES);
-                    break;
-                case EnemyController enemy:
-                    enemy.CreateContext(ENEMIES, PJS);
-                    break;
+                pj.CreateContext(pj_slot.Where(b => b != null).ToList(), enemy_slot.Where(b => b != null).ToList());
+            }
+        }
+        foreach(BattleChar enemy in enemy_slot)
+        {
+            if (enemy != null)
+            {
+                enemy.CreateContext(enemy_slot.Where(b => b != null).ToList(), pj_slot.Where(b => b != null).ToList());
             }
         }
     }
-    void InitiativeRemove(BattleChar b)
+
+    void SetAllPosition()
+    {
+        for(int i = 0; i < pj_slot.Length; i++)
+        {
+            if(pj_slot[i] != null) { pj_slot[i].transform.position = (Vector3)(i * 2 * Vector2.left) + new Vector3(-4, 0, -5); }
+        }
+        for(int i = 0; i < enemy_slot.Length; i++)
+        {
+            if(enemy_slot[i] != null) { enemy_slot[i].transform.position = (Vector3)(i * 2 * Vector2.right) + new Vector3(4, 0, -5); }
+        }
+    }
+
+    public void InitiativeRemove(BattleChar b)
     {
         if (initiative.Contains(b)) { initiative.Remove(b); }
     }
 
-    void UpdateContext(BattleContext ctx)
+    public void SlotRemove(BattleChar b)
     {
-        foreach(BattleChar b in ctx.Enemies)
+        switch(b)
         {
-            if (!initiative.Contains(b)) { ctx.Enemies.Remove(b); }
-            
-        }
-
-        foreach(BattleChar b in ctx.Party)
-        {
-            if (!initiative.Contains(b)) { ctx.Party.Remove(b); }
-            
+            case PjController pj:
+                for(int i = 0; i < pj_slot.Length; i++)
+                {
+                    if(pj_slot[i] == pj) { pj_slot[i] = null; break; }
+                }
+                break;
+            case EnemyController enemy:
+                for(int i = 0; i < enemy_slot.Length; i++)
+                {
+                    if(enemy_slot[i] == enemy) { enemy_slot[i] = null; break; }
+                }
+                break;
         }
     }
 
     IEnumerator CharacterDeath(BattleChar b)
     {
-        b.OnCharacterDeath();
         InitiativeRemove(b);
-        foreach(BattleChar c in initiative)
-        {
-            UpdateContext(c.Context);
-        }
+        SlotRemove(b);
+        SetContext();
         yield return null;
     }
 

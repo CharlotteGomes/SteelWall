@@ -14,7 +14,6 @@ public class EnemyController : BattleChar
     }
     void Update()
     {
-        //if (Input.GetKeyDown(KeyCode.H)) { StartCoroutine(OnGoingTurn()); }
     }
 
     #region Init

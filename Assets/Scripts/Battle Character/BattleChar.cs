@@ -17,7 +17,9 @@ using UnityEngine.Rendering;
 }*/
 public abstract class BattleChar : MonoBehaviour
 {
-    
+    public Transform tf { get ; private set; }
+    public SpriteRenderer sprite_renderer { get; private set; }
+
     [Header("BattleInfo")]
     [SerializeField] protected int life_max;
     [SerializeField] protected int life_current;
@@ -42,9 +44,6 @@ public abstract class BattleChar : MonoBehaviour
     public int r_ice { get; protected set; }
     public int r_lightning { get; protected set; }
     public int r_purity { get; protected set; }
-
-[Header("Ref")]
-    [SerializeField] Animator animator;
 
     public IReadOnlyList<StatusEffectData> status_effects => StatusEffect.AsReadOnly();
     /*[Header("Actions")]
@@ -280,9 +279,11 @@ public abstract class BattleChar : MonoBehaviour
     #region Turn
     public abstract IEnumerator OnGoingTurn();
     #endregion
+
+
     public void CreateContext(List<BattleChar> allies, List<BattleChar> enemies)
     {
-        ctx = new BattleContext();
+        if(ctx == null) ctx = new BattleContext();
         ctx.Self = this;
         ctx.Party = allies;
         ctx.Enemies = enemies;
@@ -302,5 +303,11 @@ public abstract class BattleChar : MonoBehaviour
     {
         if(ctx.Target.Count >= 1) ctx.Target.Clear();
         OnStartTurn();
+    }
+
+    protected virtual void Awake()
+    {
+        sprite_renderer = GetComponent<SpriteRenderer>();
+        tf = GetComponent<Transform>(); 
     }
 }
