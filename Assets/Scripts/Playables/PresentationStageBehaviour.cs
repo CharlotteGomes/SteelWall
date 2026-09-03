@@ -5,6 +5,7 @@ using System.Collections.Generic;
 public class PresentationStageBehaviour : PlayableBehaviour
 {
     public List<double> startTimes = new();
+    public double self_start_time = 0;
     public override void OnGraphStart(Playable playable)
     {
         
