@@ -2,7 +2,7 @@ using UnityEngine;
 using UnityEngine.Playables;
 
 // A behaviour that is attached to a playable
-public class CharacterMoveBehaviour : PlayableBehaviour
+public class CharacterMoveBehaviour : PatternPlayable
 {
     public Transform tf;
     public Vector2 start_pos;
@@ -10,10 +10,6 @@ public class CharacterMoveBehaviour : PlayableBehaviour
     public float start_process = 0;
     public Vector2 velocity = Vector2.zero;
     float smooth_time = 0;
-    public override void OnGraphStart(Playable playable)
-    {
-
-    }
 
     // Called when the owning graph stops playing
     public override void OnGraphStop(Playable playable)
@@ -25,7 +21,6 @@ public class CharacterMoveBehaviour : PlayableBehaviour
     public override void OnBehaviourPlay(Playable playable, FrameData info)
     {
         smooth_time = (float)playable.GetDuration();
-        tf.localPosition = start_pos;
     }
 
     // Called when the state of the playable is set to Paused
@@ -36,6 +31,7 @@ public class CharacterMoveBehaviour : PlayableBehaviour
 
     public override void ProcessFrame(Playable playable, FrameData info, object playerData)
     {
+        if (playable.GetTime() < start_time) { return; }
         tf.localPosition = Vector2.SmoothDamp(tf.localPosition, target_pos, ref velocity, smooth_time);
     }
 

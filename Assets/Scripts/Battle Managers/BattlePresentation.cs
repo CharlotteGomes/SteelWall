@@ -9,32 +9,20 @@ public class BattlePresentation : MonoBehaviour
 {
     PlayableGraph graph;
     [SerializeField] Camera cam;
-    BattleChar User;
-    List<BattleChar> Targets = new();
-    Sprite user_spr;
-    [SerializeField]List<Sprite> target_spr = new();
     public IEnumerator StartPresentation(BattleChar User, List<BattleChar> Targets, PresentationSO so)
     {
+        yield return null;
         graph = PlayableGraph.Create();
 
-        this.User = User;
-        this.Targets = new List<BattleChar>(Targets);
-        SetSprites(so);
-        var mixer = FirstAct(so);
-
         graph.Play();
-        yield return new WaitForSeconds((float)mixer.GetDuration());
-
+        //yield return new WaitForSeconds((float)mixer.GetDuration());
+        //IDEIA: FAZER UM VOID QUE ACEITA 3 MIXERS, UM SENDO OPCIONAL, DEPOIS ELE MONTA A TIMELINE E RODA
         if (graph.IsValid())
         {
             graph.Destroy();
         }
-        this.User = null;
-        this.Targets.Clear();
-        user_spr = null;
-        target_spr.Clear();
     }
-
+    /*
     ScriptPlayable<PlayableMixerBehaviour> FirstAct(PresentationSO so)
     {
         int i = 0;
@@ -102,18 +90,18 @@ public class BattlePresentation : MonoBehaviour
         delays.Add(0);
         return CreateMixer(bh, delays, bh.Count);
     }
-    ScriptPlayable<CharacterFacingBehaviour> CreateFacing(float duration, Transform tf, float scale)
+    */
+    public ScriptPlayable<CharacterFacingBehaviour> CreateFacing(float duration, Transform tf)
     {
         var playable = ScriptPlayable<CharacterFacingBehaviour>.Create(graph);
         var behaviour = playable.GetBehaviour();
         playable.SetDuration(duration);
         behaviour.cam = cam;
         behaviour.tf = tf;
-        behaviour.scale = Vector2.one * scale;
         return playable;
     }
 
-    ScriptPlayable<CharacterMoveBehaviour> CreateMove(float duration, Transform tf, Vector2 start_pos, Vector2 target_pos)
+    public ScriptPlayable<CharacterMoveBehaviour> CreateMove(float duration, float delay, Transform tf, Vector2 start_pos, Vector2 target_pos)
     {
         var playable = ScriptPlayable<CharacterMoveBehaviour>.Create(graph);
         var behaviour = playable.GetBehaviour();
@@ -121,10 +109,11 @@ public class BattlePresentation : MonoBehaviour
         behaviour.start_pos = start_pos;
         behaviour.target_pos = target_pos;
         behaviour.tf = tf;
+        behaviour.start_time = delay;
         return playable;
     }
 
-    ScriptPlayable<CameraZoomBehaviour> CreateZoom(float duration, float start_size, float end_size, float start_progress = 0)
+    public ScriptPlayable<CameraZoomBehaviour> CreateZoom(float duration, float delay, float start_size, float end_size, float start_progress = 0)
     {
         var playable = ScriptPlayable<CameraZoomBehaviour>.Create(graph);
         var behaviour = playable.GetBehaviour();
@@ -133,10 +122,11 @@ public class BattlePresentation : MonoBehaviour
         behaviour.start_size = start_size;
         behaviour.end_size = end_size;
         behaviour.start_progress = start_progress;
+        behaviour.start_time = delay;
         return playable;
     }
 
-    ScriptPlayable<CameraRotateBehaviour> CreateRotate(float duration, float start_rotate, float end_rotate, float start_progress = 0) 
+    public ScriptPlayable<CameraRotateBehaviour> CreateRotate(float duration, float delay, float start_rotate, float end_rotate, float start_progress = 0) 
     {
         var playable = ScriptPlayable<CameraRotateBehaviour>.Create(graph);
         var behaviour = playable.GetBehaviour();
@@ -144,11 +134,12 @@ public class BattlePresentation : MonoBehaviour
         behaviour.cam = cam;
         behaviour.start_rotate = start_rotate;
         behaviour.end_rotate = end_rotate;
+        behaviour.start_time = delay;
         behaviour.start_progress = start_progress;
         return playable;
     }
 
-    ScriptPlayable<CharacterChangeSpriteBehaviour> CreateSprite(SpriteRenderer spriteRenderer, Sprite spr)
+    public ScriptPlayable<CharacterChangeSpriteBehaviour> CreateSprite(SpriteRenderer spriteRenderer, Sprite spr)
     {
         var playable = ScriptPlayable<CharacterChangeSpriteBehaviour>.Create(graph);
         var behaviour = playable.GetBehaviour();
@@ -157,96 +148,45 @@ public class BattlePresentation : MonoBehaviour
         behaviour.spr = spr;
         return playable;
     }
-
-    ScriptPlayable<CharacterReturn> CreateReturn(float duration, float scale, Vector2 pos, Transform tf)
+    public ScriptPlayable<PlayableMixerBehaviour> CreateMixer(List<Playable> inputs, float delay)
     {
-        var playable = ScriptPlayable<CharacterReturn>.Create(graph);
-        var behaviour = playable.GetBehaviour();
-        playable.SetDuration(duration);
-        behaviour.scale = scale;
-        behaviour.tf = tf;
-        behaviour.pos = pos;
-        return playable; 
-    }
-
-    ScriptPlayable<PlayableMixerBehaviour> CreateMixer(List<Playable> inputs, List<double> start_times, int inp)
-    {
-        if (inputs.Count != start_times.Count)
-        {
-            Debug.LogError($"Inputs e start_times precisam ter o mesmo tamanho. {start_times.Count} | {inp}");
-            return default;
-        }
         var mixer = ScriptPlayable<PlayableMixerBehaviour>.Create(graph, inputs.Count);
         var behaviour = mixer.GetBehaviour();
-        behaviour.startTimes = start_times;
-        double duration = 0;
+        behaviour.start_time = delay;
+        float duration = Mathf.Infinity;
         for (int i = 0; i < inputs.Count; i++)
         {
+            var bh = ((ScriptPlayable<PatternPlayable>)inputs[i]).GetBehaviour();
+            duration = Mathf.Max(duration, (float)inputs[i].GetDuration() + bh.start_time);
             graph.Connect(inputs[i], 0, mixer, i);
-            double endTime = start_times[i] + inputs[i].GetDuration();
-            duration = System.Math.Max(duration, endTime);
         }
         mixer.SetDuration(duration);
         return mixer;
     }
 
-    void SetSprites(PresentationSO so)
+    public Sprite SetSprites(PresentationSO so, BattleChar b)
     {
         switch (so.self)
         {
             case BattleSprites.Slash:
-                user_spr = User.spriteSO.slash;
-                break;
+                return b.spriteSO.slash;
 
             case BattleSprites.Pierce:
-                user_spr = User.spriteSO.pierce;
-                break;
+                return b.spriteSO.pierce;
 
             case BattleSprites.Bludgeoning:
-                user_spr = User.spriteSO.bludgeoning;
-                break;
+                return b.spriteSO.bludgeoning;
 
             case BattleSprites.Casting:
-                user_spr = User.spriteSO.casting;
-                break;
+                return b.spriteSO.casting;
 
             case BattleSprites.Ranged:
-                user_spr = User.spriteSO.ranged;
-                break;
+                return b.spriteSO.ranged;
 
             case BattleSprites.Hurt:
-                user_spr = User.spriteSO.hurt;
-                break;
-        }
-
-        foreach (BattleChar ch in Targets)
-        {
-            switch (so.targets)
-            {
-                case BattleSprites.Slash:
-                    target_spr.Add(ch.spriteSO.slash);
-                    break;
-
-                case BattleSprites.Pierce:
-                    target_spr.Add(ch.spriteSO.pierce);
-                    break;
-
-                case BattleSprites.Bludgeoning:
-                    target_spr.Add(ch.spriteSO.bludgeoning);
-                    break;
-
-                case BattleSprites.Casting:
-                    target_spr.Add(ch.spriteSO.casting);
-                    break;
-
-                case BattleSprites.Ranged:
-                    target_spr.Add(ch.spriteSO.ranged);
-                    break;
-
-                case BattleSprites.Hurt:
-                    target_spr.Add(ch.spriteSO.hurt);
-                    break;
-            }
+                return b.spriteSO.hurt;
+            default:
+                return null;
         }
     }
 
@@ -258,7 +198,6 @@ public class BattlePresentation : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        //if (Input.GetKeyDown(KeyCode.Space)) { StartCoroutine(StartApresentation()); }
     }
 
     private void OnDestroy()

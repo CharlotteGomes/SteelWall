@@ -1,0 +1,41 @@
+using UnityEngine;
+using UnityEngine.Playables;
+
+// A behaviour that is attached to a playable
+public class PatternPlayable : PlayableBehaviour
+{
+    public float start_time = 0;
+
+    public override void OnGraphStart(Playable playable)
+    {
+        playable.SetDuration(playable.GetDuration() + start_time);    
+    }
+
+    // Called when the owning graph stops playing
+    public override void OnGraphStop(Playable playable)
+    {
+        
+    }
+
+    // Called when the state of the playable is set to Play
+    public override void OnBehaviourPlay(Playable playable, FrameData info)
+    {
+        
+    }
+
+    // Called when the state of the playable is set to Paused
+    public override void OnBehaviourPause(Playable playable, FrameData info)
+    {
+        
+    }
+
+    // Called each frame while the state is set to Play
+    public override void PrepareFrame(Playable playable, FrameData info)
+    {
+       
+    }
+
+    public override void ProcessFrame(Playable playable, FrameData info, object playerData)
+    {
+    }
+}

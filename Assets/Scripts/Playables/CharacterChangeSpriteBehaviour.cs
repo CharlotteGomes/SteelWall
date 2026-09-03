@@ -2,7 +2,7 @@ using UnityEngine;
 using UnityEngine.Playables;
 
 // A behaviour that is attached to a playable
-public class CharacterChangeSpriteBehaviour : PlayableBehaviour
+public class CharacterChangeSpriteBehaviour : PatternPlayable
 {
     public SpriteRenderer spriteRenderer;
     public Sprite spr;

@@ -3,11 +3,12 @@ using UnityEngine.Playables;
 using TMPro;
 using System.Collections.Generic;
 // A behaviour that is attached to a playable
-public class PlayableMixerBehaviour : PlayableBehaviour
+public class PlayableMixerBehaviour : PatternPlayable
 {
     public List<double> startTimes;
     public override void OnGraphStart(Playable playable)
     {
+        base.OnGraphStart(playable);
         for (int i = 0; i < playable.GetInputCount(); i++)
         {
             Playable input = playable.GetInput(i);
@@ -35,6 +36,15 @@ public class PlayableMixerBehaviour : PlayableBehaviour
 
     public override void ProcessFrame(Playable playable, FrameData info, object playerData)
     {
+        if (playable.GetTime() < start_time) { return; }
+        for(int i = 0; i < playable.GetInputCount(); i++)
+        {
+            if(playable.GetInput(i).IsValid())
+            {
+                playable.GetInput(i).Play();
+            }
+        }
+        /*
         double mixerTime = playable.GetTime();
         for (int i = 0; i < playable.GetInputCount(); i++)
         {
@@ -60,7 +70,7 @@ public class PlayableMixerBehaviour : PlayableBehaviour
             }
             input.Play();
             input.SetSpeed(1);
-        }
+        }*/
     }
 
     // Called each frame while the state is set to Play
