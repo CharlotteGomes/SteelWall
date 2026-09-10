@@ -1,20 +1,21 @@
-using NUnit.Framework.Constraints;
 using UnityEngine;
 
 [CreateAssetMenu(fileName = "DamageEffect", menuName = "Scriptable Objects/SkillSO/Effects/Damage")]
 public class DamageTarget: SkillEffectSO
 {
-    public DamageType type;
-    public int max_damage;
-    public int min_damage;
-    public bool unique_value;
-    public override void Execute(BattleContext ctx)
+    [Range(0, 2)]
+    public float dmg;
+    public override void Execute(BattleChar user, BattleResult result)
     {
-        foreach (BattleChar target in ctx.Target)
+        int min_damage = result.crit == true ? (int)(user.GetStat(StatType.DMG_MIN) * dmg) * 2 : (int)(user.GetStat(StatType.DMG_MIN) * dmg);
+        int max_damage = result.crit == true ? (int)(user.GetStat(StatType.DMG_MAX) * dmg) * 2 : (int)(user.GetStat(StatType.DMG_MAX) * dmg);
+        Debug.Log($"{min_damage} | {max_damage}");
+        int damage = Random.Range(min_damage, max_damage + 1);
+        
+        foreach (BattleChar target in result.hit)
         {
-            int dmg = unique_value ? max_damage : Random.Range(min_damage, max_damage + 1);
-            DamageInfo info = new DamageInfo(ctx.Self, target, dmg, type);
-            ctx.Self.DealDamage(info);
+            DamageInfo info = new DamageInfo(user, target, damage);
+            user.DealDamage(info);
         }
     }
 }

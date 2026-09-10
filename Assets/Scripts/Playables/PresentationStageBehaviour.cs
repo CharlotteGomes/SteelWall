@@ -61,7 +61,6 @@ public class PresentationStageBehaviour : PlayableBehaviour
 
             // Está executando
             input.Play();
-
             playable.SetInputWeight(i, 1);
         }
     }

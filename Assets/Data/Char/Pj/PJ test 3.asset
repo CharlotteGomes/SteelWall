@@ -14,8 +14,10 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::PJSO
   Name: PJ C
   sprites: {fileID: 11400000, guid: ea00853d930d22d47991be5e1b19c595, type: 2}
-  Cons: 1
-  Str: 2
-  Dex: 3
-  Int: 5
-  Mnd: 4
+  life: 1000
+  protect: 0
+  dodge: 0
+  damage_min: 0
+  damage_max: 0
+  accuracy: 0
+  spd: 0

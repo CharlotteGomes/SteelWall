@@ -7,6 +7,7 @@ public class CharacterMoveBehaviour : PlayableBehaviour
     public Transform tf;
     public Vector2 start_pos;
     public Vector2 target_pos;
+    public Vector2 end_pos;
     public float start_process = 0;
     public Vector2 velocity = Vector2.zero;
     float smooth_time = 0;
@@ -21,6 +22,7 @@ public class CharacterMoveBehaviour : PlayableBehaviour
     public override void OnBehaviourPlay(Playable playable, FrameData info)
     {
         smooth_time = (float)playable.GetDuration();
+        end_pos = start_pos + target_pos;
     }
 
     // Called when the state of the playable is set to Paused
@@ -32,7 +34,7 @@ public class CharacterMoveBehaviour : PlayableBehaviour
     public override void ProcessFrame(Playable playable, FrameData info, object playerData)
     {
 
-        tf.localPosition = Vector2.SmoothDamp(tf.localPosition, target_pos, ref velocity, smooth_time);
+        tf.localPosition = Vector2.SmoothDamp(tf.localPosition, end_pos, ref velocity, smooth_time);
     }
 
     // Called each frame while the state is set to Play

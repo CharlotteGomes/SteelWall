@@ -25,7 +25,6 @@ public class PresentationSequenceManager : PlayableBehaviour
     // Called when the state of the playable is set to Paused
     public override void OnBehaviourPause(Playable playable, FrameData info)
     {
-        
     }
 
     public override void ProcessFrame(Playable playable, FrameData info, object playerData)
@@ -46,7 +45,7 @@ public class PresentationSequenceManager : PlayableBehaviour
                 continue;
             }
 
-            if (stageTime >= duration)
+            if (stageTime >= end)
             {
                 input.Pause();
                 continue;

@@ -6,12 +6,12 @@ public class PoisonEffectSO : ApplyStatusEffect
 {
     public int tier;
 
-    public override void Execute(BattleContext ctx)
+    public override void Execute(BattleChar user, BattleResult result)
     {
-        foreach(BattleChar target in ctx.Target)
+        foreach(BattleChar target in result.hit)
         {
-            PoisonEffect poison = new PoisonEffect(ctx.Self, target, sfSO, tier);
-            ctx.Self.GiveStatus(poison);        
+            PoisonEffect poison = new PoisonEffect(user, target, sfSO, tier);
+            user.GiveStatus(poison);        
         }
     }
 }

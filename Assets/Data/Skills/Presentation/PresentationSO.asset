@@ -15,6 +15,7 @@ MonoBehaviour:
   self: 1
   targets: 6
   self_start_pos: {x: 1, y: 0}
-  self_end_pos: {x: -3, y: 0}
+  self_end_pos: {x: 5, y: 0}
   targets_start_pos: {x: 1, y: 0}
   targets_end_pos: {x: -3, y: 0}
+  relative_pos: 0

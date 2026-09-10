@@ -5,6 +5,7 @@ using System.Linq;
 using UnityEditor;
 using UnityEditor.Search;
 using UnityEngine;
+using UnityEngine.Playables;
 public class PjController : BattleChar
 {
     [SerializeField] List<SkillSO> test = new List<SkillSO>();
@@ -38,6 +39,7 @@ public class PjController : BattleChar
     // Update is called once per frame
     void Update()
     {
+        
     }
 
     #region Init

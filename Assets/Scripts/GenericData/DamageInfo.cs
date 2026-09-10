@@ -5,14 +5,12 @@ public class DamageInfo
 {
     public BattleChar dealer { get; private set; }
     public BattleChar receiver { get; private set; }
-    public float damage;
-    public DamageType damageType { get; set; }
+    public int damage;
 
-    public DamageInfo(BattleChar dealer, BattleChar receiver, float damage, DamageType damageType)
+    public DamageInfo(BattleChar dealer, BattleChar receiver, int damage)
     {
         this.dealer = dealer;
         this.receiver = receiver;
         this.damage = damage;
-        this.damageType = damageType;
     }
 }

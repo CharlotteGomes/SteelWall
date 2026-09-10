@@ -16,14 +16,17 @@ public class CharacterChangeSpriteBehaviour : PlayableBehaviour
     // Called when the owning graph stops playing
     public override void OnGraphStop(Playable playable)
     {
-        spriteRenderer.sortingOrder = original_sort;
     }
 
     // Called when the state of the playable is set to Play
     public override void OnBehaviourPlay(Playable playable, FrameData info)
     {
-        spriteRenderer.sprite = spr;
         spriteRenderer.sortingOrder += 10;
+    }
+
+    public override void ProcessFrame(Playable playable, FrameData info, object playerData)
+    {
+        spriteRenderer.sprite = spr;
     }
 
     // Called when the state of the playable is set to Paused

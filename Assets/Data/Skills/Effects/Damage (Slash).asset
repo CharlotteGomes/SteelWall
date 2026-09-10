@@ -12,7 +12,4 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 70f03a3c0e9c7ef4ebfabc26c95b6848, type: 3}
   m_Name: Damage (Slash)
   m_EditorClassIdentifier: Assembly-CSharp::DamageTarget
-  type: {fileID: 11400000, guid: f1808f590117e4a4085bd31a36857bff, type: 2}
-  max_damage: 10
-  min_damage: 2
-  unique_value: 0
+  dmg: 1

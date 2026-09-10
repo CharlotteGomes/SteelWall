@@ -21,16 +21,8 @@ public class EnemyController : BattleChar
     {
         EnemySO so = battle_char as EnemySO;
         base.InitStats();
-        life_max = so.life_max;
         life_current = life_max;
         behaviourSO = so.behaviour;
-        r_slashing = so.r_slashing;
-        r_bludgeoning = so.r_bludgeoning;
-        r_pierce = so.r_pierce;
-        r_ice = so.r_ice;
-        r_fire = so.r_fire;
-        r_lightning = so.r_lightning;
-        r_purity = so.r_purity;
     }
     #endregion
 

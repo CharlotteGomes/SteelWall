@@ -1,20 +1,21 @@
-using System.Reflection;
-using UnityEngine;
 using System.Collections;
-using System;
-using NUnit.Framework;
 using System.Collections.Generic;
-using UnityEditor.Animations;
-using UnityEditor.Playables;
-using UnityEditor.UI;
-using Unity.VisualScripting;
-using UnityEngine.Rendering;
+using UnityEngine;
+using UnityEngine.Playables;
 
-/*public enum BattleOptions 
-{ 
-    Attack = 0,
-    Skill = 1,
-}*/
+
+public enum StatType
+{
+    SPD,
+    DMG_MIN,
+    DMG_MAX,
+    PROTECT,
+    DODGE,
+    ACCURACY,
+    LIFE_MAX,
+    LIFE_CURRENT
+}
+
 public abstract class BattleChar : MonoBehaviour
 {
     public Transform tf { get ; private set; }
@@ -23,76 +24,45 @@ public abstract class BattleChar : MonoBehaviour
     [Header("BattleInfo")]
     [SerializeField] protected int life_max;
     [SerializeField] protected int life_current;
+    [SerializeField] protected int protect, dodge, damage_min, damage_max, accuracy, spd, crit;
     [SerializeField] protected BattleCharSO battle_char;
     [SerializeField] protected BattleContext ctx;
+    public CharacterSpriteSO spriteSO { get; private set; }
+
+    [SerializeField] protected List<StatusEffectData> StatusEffect = new();
+    public IReadOnlyList<StatusEffectData> status_effects => StatusEffect.AsReadOnly();
     public BattleContext Context => ctx;
     [SerializeField] protected SkillSO skill_current;
-    [SerializeField] protected List<StatusEffectData> StatusEffect = new();
     [SerializeField] protected TurnStep step;
-    public CharacterSpriteSO spriteSO { get; private set; }
-    
-
-    public int strength { get; protected set; }
-    public int dexterity { get; protected set; }
-    public int constitution { get; protected set; }
-    public int intelligence { get; protected set; }
-    public int mind { get; protected set; }
-    public int r_slashing { get; protected set; }
-    public int r_bludgeoning { get; protected set; }
-    public int r_pierce { get; protected set; }
-    public int r_fire { get; protected set; }
-    public int r_ice { get; protected set; }
-    public int r_lightning { get; protected set; }
-    public int r_purity { get; protected set; }
-
-    public IReadOnlyList<StatusEffectData> status_effects => StatusEffect.AsReadOnly();
-    /*[Header("Actions")]
-    public Action<BattleChar> Death;
-    public Action<BattleChar> start_turn;
-    public Action<BattleChar> end_turn;
-    public Action<BattleChar, TypeDmg, int> deal_damage;
-    public Action<BattleChar, TypeDmg, int> take_damage;
-    public Action<BattleChar, int> deal_heal;
-    public Action<BattleChar, int> receive_heal;
-    public Action<BattleChar> apply_status_effect;
-    public Action<BattleChar> receive_status_effect;*/
 
     #region Init
     public virtual void InitStats()
     {
         spriteSO = battle_char.sprites;
-        strength = battle_char.Str;
-        dexterity = battle_char.Dex;
-        constitution = battle_char.Cons;
-        intelligence = battle_char.Int;
-        mind = battle_char.Mnd;
+        life_max = battle_char.life;
+        life_current = life_max;
+        protect = battle_char.protect;
+        dodge = battle_char.dodge;
+        damage_min = battle_char.damage_min;
+        damage_max = battle_char.damage_max;
+        accuracy = battle_char.accuracy;
+        spd = battle_char.spd;
+        crit = battle_char.crit;
     }
     public void SetBattleChar(BattleCharSO battle_char)
     {
         this.battle_char = battle_char;
     }
     #endregion
+    //divide por 100 e multiplica pelo valor total
 
     #region Generic
-
-    public void ApplyResistences(DamageInfo info)
-    {
-        foreach(ResistenseData dt in battle_char.Resists)
-        {
-            if (dt.resistence_type == info.damageType)
-            {
-                info.damage = Mathf.Clamp(info.damage * (1 - dt.value), 0, Mathf.Infinity);
-                Debug.Log(info.damage);
-            }
-        }
-    }
-
     public void TakeDamage(DamageInfo info)
     {
-        Debug.Log($"{info.receiver.battle_char.name} took {info.damage} damage from {info.dealer.battle_char.name}");
-        ApplyResistences(info);
+        Debug.Log($"dano pré defesa: {info.damage}");
+        ReduceDamage(info);
+        Debug.Log($"dano pós defese: {info.damage}");
         OnDamageTaken(info);
-        info.damageType.OnDamageTaken(info);
         if(info.damage>= 0)
         {
             life_current = (int)Mathf.Clamp(life_current - info.damage, 0, Mathf.Infinity);
@@ -101,18 +71,25 @@ public abstract class BattleChar : MonoBehaviour
 
     public void DealDamage(DamageInfo info)
     {
-        Debug.Log($"{info.dealer.battle_char.name} dealt {info.damage} damage to {info.receiver.battle_char.name}");
-        OnDamageDealt(info);
-        info.damageType.OnDamageDealt(info);    
+        OnDamageDealt(info);   
         if(info.damage >= 0)
         {
             info.receiver.TakeDamage(info);
         }
     }
 
+    public void ReduceDamage(DamageInfo info)
+    {
+        if (info.damage >= 0)
+        {
+            float prot = protect;
+            Debug.Log(info.damage * prot / 100);
+            info.damage -= (int)(info.damage * (prot / 100));
+        }
+    }
+
     public void ReceiveHeal(HealInfo info)
     {
-        Debug.Log($"{info.target.battle_char.name} received {info.heal_amount} healing from {info.healer.battle_char.name}");
         OnHealReceived(info);
         if(info.heal_amount >= 0)
         {
@@ -122,7 +99,6 @@ public abstract class BattleChar : MonoBehaviour
 
     public void DealHeal(HealInfo info)
     {
-        Debug.Log($"{info.healer.battle_char.name} healed {info.target.battle_char.name} for {info.heal_amount}");
         OnHealGiven(info);
         if(info.heal_amount >= 0)
         {
@@ -260,19 +236,58 @@ public abstract class BattleChar : MonoBehaviour
     #region Skill functions
     public virtual IEnumerator StartSkill()
     {
-        yield return StartCoroutine(OnGoingSkill());
+        BattlePresentation.CreateGraph();
+        PresentationContext context = new PresentationContext(ctx.Self, ctx.Target.ToArray(), Camera.main, skill_current.presentation);
+        BattleResult result = new BattleResult();
+
+        yield return StartCoroutine(OnGoingSkill(result));
+        result.AddBuild(new BuildAttackStage(context));
+        result.AddBuild(new BuildReturnStage(context));
+        var presentation = result.BuildFinalResult();
+
+        var output = ScriptPlayableOutput.Create(BattlePresentation.graph, "Battle Presentation");
+
+        output.SetSourcePlayable(presentation);
+        BattlePresentation.graph.Play();
+        yield return new WaitForSeconds((float)presentation.GetDuration());
+        BattlePresentation.graph.Destroy();
     }
 
-    public virtual IEnumerator OnGoingSkill()
+    public virtual IEnumerator OnGoingSkill(BattleResult result) 
     {
-        //yield return StartCoroutine(GM.instance.battle_manager.battle_presentation.StartPresentation(ctx.Self, ctx.Target, skill_current.presentation));
-        yield return StartCoroutine(FinishingSkill());
+        int roll = Random.Range(0, 101);
+
+        result.acc_base = skill_current.acc_base + accuracy;
+        result.acc_roll = roll;
+        result.skill_fail = roll <= skill_current.acc_base || !skill_current.can_miss ? false : true;
+        result.crit = roll <= crit + skill_current.crit_mod;
+        Debug.Log($"{result.acc_roll} {result.acc_base} {result.skill_fail}");
+        ResolveSkill(result);
+        yield return StartCoroutine(FinishingSkill(result));
     }
 
-    public virtual IEnumerator FinishingSkill()
+    public virtual IEnumerator FinishingSkill(BattleResult result)
     {
-        skill_current.Execute(ctx);
+        if (result.skill_fail) yield break ;
+        skill_current.Execute(this, result);
         yield return null;
+    }
+
+    public void ResolveSkill(BattleResult result)
+    {
+        foreach(BattleChar n in ctx.Target)
+        {
+            int hitChance = result.acc_base - n.dodge;
+
+            if (result.acc_roll > hitChance)
+            {
+                Debug.Log($"{n.name} desviou");
+                result.dodge.Add(n);
+                return;            
+            }
+            Debug.Log($"{n.name} tomou a skill");
+            result.hit.Add(n);
+        }
     }
     #endregion
 
@@ -280,7 +295,7 @@ public abstract class BattleChar : MonoBehaviour
     public abstract IEnumerator OnGoingTurn();
     #endregion
 
-
+    #region Info
     public void CreateContext(List<BattleChar> allies, List<BattleChar> enemies)
     {
         if(ctx == null) ctx = new BattleContext();
@@ -305,6 +320,23 @@ public abstract class BattleChar : MonoBehaviour
         OnStartTurn();
     }
 
+    public int GetStat(StatType stat)
+    {
+        return stat switch
+        {
+            StatType.SPD => spd,
+            StatType.DMG_MIN => damage_min,
+            StatType.DMG_MAX => damage_max,
+            StatType.PROTECT => protect,
+            StatType.LIFE_CURRENT => life_current,
+            StatType.LIFE_MAX => life_max,
+            StatType.ACCURACY => accuracy,
+            StatType.DODGE => dodge,
+            _ => 0
+        };
+    }
+
+    #endregion 
     protected virtual void Awake()
     {
         sprite_renderer = GetComponent<SpriteRenderer>();

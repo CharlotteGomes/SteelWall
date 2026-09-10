@@ -14,11 +14,11 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::PJSO
   Name: PJ A
   sprites: {fileID: 11400000, guid: ea00853d930d22d47991be5e1b19c595, type: 2}
-  Cons: 1
-  Str: 2
-  Dex: 3
-  Int: 4
-  Mnd: 5
-  Resists:
-  - resistence_type: {fileID: 11400000, guid: ed37d09286d42f845a0a212856defd4d, type: 2}
-    value: 0
+  life: 1000
+  protect: 50
+  dodge: 0
+  damage_min: 12
+  damage_max: 20
+  accuracy: 0
+  spd: 0
+  crit: 5

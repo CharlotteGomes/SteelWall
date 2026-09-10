@@ -2,30 +2,28 @@ using UnityEngine;
 
 public class PresentationContext
 {
-    public BattleChar attacker;
-    public BattleChar[] target;
-
     public Camera camera;
 
-    public CharacterPresentationState attackerState;
+    public CharacterPresentationState userState;
     public CharacterPresentationState[] targetState;
 
     public CameraPresentationState cameraState;
 
-    public PresentationContext(BattleChar attacker, BattleChar[] targets, Camera cam)
+    public PresentationSO presentationSO;
+
+    public PresentationContext(BattleChar user, BattleChar[] targets, Camera cam, PresentationSO so)
     {
-        this.attacker = attacker;
-        this.target = targets;
+        targetState = new CharacterPresentationState[targets.Length];
         this.camera = cam;
 
-        attackerState = new CharacterPresentationState(attacker.transform.position, attacker.transform.rotation, attacker.sprite_renderer.sprite);
-        target = targets;
+        userState = new CharacterPresentationState(user.transform.position, user.transform.rotation, user.sprite_renderer.sprite, user.transform.localScale ,user, user.sprite_renderer);
         for(int i = 0; i < targets.Length; i++)
         {
             BattleChar b = targets[i];
-            targetState[i] = new CharacterPresentationState(b.transform.position, b.transform.rotation, b.sprite_renderer.sprite);
+            targetState[i] = new CharacterPresentationState(b.transform.position, b.transform.rotation, b.sprite_renderer.sprite, targets[i].transform.localScale, b, b.sprite_renderer);
         }
 
         cameraState = new CameraPresentationState(cam.transform.position, cam.orthographicSize);
+        presentationSO = so;
     }
 }

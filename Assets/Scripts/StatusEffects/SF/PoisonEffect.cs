@@ -11,9 +11,7 @@ public class PoisonEffect : StatusEffectData
 
     public override void OnStartTurn()
     {
-        Poison type = ScriptableObject.CreateInstance<Poison>();
-        DamageInfo info = new DamageInfo(source, owner, stacks * tier, type);
-        Debug.Log("OOOOOOOOOLHA O VENENOOOOOOO");
+        DamageInfo info = new DamageInfo(source, owner, stacks * tier);
         owner.TakeDamage(info);
     }
 }

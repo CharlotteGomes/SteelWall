@@ -13,8 +13,7 @@ public enum TurnStep
 }
 
 public class BattleManager : MonoBehaviour
-{
-    public BattlePresentation battle_presentation { get; private set; }
+{ 
 
     [SerializeField] List<BattleChar> initiative = new List<BattleChar>();
     [SerializeField] GameObject pj_prefab, enemy_prefab;
@@ -31,7 +30,6 @@ public class BattleManager : MonoBehaviour
     [SerializeField] int initiative_index = 0;
     private void Awake()
     {
-        battle_presentation = GetComponent<BattlePresentation>();
         StartBattle(test1, test2);
     }
 
@@ -103,7 +101,7 @@ public class BattleManager : MonoBehaviour
 
     void SetInitiative()
     {
-        initiative = initiative.OrderByDescending(a => a.dexterity).ToList();   
+        initiative = initiative.OrderByDescending(a => a.GetStat(StatType.SPD)).ToList();   
     }
 
     void SetContext()

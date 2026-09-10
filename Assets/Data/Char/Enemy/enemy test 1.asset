@@ -14,17 +14,11 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::EnemySO
   Name: Inimigo A
   sprites: {fileID: 11400000, guid: 6dd98634dc6ea904292f4549dfaadd4e, type: 2}
-  Cons: 1
-  Str: 2
-  Dex: 3
-  Int: 4
-  Mnd: 5
-  life_max: 20
-  r_slashing: 0
-  r_bludgeoning: 0
-  r_pierce: 0
-  r_fire: 0
-  r_ice: 0
-  r_lightning: 0
-  r_purity: 0
+  life: 1000
+  protect: 0
+  dodge: 0
+  damage_min: 10
+  damage_max: 20
+  accuracy: 0
+  spd: 0
   behaviour: {fileID: 11400000, guid: 1295117b36dc8324c80d648feb6b9fdc, type: 2}

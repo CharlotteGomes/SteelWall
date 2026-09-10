@@ -12,7 +12,4 @@ public abstract class Character : MonoBehaviour
     [Header("Appearence")]
     [SerializeField] protected Sprite sprite;
     [SerializeField] protected Sprite[] portraits;
-
-    //State
-    CharacterState state;
 }
