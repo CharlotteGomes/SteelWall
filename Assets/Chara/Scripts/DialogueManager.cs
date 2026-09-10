@@ -3,12 +3,13 @@ using UnityEngine.UI;
 using TMPro;
 using System.Collections;
 using UnityEngine.InputSystem;
+using Unity.VectorGraphics;
+using UnityEngine.SceneManagement;
 
 public class DialogueManager : MonoBehaviour
 {
     private Coroutine typingCoroutine;
     private bool dialogueActive;
-
     public TMP_Text nameText;
     public TMP_Text dialogueText;
 
@@ -29,6 +30,14 @@ public class DialogueManager : MonoBehaviour
         }
     }
 
+    private void Start() 
+    {
+        if (GM.instance.currentDialogue != null)
+        {
+            StartDialogue(GM.instance.currentDialogue);
+        } 
+    }
+
     void Update() 
     {
         if (!dialogueActive)
@@ -40,8 +49,6 @@ public class DialogueManager : MonoBehaviour
         {
             NextLine();
         }
-        
-
     }
 
     public void StartDialogue(Dialogue dialogue)
@@ -68,6 +75,13 @@ public class DialogueManager : MonoBehaviour
 
     public void ShowLine() //Mostrar o dialogo
     {
+        dialogueText.text = "TESTE DO DIÁLOGO!";
+        nameText.text = "TESTE";
+
+        Debug.Log("ShowLine está funcionando!");
+
+
+
         DialogueLine line = currentDialogue.lines[currentIndex]; //linha de dialogo
 
         nameText.text = line.speaker.characterName; //nome de quem fala
@@ -101,7 +115,9 @@ public class DialogueManager : MonoBehaviour
     {
         dialogueActive = false;
         currentDialogue = null;
+
+        SceneManager.LoadScene(GM.instance.previousScene);
+
         Debug.Log("Cabou");
     }
 }
-//Como posso fazer um sistema de dialogo na unity onde possui o dialogo, nome da pessoa que está falando, moldura do player e do npc junto de como poderia mudar suas expressoes conforme falam

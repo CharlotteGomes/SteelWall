@@ -10,6 +10,12 @@ public class PlayerController : MonoBehaviour
     }
     void Start()
     {
+        if(GM.instance != null && GM.instance.returningFromDialogue)
+        {
+            transform.position = GM.instance.playerPosition;
+            GM.instance.returningFromDialogue = false;
+        }
+
         player_state = new PlayerWalk(this);   
     }
 

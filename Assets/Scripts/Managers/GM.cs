@@ -7,6 +7,10 @@ public class GM : MonoBehaviour
     public static GM instance { get; private set; } //Singleton
     [SerializeField] Action game_state; //Current State
 
+    public string previousScene;
+    public Vector3 playerPosition;
+    public Dialogue currentDialogue;
+    public bool returningFromDialogue;
     private void Awake()
     {
         if(instance != this && instance != null)
