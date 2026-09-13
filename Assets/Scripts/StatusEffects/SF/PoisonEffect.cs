@@ -1,6 +1,6 @@
 using UnityEngine;
 
-
+[System.Serializable]
 public class PoisonEffect : StatusEffectData
 {
     public int tier;
@@ -11,7 +11,12 @@ public class PoisonEffect : StatusEffectData
 
     public override void OnStartTurn()
     {
-        DamageInfo info = new DamageInfo(source, owner, stacks * tier);
+        DamageInfo info = new DamageInfo(source, owner, stacks * tier, true);
         owner.TakeDamage(info);
+        stacks--;
+        if(stacks <= 0)
+        {
+            owner.StatusRemove(this);
+        }
     }
 }

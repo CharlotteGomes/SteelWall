@@ -1,0 +1,21 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4f25ae167da133e4fbcec3907c264d40, type: 3}
+  m_Name: SwordEnemy
+  m_EditorClassIdentifier: Assembly-CSharp::CharacterSpriteSO
+  idle: {fileID: 2147685559727469259, guid: 2dff50f3041db95468be66323bbecfb0, type: 3}
+  slash: {fileID: -4295039307428948894, guid: 2a2d89a8ee7a0ad4682d1fe627987f3c, type: 3}
+  pierce: {fileID: 0}
+  bludgeoning: {fileID: 0}
+  casting: {fileID: 0}
+  ranged: {fileID: 0}
+  hurt: {fileID: -2048800907179887802, guid: 57471dfe1d2a7cc41810cf65e6082544, type: 3}

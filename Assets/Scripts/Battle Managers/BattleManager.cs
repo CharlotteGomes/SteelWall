@@ -106,18 +106,18 @@ public class BattleManager : MonoBehaviour
 
     void SetContext()
     {
-        foreach(BattleChar pj in pj_slot)
+        for(int i = 0; i < pj_slot.Length; i++)
         {
-            if (pj != null)
+            if (pj_slot[i] != null)
             {
-                pj.CreateContext(pj_slot.Where(b => b != null).ToList(), enemy_slot.Where(b => b != null).ToList());
+                pj_slot[i].CreateContext(pj_slot.Where(b => b != null).ToList(), enemy_slot.Where(b => b != null).ToList(), i);
             }
         }
-        foreach(BattleChar enemy in enemy_slot)
+        for (int i = 0; i < enemy_slot.Length; i++)
         {
-            if (enemy != null)
+            if (enemy_slot[i] != null)
             {
-                enemy.CreateContext(enemy_slot.Where(b => b != null).ToList(), pj_slot.Where(b => b != null).ToList());
+                enemy_slot[i].CreateContext(enemy_slot.Where(b => b != null).ToList(), pj_slot.Where(b => b != null).ToList(), i);
             }
         }
     }

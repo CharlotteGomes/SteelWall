@@ -60,17 +60,12 @@ public class EnemyController : BattleChar
 
     void ChoosingSkill()
     {
-        /*foreach (ConditionalSkillSO so in behaviourSO.conditional)
-                    {
-                        if(behaviour_index > behaviourSO.behaviour.Count - 1) { behaviour_index = 0; }
-                        if (so.Check())
-                        {
-                            skill_current = new SkillData(so.skill);
-                            step = TurnStep.ChooseTarget;
-                            break;
-                        }
-                    }*/
-        skill_current = behaviourSO.behaviour[behaviour_index]; step = TurnStep.ChooseTarget;
+        skill_current = behaviourSO.behaviour[behaviour_index]; 
+        for (int i = 0; i < skill_current.use_pos.Length; i++)
+        {
+            if (ctx.SelfPosition == skill_current.use_pos[i]) { step = TurnStep.ChooseTarget; return; }
+        }
+        BehaviourUpdate();
     }
 
     void ChoosingTarget()
@@ -83,7 +78,7 @@ public class EnemyController : BattleChar
                 {
                     if(p < ctx.Enemies.Count) SetTarget(p, ctx.Enemies);
                 }
-                if (ctx.Target.Count == 0) { behaviour_index++; step = TurnStep.ChooseSkill; return; }
+                if (ctx.Target.Count == 0) { BehaviourUpdate(); return; }
                 step = TurnStep.ExecutingSkill; return;
             }
 
@@ -91,7 +86,7 @@ public class EnemyController : BattleChar
             {
                 if (p < ctx.Party.Count) SetTarget(p, ctx.Party);
             }
-            if (ctx.Target.Count == 0) { behaviour_index++; step = TurnStep.ChooseSkill; return; }
+            if (ctx.Target.Count == 0) { BehaviourUpdate(); return; }
             step = TurnStep.ExecutingSkill; return;
         }
 
@@ -104,7 +99,7 @@ public class EnemyController : BattleChar
             }
             int erand = Random.Range(0, elist.Count);
             SetTarget(erand, ctx.Enemies);
-            if (ctx.Target.Count == 0) { behaviour_index++; step = TurnStep.ChooseSkill; return; }
+            if (ctx.Target.Count == 0) { BehaviourUpdate(); return; }
             step = TurnStep.ExecutingSkill; return;
         }
 
@@ -115,8 +110,15 @@ public class EnemyController : BattleChar
         }
         int rand = Random.Range(0, list.Count);
         SetTarget(rand, ctx.Party);
-        if(ctx.Target.Count == 0) { behaviour_index++; step = TurnStep.ChooseSkill; return; }
+        if(ctx.Target.Count == 0) { BehaviourUpdate(); return; }
         step = TurnStep.ExecutingSkill;
+    }
+
+    void BehaviourUpdate()
+    {
+        behaviour_index++;
+        if(behaviour_index > behaviourSO.behaviour.Count - 1) { behaviour_index = 0; }
+        step = TurnStep.ChooseSkill;
     }
     #endregion
 

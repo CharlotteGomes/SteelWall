@@ -8,4 +8,5 @@ public class BattleContext
     public List<BattleChar> Target = new List<BattleChar>();
     public List<BattleChar> Party = new List<BattleChar>();
     public List<BattleChar> Enemies = new List<BattleChar>();
+    public int SelfPosition;
 }

@@ -13,7 +13,7 @@ MonoBehaviour:
   m_Name: PJ test 1
   m_EditorClassIdentifier: Assembly-CSharp::PJSO
   Name: PJ A
-  sprites: {fileID: 11400000, guid: ea00853d930d22d47991be5e1b19c595, type: 2}
+  sprites: {fileID: 11400000, guid: 2df220cb0c678924f8b62d6422da8a74, type: 2}
   life: 1000
   protect: 50
   dodge: 0

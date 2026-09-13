@@ -112,7 +112,13 @@ public class PjController : BattleChar
             skill_index = Mathf.Clamp(skill_index + InputManager.hud_horizontal, 0, skills_equipped.Count - 1);
             skill_current = skills_equipped[skill_index];
         }
-        if (InputManager.interact && skill_current != null) { step = TurnStep.ChooseTarget; }
+        if (InputManager.interact && skill_current != null)
+        {
+            for(int i = 0; i < skill_current.use_pos.Length; i++)
+            {
+                if(ctx.SelfPosition == skill_current.use_pos[i]) { step = TurnStep.ChooseTarget; break; }
+            }
+        }
     }
 
     void ChoosingTarget()

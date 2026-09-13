@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 using UnityEngine.Playables;
 
@@ -31,6 +32,8 @@ public abstract class BattleChar : MonoBehaviour
 
     [SerializeField] protected List<StatusEffectData> StatusEffect = new();
     public IReadOnlyList<StatusEffectData> status_effects => StatusEffect.AsReadOnly();
+    List<StatusEffectData> onlyapply = new();
+
     public BattleContext Context => ctx;
     [SerializeField] protected SkillSO skill_current;
     [SerializeField] protected TurnStep step;
@@ -48,6 +51,7 @@ public abstract class BattleChar : MonoBehaviour
         accuracy = battle_char.accuracy;
         spd = battle_char.spd;
         crit = battle_char.crit;
+        sprite_renderer.sprite = spriteSO.idle;
     }
     public void SetBattleChar(BattleCharSO battle_char)
     {
@@ -60,7 +64,7 @@ public abstract class BattleChar : MonoBehaviour
     public void TakeDamage(DamageInfo info)
     {
         Debug.Log($"dano pré defesa: {info.damage}");
-        ReduceDamage(info);
+        if(info.ignore_prot) ReduceDamage(info);
         Debug.Log($"dano pós defese: {info.damage}");
         OnDamageTaken(info);
         if(info.damage>= 0)
@@ -121,9 +125,8 @@ public abstract class BattleChar : MonoBehaviour
         {
             if (data.effectName == dt.effectName)
             {
-                int amount = data.stacks > dt.stacks ? data.stacks : dt.stacks;
-                dt.stacks = amount;
-                continue;
+                dt.stacks += data.stacks;
+                return;
             }
         }
         StatusEffect.Add(data);
@@ -149,7 +152,8 @@ public abstract class BattleChar : MonoBehaviour
     #region Turn Events
     public void OnStartTurn()
     {
-        foreach(StatusEffectData status in StatusEffect)
+        onlyapply = StatusEffect.ToList();
+        foreach(StatusEffectData status in onlyapply)
         {
             status.OnStartTurn();
         }
@@ -157,7 +161,7 @@ public abstract class BattleChar : MonoBehaviour
 
     public void OnEndTurn()
     {
-        foreach (StatusEffectData status in StatusEffect)
+        foreach (StatusEffectData status in onlyapply)
         {
             status.OnEndTurn();
         }
@@ -165,7 +169,7 @@ public abstract class BattleChar : MonoBehaviour
 
     public void OnDamageDealt(DamageInfo info)
     {
-        foreach (StatusEffectData status in StatusEffect)
+        foreach (StatusEffectData status in onlyapply)
         {
             status.OnDamageDealt(info);
         }
@@ -173,7 +177,7 @@ public abstract class BattleChar : MonoBehaviour
 
     public void OnDamageTaken(DamageInfo info)
     {
-        foreach (StatusEffectData status in StatusEffect)
+        foreach (StatusEffectData status in onlyapply)
         {
             status.OnDamageTaken(info);
         }
@@ -181,28 +185,21 @@ public abstract class BattleChar : MonoBehaviour
 
     public void OnHealGiven(HealInfo info)
     {
-        foreach(StatusEffectData status in StatusEffect)
+        foreach(StatusEffectData status in onlyapply)
         {
             status.OnHealGiven(info);
-        }
-        if(info.heal_amount > 0)
-        {
-            foreach(BattleChar target in ctx.Target)
-            {
-                target.OnHealReceived(info);
-            }
         }
     }
     public void OnHealReceived(HealInfo info) 
     {
-        foreach(StatusEffectData status in StatusEffect)
+        foreach(StatusEffectData status in onlyapply)
         {
             status.OnHealReceived(info);
         }
     }
     public void OnReceiveStatus(StatusEffectData status)
     {
-        foreach(StatusEffectData s in StatusEffect)
+        foreach(StatusEffectData s in onlyapply)
         {
             s.OnReceiveStatus(status.sfSO);
         }
@@ -210,7 +207,7 @@ public abstract class BattleChar : MonoBehaviour
 
     public void OnGiveStatus(StatusEffectData status)
     {
-        foreach(StatusEffectData s in StatusEffect)
+        foreach(StatusEffectData s in onlyapply)
         {
             s.OnGiveStatus(status.sfSO);
         }
@@ -218,14 +215,14 @@ public abstract class BattleChar : MonoBehaviour
 
     public void OnStatusRemoved(StatusEffectData status)
     {
-        foreach(StatusEffectData s in StatusEffect)
+        foreach(StatusEffectData s in onlyapply)
         {
             s.OnStatusRemoved(status.sfSO);
         }
     }
 
     public void OnCharacterDeath() {
-        foreach(StatusEffectData status in StatusEffect)
+        foreach(StatusEffectData status in onlyapply)
         {
             status.OnCharacterDeath();
         }
@@ -296,12 +293,13 @@ public abstract class BattleChar : MonoBehaviour
     #endregion
 
     #region Info
-    public void CreateContext(List<BattleChar> allies, List<BattleChar> enemies)
+    public void CreateContext(List<BattleChar> allies, List<BattleChar> enemies, int pos)
     {
         if(ctx == null) ctx = new BattleContext();
         ctx.Self = this;
         ctx.Party = allies;
         ctx.Enemies = enemies;
+        ctx.SelfPosition = pos;
     }
 
     public void SetTarget(int pos, List<BattleChar> list)

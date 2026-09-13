@@ -13,7 +13,7 @@ MonoBehaviour:
   m_Name: enemy test 3
   m_EditorClassIdentifier: Assembly-CSharp::EnemySO
   Name: Inimigo C
-  sprites: {fileID: 11400000, guid: 6dd98634dc6ea904292f4549dfaadd4e, type: 2}
+  sprites: {fileID: 11400000, guid: 668c1841bb6fcb7468d85badd9bd87f2, type: 2}
   life: 1000
   protect: 0
   dodge: 0
@@ -21,4 +21,5 @@ MonoBehaviour:
   damage_max: 20
   accuracy: 0
   spd: 10
+  crit: 5
   behaviour: {fileID: 11400000, guid: 1295117b36dc8324c80d648feb6b9fdc, type: 2}

@@ -9,6 +9,7 @@ public class SkillSO : ScriptableObject
     public Sprite spr;
     public SkillEffectSO[] effects;
     public int[] pos;
+    public int[] use_pos;
 
     public int acc_base = 100;
     public int crit_mod = 0;

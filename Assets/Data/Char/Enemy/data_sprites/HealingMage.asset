@@ -1,0 +1,21 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4f25ae167da133e4fbcec3907c264d40, type: 3}
+  m_Name: HealingMage
+  m_EditorClassIdentifier: Assembly-CSharp::CharacterSpriteSO
+  idle: {fileID: 2147685559727469259, guid: bec8578281ee0624596864ffba9b0ba6, type: 3}
+  slash: {fileID: -4295039307428948894, guid: bbf7ec3ee6961f249848b313f4b58e13, type: 3}
+  pierce: {fileID: 0}
+  bludgeoning: {fileID: 0}
+  casting: {fileID: 0}
+  ranged: {fileID: 0}
+  hurt: {fileID: -2048800907179887802, guid: a6baaf2b7aa090640a9ca6dabc5a851e, type: 3}
