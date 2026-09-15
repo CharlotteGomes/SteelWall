@@ -1,6 +1,4 @@
 using UnityEngine;
-using UnityEditor.Playables;
-using UnityEditor.Animations;
 using UnityEngine.Playables;
 using System.Collections;
 using UnityEngine.Animations;

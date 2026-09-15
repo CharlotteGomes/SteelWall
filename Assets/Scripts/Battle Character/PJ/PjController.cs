@@ -1,11 +1,6 @@
-using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.Linq;
-using UnityEditor;
-using UnityEditor.Search;
 using UnityEngine;
-using UnityEngine.Playables;
 public class PjController : BattleChar
 {
     [SerializeField] List<SkillSO> test = new List<SkillSO>();
@@ -110,7 +105,7 @@ public class PjController : BattleChar
         {
             Debug.Log("Trocou de Skill");
             skill_index = Mathf.Clamp(skill_index + InputManager.hud_horizontal, 0, skills_equipped.Count - 1);
-            skill_current = skills_equipped[skill_index];
+            SetSkill(skills_equipped[skill_index]);
         }
         if (InputManager.interact && skill_current != null)
         {

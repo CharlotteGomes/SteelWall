@@ -14,7 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::SkillSO
   Name: "Rem\xE9dio Letal"
   Description: 
-  spr: {fileID: 0}
+  spr: {fileID: 3482906148250628609, guid: 1f2274ad0f543664b8d6cf9f05a8eb8d, type: 3}
   effects:
   - {fileID: 11400000, guid: c427fcd231d1e714b8932f9ccab2c390, type: 2}
   pos: 0000000001000000

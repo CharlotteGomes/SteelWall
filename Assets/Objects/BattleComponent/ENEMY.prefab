@@ -11,6 +11,7 @@ GameObject:
   - component: {fileID: 3085384902943926256}
   - component: {fileID: 1644163034527216552}
   - component: {fileID: 4092405471353485593}
+  - component: {fileID: 5874938780679596860}
   m_Layer: 0
   m_Name: ENEMY
   m_TagString: Untagged
@@ -104,32 +105,71 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e9a167cde03b6094f8a7e6bf4b1a1540, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::EnemyController
+  life_max: 0
+  life_current: 0
+  protect: 0
+  dodge: 0
+  damage_min: 0
+  damage_max: 0
+  accuracy: 0
+  spd: 0
+  crit: 0
   battle_char: {fileID: 0}
   ctx:
     Self: {fileID: 0}
-    Target: {fileID: 0}
+    Target:
+    - {fileID: 0}
     Party: []
     Enemies: []
-  skill_current:
-    skill: {fileID: 0}
-    cooldown: 0
+    SelfPosition: 0
+  StatusEffect: []
+  skill_current: {fileID: 0}
   step: 0
-  strength: 0
-  dexterity: 0
-  constitution: 0
-  intelligence: 0
-  mind: 0
-  life_max: 0
-  life_current: 0
-  mana_max: 0
-  mana_current: 0
-  r_slashing: 0
-  r_bludgeoning: 0
-  r_pierce: 0
-  r_fire: 0
-  r_ice: 0
-  r_lightning: 0
-  r_purity: 0
-  animator: {fileID: 0}
   behaviourSO: {fileID: 0}
   behaviour_index: 0
+--- !u!61 &5874938780679596860
+BoxCollider2D:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1574995437504366707}
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Density: 1
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_ForceSendLayers:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  m_ForceReceiveLayers:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  m_ContactCaptureLayers:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  m_CallbackLayers:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  m_IsTrigger: 1
+  m_UsedByEffector: 0
+  m_CompositeOperation: 0
+  m_CompositeOrder: 0
+  m_Offset: {x: 0, y: 0}
+  m_SpriteTilingProperty:
+    border: {x: 0, y: 0, z: 0, w: 0}
+    pivot: {x: 0.5, y: 0.5}
+    oldSize: {x: 3.158228, y: 3.987342}
+    newSize: {x: 1, y: 1}
+    adaptiveTilingThreshold: 0.5
+    drawMode: 0
+    adaptiveTiling: 0
+  m_AutoTiling: 0
+  m_Size: {x: 3.158228, y: 3.987342}
+  m_EdgeRadius: 0

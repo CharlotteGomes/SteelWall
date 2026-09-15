@@ -286,6 +286,11 @@ public abstract class BattleChar : MonoBehaviour
             result.hit.Add(n);
         }
     }
+
+    public void SetSkill(SkillSO so)
+    {
+        skill_current = so;
+    }
     #endregion
 
     #region Turn

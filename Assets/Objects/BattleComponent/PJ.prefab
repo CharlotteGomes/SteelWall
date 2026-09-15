@@ -11,6 +11,8 @@ GameObject:
   - component: {fileID: 5468499750618803084}
   - component: {fileID: 4008533514988991853}
   - component: {fileID: 880773031608702503}
+  - component: {fileID: -1120811859054469559}
+  - component: {fileID: 4812769170440970493}
   m_Layer: 0
   m_Name: PJ
   m_TagString: Untagged
@@ -104,48 +106,88 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9504f100ed4c4cd48a3fa6fb0d8aba65, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::PjController
+  life_max: 0
+  life_current: 0
+  protect: 0
+  dodge: 0
+  damage_min: 0
+  damage_max: 0
+  accuracy: 0
+  spd: 0
+  crit: 0
   battle_char: {fileID: 0}
   ctx:
     Self: {fileID: 0}
-    Target: {fileID: 0}
+    Target:
+    - {fileID: 0}
     Party: []
     Enemies: []
-  skill_current:
-    skill: {fileID: 0}
-    cooldown: 0
+    SelfPosition: 0
+  StatusEffect: []
+  skill_current: {fileID: 0}
   step: 0
-  strength: 0
-  dexterity: 0
-  constitution: 0
-  intelligence: 0
-  mind: 0
-  life_max: 0
-  life_current: 0
-  mana_max: 0
-  mana_current: 0
-  r_slashing: 0
-  r_bludgeoning: 0
-  r_pierce: 0
-  r_fire: 0
-  r_ice: 0
-  r_lightning: 0
-  r_purity: 0
-  animator: {fileID: 0}
   test:
   - {fileID: 11400000, guid: 79962291d56c0d346b28c0de426ba936, type: 2}
   - {fileID: 11400000, guid: 0e6baf26106d6204f8484fe7bc203e39, type: 2}
   - {fileID: 11400000, guid: 0180c36900014164596a966a99d070f6, type: 2}
   - {fileID: 11400000, guid: 755f86cc91fa8e349b0187ce092b9c66, type: 2}
-  weapon: {fileID: 11400000, guid: 8a6739ac2424eef44b1933e707659b33, type: 2}
-  helmet: {fileID: 0}
-  chestplate: {fileID: 0}
-  bracelet: {fileID: 0}
-  gloves: {fileID: 0}
-  legs: {fileID: 0}
-  greaves: {fileID: 0}
   skills_unlocked: []
   skills_equipped: []
-  weapon_skills: []
-  battle_options: 0
-  option_index: 0
-  skill_index: 0
+--- !u!114 &-1120811859054469559
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2813120227586499364}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: bc93ed274a8f96844b053b2da0b25cc2, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::BattleCharClick
+--- !u!61 &4812769170440970493
+BoxCollider2D:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2813120227586499364}
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Density: 1
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_ForceSendLayers:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  m_ForceReceiveLayers:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  m_ContactCaptureLayers:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  m_CallbackLayers:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  m_IsTrigger: 1
+  m_UsedByEffector: 0
+  m_CompositeOperation: 0
+  m_CompositeOrder: 0
+  m_Offset: {x: 0, y: 0}
+  m_SpriteTilingProperty:
+    border: {x: 0, y: 0, z: 0, w: 0}
+    pivot: {x: 0.5, y: 0.5}
+    oldSize: {x: 2.493671, y: 3.556962}
+    newSize: {x: 1, y: 1}
+    adaptiveTilingThreshold: 0.5
+    drawMode: 0
+    adaptiveTiling: 0
+  m_AutoTiling: 0
+  m_Size: {x: 2.493671, y: 3.556962}
+  m_EdgeRadius: 0
