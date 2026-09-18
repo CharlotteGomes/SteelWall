@@ -14,7 +14,6 @@ public enum TurnStep
 
 public class BattleManager : MonoBehaviour
 {
-    public BattleHUD hud;
     [SerializeField] List<BattleChar> initiative = new List<BattleChar>();
     [SerializeField] GameObject pj_prefab, enemy_prefab;
     [SerializeField] List<PJSO> test1 = new List<PJSO>();
@@ -58,8 +57,7 @@ public class BattleManager : MonoBehaviour
             yield return new WaitForSeconds(1f);
 
             current = initiative[initiative_index];
-            if (!current.CheckAlive()) { StartCoroutine(CharacterDeath(current)); current = null; continue; }
-            if(current is PjController pj){ hud.current = pj; hud.UpdateSkills(); } 
+            if (!current.CheckAlive()) { StartCoroutine(CharacterDeath(current)); current = null; continue; } 
             yield return StartCoroutine(current.OnGoingTurn());
             initiative_index++;
             if (initiative_index > initiative.Count - 1) { initiative_index = 0; turn++; }

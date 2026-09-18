@@ -14,12 +14,6 @@ public class PjController : BattleChar
     protected override void Awake()
     {
         base.Awake();
-        life_max = 1000;
-        life_current = 1000;
-        /*StatusEffectSO pois = new StatusEffectSO();
-        pois.stacks = 3;
-        StatusEffectData instance = new PoisonEffect(this, this, pois, 3);
-        GiveStatus(instance);*/
     }
 
     void Start()
@@ -103,53 +97,80 @@ public class PjController : BattleChar
         InputManager.GetInputs();
         if (InputManager.hud_horizontal != 0)
         {
-            Debug.Log("Trocou de Skill");
-            skill_index = Mathf.Clamp(skill_index + InputManager.hud_horizontal, 0, skills_equipped.Count - 1);
-            SetSkill(skills_equipped[skill_index]);
+            SelectSkill(skill_index + InputManager.hud_horizontal);
         }
-        if (InputManager.interact && skill_current != null)
+        if (InputManager.interact){ConfirmSkill();}
+    }
+
+    public void SelectSkill(int index)
+    {
+        if(index < 0 || index >= skills_equipped.Count) { return; }
+        skill_index = index;
+        SetSkill(skills_equipped[skill_index]);
+    }
+
+    public void ConfirmSkill()
+    {
+        if (skill_current == null)
+            return;
+
+        for (int i = 0; i < skill_current.use_pos.Length; i++)
         {
-            for(int i = 0; i < skill_current.use_pos.Length; i++)
+            if (ctx.SelfPosition == skill_current.use_pos[i])
             {
-                if(ctx.SelfPosition == skill_current.use_pos[i]) { step = TurnStep.ChooseTarget; break; }
+                SelectTarget(0);
+                step = TurnStep.ChooseTarget;
+                return;
             }
         }
     }
 
-    void ChoosingTarget()
+    public void SelectTarget(int index)
     {
+        if(skill_current == null) { return; }
+        if (index < 0 || index >= ctx.Enemies.Count) return;
+        intent_index = index;
+        ctx.Target.Clear();
         if (!skill_current.chose)
         {
             if (skill_current.affect_enemy)
             {
-                foreach(int p in skill_current.pos)
+                foreach (int p in skill_current.pos)
                 {
-                    if(p < ctx.Enemies.Count) SetTarget(p, ctx.Enemies);
+                    if (p < ctx.Enemies.Count) SetTarget(p, ctx.Enemies);
                 }
-                step = TurnStep.ExecutingSkill; return;
+                return;
             }
 
-            foreach(int p in skill_current.pos)
+            foreach (int p in skill_current.pos)
             {
                 if (p < ctx.Party.Count) SetTarget(p, ctx.Party);
             }
-            step = TurnStep.ExecutingSkill; return;
+            return;
         }
         
-        InputManager.GetInputs();
-        if (InputManager.interact) step = TurnStep.ExecutingSkill;
-        if (!(InputManager.hud_horizontal != 0)) { return; }
         if (skill_current.affect_enemy)
         {
-            intent_index = Mathf.Clamp(intent_index + InputManager.hud_horizontal, 0, ctx.Enemies.Count - 1);
             ctx.Target.Clear();
             SetTarget(intent_index, ctx.Enemies);
             return;
         }
-            intent_index = Mathf.Clamp(intent_index + InputManager.hud_horizontal, 0, ctx.Party.Count - 1);
-            ctx.Target.Clear();
-            SetTarget(intent_index, ctx.Party);
-        
+        ctx.Target.Clear();
+        SetTarget(intent_index, ctx.Party);
+    }
+
+    public void ConfirmTarget() 
+    {
+        if (skill_current == null) return;
+        if(ctx.Target.Count == 0) return;
+        step = TurnStep.ExecutingSkill;
+    }
+
+    void ChoosingTarget()
+    {
+        InputManager.GetInputs();
+        if(InputManager.hud_horizontal != 0) SelectTarget(intent_index + InputManager.hud_horizontal);
+        if (InputManager.interact) ConfirmTarget(); 
     }
     public override void SetRound()
     {

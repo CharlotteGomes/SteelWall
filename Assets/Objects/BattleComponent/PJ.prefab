@@ -11,7 +11,6 @@ GameObject:
   - component: {fileID: 5468499750618803084}
   - component: {fileID: 4008533514988991853}
   - component: {fileID: 880773031608702503}
-  - component: {fileID: -1120811859054469559}
   - component: {fileID: 4812769170440970493}
   m_Layer: 0
   m_Name: PJ
@@ -133,18 +132,6 @@ MonoBehaviour:
   - {fileID: 11400000, guid: 755f86cc91fa8e349b0187ce092b9c66, type: 2}
   skills_unlocked: []
   skills_equipped: []
---- !u!114 &-1120811859054469559
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2813120227586499364}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: bc93ed274a8f96844b053b2da0b25cc2, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::BattleCharClick
 --- !u!61 &4812769170440970493
 BoxCollider2D:
   m_ObjectHideFlags: 0
