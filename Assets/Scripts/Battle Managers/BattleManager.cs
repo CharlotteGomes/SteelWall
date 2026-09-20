@@ -1,9 +1,10 @@
-using UnityEngine;
-using System.Collections.Generic;
-using System;
-using System.Linq;
 using NUnit.Framework;
+using System;
 using System.Collections;
+using System.Collections.Generic;
+using System.Linq;
+using UnityEngine;
+using UnityEngine.TextCore.Text;
 public enum TurnStep
 {
     ChooseSkill,
@@ -21,7 +22,7 @@ public class BattleManager : MonoBehaviour
 
     [SerializeField] BattleChar[] pj_slot = new BattleChar[4];
     [SerializeField] BattleChar[] enemy_slot = new BattleChar[4];
-
+    [SerializeField] List<BattleChar> test = new List<BattleChar>();
 
     public BattleChar current { get; private set; }
 
@@ -40,7 +41,7 @@ public class BattleManager : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-       
+        if (Input.GetKeyDown(KeyCode.Space)) { SwapPosition(test[0], test[1]);}
     }
 
     public void StartBattle(List<PJSO> pjs, List<EnemySO> enemies)
@@ -134,6 +135,29 @@ public class BattleManager : MonoBehaviour
         }
     }
 
+    public void SwapPosition(BattleChar a, BattleChar b)
+    {
+        int PosA = GetPosition(a);
+        int PosB = GetPosition(b); 
+
+        if (a == null || b == null || PosA == -1|| PosB == -1) { return;}
+
+        if(a is PjController && b is PjController)
+        {
+            pj_slot[PosA] = b;
+            pj_slot[PosB] = a;
+        }
+
+        if(a is EnemyController && b is EnemyController)
+        {
+            enemy_slot[PosA] = b;
+            enemy_slot[PosB] = a;
+        }
+
+        SetContext();
+        SetAllPosition();
+    }
+
     public void InitiativeRemove(BattleChar b)
     {
         if (initiative.Contains(b)) { initiative.Remove(b); }
@@ -156,6 +180,23 @@ public class BattleManager : MonoBehaviour
                 }
                 break;
         }
+    }
+
+    public int GetPosition(BattleChar b)
+    {
+        for (int i = 0; i < pj_slot.Length; i++)
+        {
+            if (pj_slot[i] == b)
+                return i;
+        }
+
+        for (int i = 0; i < enemy_slot.Length; i++)
+        {
+            if (enemy_slot[i] == b)
+                return i;
+        }
+
+        return -1;
     }
 
     IEnumerator CharacterDeath(BattleChar b)
