@@ -9,8 +9,8 @@ public class PjController : BattleChar
     [SerializeField] protected List<SkillSO> skills_equipped = new List<SkillSO>();
     public IReadOnlyList<SkillSO> read_skills => skills_equipped;
 
-    public int skill_index { get; private set; } = 0;
-    public int intent_index { get; private set; } = 0;
+    [SerializeField] int action_index = 0;
+    [SerializeField] int intent_index = 0;
     protected override void Awake()
     {
         base.Awake();
@@ -18,11 +18,7 @@ public class PjController : BattleChar
 
     void Start()
     {
-        foreach (SkillSO wo in test)
-        {
-            AddSkill(wo);
-        }
-        skills_equipped = skills_unlocked;
+        
     }
 
     // Update is called once per frame
@@ -34,6 +30,12 @@ public class PjController : BattleChar
     #region Init
     public override void InitStats()
     {
+        foreach (SkillSO wo in test)
+        {
+            AddSkill(wo);
+        }
+        skills_equipped = skills_unlocked;
+        SetFavoritePos(skills_equipped);
         base.InitStats();
     }
     #endregion
@@ -84,6 +86,16 @@ public class PjController : BattleChar
                     yield return null;
                     break;
 
+                case TurnStep.MoveAction:
+                    MoveAction();
+                    yield return null;
+                    break;
+
+                case TurnStep.ChooseSwapTarget:
+                    ChooseSwapTarget();
+                    yield return null;
+                    break;
+
                 case TurnStep.ExecutingSkill:
                     yield return StartCoroutine(StartSkill());
                     step = TurnStep.Finish;
@@ -92,21 +104,22 @@ public class PjController : BattleChar
         }
     }
 
-    void ChoosingSkill()
+    protected override void ChoosingSkill()
     {
         InputManager.GetInputs();
         if (InputManager.hud_horizontal != 0)
         {
-            SelectSkill(skill_index + InputManager.hud_horizontal);
+            SelectSkill(action_index + InputManager.hud_horizontal);
         }
         if (InputManager.interact){ConfirmSkill();}
     }
 
     public void SelectSkill(int index)
     {
-        if(index < 0 || index >= skills_equipped.Count) { return; }
-        skill_index = index;
-        SetSkill(skills_equipped[skill_index]);
+        if (index < 0) { return; }
+        action_index = index;
+        if (index >= skills_equipped.Count) {step = TurnStep.MoveAction; return; }
+        SetSkill(skills_equipped[action_index]);
     }
 
     public void ConfirmSkill()
@@ -124,11 +137,18 @@ public class PjController : BattleChar
             }
         }
     }
+    protected override void ChoosingTarget()
+    {
+        InputManager.GetInputs();
+        if (InputManager.hud_horizontal != 0) SelectTarget(intent_index + InputManager.hud_horizontal);
+        if (InputManager.interact) ConfirmTarget();
+    }
 
-    public void SelectTarget(int index)
+    public override void SelectTarget(int index)
     {
         if(skill_current == null) { return; }
         if (index < 0 || index >= ctx.Enemies.Count) return;
+        if (index < skill_current.pos[0] || index > skill_current.pos[skill_current.pos.Length - 1]) return;
         intent_index = index;
         ctx.Target.Clear();
         if (!skill_current.chose)
@@ -159,26 +179,41 @@ public class PjController : BattleChar
         SetTarget(intent_index, ctx.Party);
     }
 
-    public void ConfirmTarget() 
+    public override void ConfirmTarget() 
     {
         if (skill_current == null) return;
         if(ctx.Target.Count == 0) return;
         step = TurnStep.ExecutingSkill;
     }
 
-    void ChoosingTarget()
+    protected void MoveAction() 
     {
         InputManager.GetInputs();
-        if(InputManager.hud_horizontal != 0) SelectTarget(intent_index + InputManager.hud_horizontal);
-        if (InputManager.interact) ConfirmTarget(); 
+        if (InputManager.hud_horizontal != 0)
+        {
+            action_index += InputManager.hud_horizontal;
+            if(action_index < 4){step = TurnStep.ChooseSkill; }
+        }
+        if (InputManager.interact) { intent_index = ctx.SelfPosition;  step = TurnStep.ChooseSwapTarget; }
+    }
+    public override void ChooseSwapTarget()
+    {
+        InputManager.GetInputs();
+        if (InputManager.hud_horizontal != 0)
+        {
+            int new_intent = InputManager.hud_horizontal == 1 ? ctx.SelfPosition - 1 : ctx.SelfPosition + 1;
+            intent_index = (new_intent < 0 || new_intent > ctx.Party.Count - 1) ? ctx.SelfPosition : new_intent;
+        }
+
+        if (InputManager.interact) { ConfirmSwapTarget(intent_index); }
     }
     public override void SetRound()
     {
         base.SetRound();
         step = TurnStep.ChooseSkill;
         intent_index = 0;
-        skill_index = 0;
-        skill_current = skills_equipped[skill_index];
+        action_index = 0;
+        skill_current = skills_equipped[action_index];
     }
         #endregion
 }

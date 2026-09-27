@@ -3,12 +3,16 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.TextCore.Text;
 public enum TurnStep
 {
     ChooseSkill,
     ChooseTarget,
+    MoveAction,
+    ChooseSwapTarget,
+    SkipTurn,
     ExecutingSkill,
     Finish
 }
@@ -41,7 +45,7 @@ public class BattleManager : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        if (Input.GetKeyDown(KeyCode.Space)) { SwapPosition(test[0], test[1]);}
+        if (Input.GetKeyDown(KeyCode.Space)) { SwapPosition(pj_slot[0], pj_slot[1]);}
     }
 
     public void StartBattle(List<PJSO> pjs, List<EnemySO> enemies)
@@ -56,13 +60,12 @@ public class BattleManager : MonoBehaviour
         while (true)
         {
             yield return new WaitForSeconds(1f);
-
             current = initiative[initiative_index];
             if (!current.CheckAlive()) { StartCoroutine(CharacterDeath(current)); current = null; continue; } 
             yield return StartCoroutine(current.OnGoingTurn());
+            yield return new WaitForSeconds(0.5f);
             initiative_index++;
             if (initiative_index > initiative.Count - 1) { initiative_index = 0; turn++; }
-            Debug.Log("FIM DE TURNO");
         }
     }
 
@@ -77,7 +80,6 @@ public class BattleManager : MonoBehaviour
             pj.name = pjs[i].Name;
 
             ctrl.SetBattleChar(pjs[i]);
-            ctrl.InitStats();
             initiative.Add(ctrl);
         }
 
@@ -92,12 +94,12 @@ public class BattleManager : MonoBehaviour
 
             
             ctrl.SetBattleChar(enemies[i]);
-            ctrl.InitStats();
             initiative.Add(ctrl);
         }
-        SetInitiative();
         SetContext();
         SetAllPosition();
+        InitiateCharacter();
+        SetInitiative();
     }
 
     void SetInitiative()
@@ -135,11 +137,46 @@ public class BattleManager : MonoBehaviour
         }
     }
 
+    void InitiateCharacter()
+    {
+        foreach(BattleChar b in initiative)
+        {
+            b.SetBattleManager(this);
+            b.InitStats();
+        }
+    }
+
+    IEnumerator LerpSetPos(BattleChar a, BattleChar b)
+    {
+        Transform tfA = a.transform;
+        Transform tfB = b.transform;
+        Vector2 EndPosA = tfB.position;
+        Vector2 EndPosB = tfA.position;
+        Vector2 velocityA = Vector2.zero;
+        Vector2 velocityB = Vector2.zero;
+        float smoothness = .1f;
+        float distA = Vector2.Distance(tfA.position, EndPosA);
+        float distB = Vector2.Distance(tfB.position, EndPosB);
+        while (distA > 0.1f || distB > 0.1f)
+        {
+            tfA.position = Vector2.SmoothDamp(tfA.position, EndPosA, ref velocityA, smoothness);
+            tfB.position = Vector2.SmoothDamp(tfB.position, EndPosB, ref velocityB, smoothness);
+            distA = Vector2.Distance(tfA.position, EndPosA);
+            distB = Vector2.Distance(tfB.position, EndPosB);
+            yield return null;
+        }
+        tfA.position = EndPosA;
+        tfB.position = EndPosB;
+    }
+
     public void SwapPosition(BattleChar a, BattleChar b)
     {
         int PosA = GetPosition(a);
-        int PosB = GetPosition(b); 
-
+        int PosB = GetPosition(b);
+        int OrderA = a.sprite_renderer.sortingOrder;
+        int OrderB = b.sprite_renderer.sortingOrder;
+        a.sprite_renderer.sortingOrder = OrderB;
+        b.sprite_renderer.sortingOrder = OrderA;
         if (a == null || b == null || PosA == -1|| PosB == -1) { return;}
 
         if(a is PjController && b is PjController)
@@ -153,9 +190,8 @@ public class BattleManager : MonoBehaviour
             enemy_slot[PosA] = b;
             enemy_slot[PosB] = a;
         }
-
+        StartCoroutine(LerpSetPos(a, b));
         SetContext();
-        SetAllPosition();
     }
 
     public void InitiativeRemove(BattleChar b)

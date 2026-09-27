@@ -28,16 +28,19 @@ public abstract class BattleChar : MonoBehaviour
     [SerializeField] protected int protect, dodge, damage_min, damage_max, accuracy, spd, crit;
     [SerializeField] protected BattleCharSO battle_char;
     [SerializeField] protected BattleContext ctx;
+    [SerializeField] protected List<FavoritePos> favorite_pos = new();
+
     public CharacterSpriteSO spriteSO { get; private set; }
 
     [SerializeField] protected List<StatusEffectData> StatusEffect = new();
     public IReadOnlyList<StatusEffectData> status_effects => StatusEffect.AsReadOnly();
     List<StatusEffectData> onlyapply = new();
 
+    
     public BattleContext Context => ctx;
     [SerializeField] protected SkillSO skill_current;
     [SerializeField] protected TurnStep step;
-
+    protected BattleManager battle_manager;
     #region Init
     public virtual void InitStats()
     {
@@ -53,9 +56,32 @@ public abstract class BattleChar : MonoBehaviour
         crit = battle_char.crit;
         sprite_renderer.sprite = spriteSO.idle;
     }
+
+    public virtual void SetFavoritePos(List<SkillSO> so_list)
+    {
+        favorite_pos.Clear();
+        for(int ii = 0;  ii < 4; ii++)
+        {
+            favorite_pos.Add(new FavoritePos());
+        }
+
+        foreach (SkillSO so in so_list)
+        {
+            for(int i = 0; i < so.use_pos.Length; i++)
+            {
+                favorite_pos[so.use_pos[i]].AddSkill(so);
+            }
+        }
+    }
+
     public void SetBattleChar(BattleCharSO battle_char)
     {
         this.battle_char = battle_char;
+    }
+
+    public void SetBattleManager(BattleManager battle)
+    {
+        battle_manager = battle;
     }
     #endregion
     //divide por 100 e multiplica pelo valor total
@@ -295,6 +321,28 @@ public abstract class BattleChar : MonoBehaviour
 
     #region Turn
     public abstract IEnumerator OnGoingTurn();
+
+    protected abstract void ChoosingSkill();
+
+    protected abstract void ChoosingTarget();
+
+    public abstract void SelectTarget(int index);
+    public abstract void ConfirmTarget();
+    public abstract void ChooseSwapTarget();
+    public void ConfirmSwapTarget(int index)
+    {
+        if (battle_manager == null) return;
+        if (index == ctx.SelfPosition) return;
+
+        BattleChar target = ctx.Party[index];
+
+        if (target == null) return;
+
+        battle_manager.SwapPosition(this, target);
+
+        step = TurnStep.Finish;
+    }
+
     #endregion
 
     #region Info
