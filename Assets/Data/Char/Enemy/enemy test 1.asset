@@ -21,5 +21,11 @@ MonoBehaviour:
   damage_max: 20
   accuracy: 0
   spd: 0
+  stun: 0
+  debuff: 0
+  bleed: 0
+  poison: 100
+  move: 0
+  sanity: 0
   crit: 5
   behaviour: {fileID: 11400000, guid: 1295117b36dc8324c80d648feb6b9fdc, type: 2}

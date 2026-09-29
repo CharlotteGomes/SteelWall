@@ -26,6 +26,7 @@ public abstract class BattleChar : MonoBehaviour
     [SerializeField] protected int life_max;
     [SerializeField] protected int life_current;
     [SerializeField] protected int protect, dodge, damage_min, damage_max, accuracy, spd, crit;
+    public List<StatusResistence> Resistences = new List<StatusResistence>();
     [SerializeField] protected BattleCharSO battle_char;
     [SerializeField] protected BattleContext ctx;
     [SerializeField] protected List<FavoritePos> favorite_pos = new();
@@ -55,6 +56,13 @@ public abstract class BattleChar : MonoBehaviour
         spd = battle_char.spd;
         crit = battle_char.crit;
         sprite_renderer.sprite = spriteSO.idle;
+
+        Resistences.Add(new StatusResistence(ResistenceType.STUN, battle_char.stun));
+        Resistences.Add(new StatusResistence(ResistenceType.DEBUFF, battle_char.debuff));
+        Resistences.Add(new StatusResistence(ResistenceType.BLEED, battle_char.bleed));
+        Resistences.Add(new StatusResistence(ResistenceType.POISON, battle_char.poison));
+        Resistences.Add(new StatusResistence(ResistenceType.MOVE, battle_char.move));
+        Resistences.Add(new StatusResistence(ResistenceType.SANITY, battle_char.sanity));
     }
 
     public virtual void SetFavoritePos(List<SkillSO> so_list)
@@ -146,6 +154,16 @@ public abstract class BattleChar : MonoBehaviour
 
     public void ReceiveStatus(StatusEffectData data)
     {
+        if (data.sfSO.resistable == true) {
+            foreach (StatusResistence st in Resistences)
+            {
+                if (st.resist == data.sfSO.type)
+                {
+                    int roll = Random.Range(0, 101);
+                    if (roll < st.value) {return; }
+                }
+            } 
+        }
         OnReceiveStatus(data);
         foreach (StatusEffectData dt in StatusEffect)
         {
