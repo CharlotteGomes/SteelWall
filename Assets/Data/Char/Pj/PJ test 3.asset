@@ -14,10 +14,17 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::PJSO
   Name: PJ C
   sprites: {fileID: 11400000, guid: ea00853d930d22d47991be5e1b19c595, type: 2}
-  life: 1000
+  life: 20
   protect: 0
   dodge: 0
   damage_min: 0
   damage_max: 0
   accuracy: 0
   spd: 0
+  stun: 0
+  debuff: 0
+  bleed: 0
+  poison: 0
+  move: 0
+  sanity: 0
+  crit: 5

@@ -10,4 +10,5 @@ public class PresentationSO : ScriptableObject
     public Vector2 targets_start_pos;
     public Vector2 targets_end_pos;
     public bool relative_pos = false;
+    public Sprite spr;
 }

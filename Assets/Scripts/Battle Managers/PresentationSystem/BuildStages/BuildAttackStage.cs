@@ -1,4 +1,3 @@
-using Unity.VisualScripting.Antlr3.Runtime;
 using UnityEngine;
 
 public class BuildAttackStage : BuildPresentation
@@ -13,7 +12,7 @@ public class BuildAttackStage : BuildPresentation
         var user_facing = BattlePresentation.CreateFacing(2, context.userState.battleChar.tf);
         var user_move = BattlePresentation.CreateMove(2, context.userState.tf, (Vector2)context.userState.localPosition + Vector2.right * context.presentationSO.self_start_pos, Vector2.right * context.presentationSO.self_end_pos);
         var user_scale = BattlePresentation.CreateCharacterScale(0.1f, context.userState.tf, context.userState.localScale, Vector2.one * 1.5f, 1f);
-        var user_sprite = BattlePresentation.CreateSprite(context.userState.spr_render, context.userState.battleChar.spriteSO.slash);
+        var user_sprite = BattlePresentation.CreateSprite(context.userState.spr_render, context.presentationSO.spr);
         var camera_zoom = BattlePresentation.CreateZoom(.1f, 7, 5.3f, .33f);
         var camera_rotate = BattlePresentation.CreateRotate(2f, 0, 5, 0.33f);
 

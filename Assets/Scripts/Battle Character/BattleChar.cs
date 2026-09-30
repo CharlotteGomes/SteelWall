@@ -10,11 +10,19 @@ public enum StatType
     SPD,
     DMG_MIN,
     DMG_MAX,
+    CRIT,
     PROTECT,
     DODGE,
     ACCURACY,
     LIFE_MAX,
-    LIFE_CURRENT
+    LIFE_CURRENT,
+    R_STUN,
+    R_MOVE,
+    R_DEBUFF,
+    R_BLEED,
+    R_POISON,
+    R_SANITY,
+    NOONE,
 }
 
 public abstract class BattleChar : MonoBehaviour
@@ -387,6 +395,7 @@ public abstract class BattleChar : MonoBehaviour
     {
         if(ctx.Target.Count >= 1) ctx.Target.Clear();
         OnStartTurn();
+        battle_manager.UpdateHud(this);
     }
 
     public int GetStat(StatType stat)
@@ -401,6 +410,14 @@ public abstract class BattleChar : MonoBehaviour
             StatType.LIFE_MAX => life_max,
             StatType.ACCURACY => accuracy,
             StatType.DODGE => dodge,
+            StatType.CRIT => crit,
+            StatType.R_STUN => Resistences[0].value,
+            StatType.R_DEBUFF => Resistences[1].value,
+            StatType.R_BLEED => Resistences[2].value,
+            StatType.R_POISON => Resistences[3].value,
+            StatType.R_MOVE => Resistences[4].value,
+            StatType.R_SANITY => Resistences[5].value,
+            StatType.NOONE => 0,
             _ => 0
         };
     }

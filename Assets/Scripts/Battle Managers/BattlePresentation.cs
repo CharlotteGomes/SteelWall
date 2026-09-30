@@ -1,6 +1,7 @@
 using UnityEngine;
 using UnityEngine.Playables;
 using System.Collections.Generic;
+using System.Runtime.InteropServices.WindowsRuntime;
 public static class BattlePresentation
 {
     public static PlayableGraph graph { get; private set; } = PlayableGraph.Create();
@@ -137,27 +138,12 @@ public static class BattlePresentation
 
     public static Sprite SetSprites(PresentationSO so, BattleChar b)
     {
-        switch (so.self)
+        return so.self switch
         {
-            case BattleSprites.Slash:
-                return b.spriteSO.slash;
-
-            case BattleSprites.Pierce:
-                return b.spriteSO.pierce;
-
-            case BattleSprites.Bludgeoning:
-                return b.spriteSO.bludgeoning;
-
-            case BattleSprites.Casting:
-                return b.spriteSO.casting;
-
-            case BattleSprites.Ranged:
-                return b.spriteSO.ranged;
-
-            case BattleSprites.Hurt:
-                return b.spriteSO.hurt;
-            default:
-                return null;
-        }
+            BattleSprites.Hurt => b.spriteSO.hurt,
+            BattleSprites.Idle => b.spriteSO.idle,
+            BattleSprites.buff => b.spriteSO.buff,
+            _ => null
+        };
     }
 }

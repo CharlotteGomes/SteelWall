@@ -1,6 +1,8 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.InputSystem.HID;
 public class PjController : BattleChar
 {
     [SerializeField] List<SkillSO> test = new List<SkillSO>();
@@ -9,8 +11,8 @@ public class PjController : BattleChar
     [SerializeField] protected List<SkillSO> skills_equipped = new List<SkillSO>();
     public IReadOnlyList<SkillSO> read_skills => skills_equipped;
 
-    [SerializeField] int action_index = 0;
-    [SerializeField] int intent_index = 0;
+    public int action_index { get; private set; } = 0;
+    public int intent_index { get; private set; } = 0;
     protected override void Awake()
     {
         base.Awake();
@@ -88,6 +90,8 @@ public class PjController : BattleChar
 
                 case TurnStep.MoveAction:
                     MoveAction();
+                    if (action_index <= 3) { step = TurnStep.ChooseSkill; SelectSkill(action_index);}
+                    if (action_index >= 5) step = TurnStep.SkipTurn;
                     yield return null;
                     break;
 
@@ -98,6 +102,9 @@ public class PjController : BattleChar
 
                 case TurnStep.ExecutingSkill:
                     yield return StartCoroutine(StartSkill());
+                    step = TurnStep.Finish;
+                    break;
+                case TurnStep.SkipTurn:
                     step = TurnStep.Finish;
                     break;
             }
@@ -117,9 +124,10 @@ public class PjController : BattleChar
     public void SelectSkill(int index)
     {
         if (index < 0) { return; }
-        action_index = index;
-        if (index >= skills_equipped.Count) {step = TurnStep.MoveAction; return; }
+        SetActionIndex(index);
+        if (index >= skills_equipped.Count) {step = TurnStep.MoveAction; battle_manager.hud.pj_panel.DiselectAllSkillIcon(); return; }
         SetSkill(skills_equipped[action_index]);
+        battle_manager.hud.pj_panel.SelectSkillIcon(action_index);
     }
 
     public void ConfirmSkill()
@@ -131,8 +139,8 @@ public class PjController : BattleChar
         {
             if (ctx.SelfPosition == skill_current.use_pos[i])
             {
-                SelectTarget(0);
                 step = TurnStep.ChooseTarget;
+                SelectTarget(0);
                 return;
             }
         }
@@ -140,6 +148,7 @@ public class PjController : BattleChar
     protected override void ChoosingTarget()
     {
         InputManager.GetInputs();
+        if(InputManager.esc || InputManager.back) { step = TurnStep.ChooseSkill; ctx.Target.Clear(); return; }
         if (InputManager.hud_horizontal != 0) SelectTarget(intent_index + InputManager.hud_horizontal);
         if (InputManager.interact) ConfirmTarget();
     }
@@ -148,7 +157,12 @@ public class PjController : BattleChar
     {
         if(skill_current == null) { return; }
         if (index < 0 || index >= ctx.Enemies.Count) return;
-        if (index < skill_current.pos[0] || index > skill_current.pos[skill_current.pos.Length - 1]) return;
+        if (index < skill_current.pos[0] || index > skill_current.pos[skill_current.pos.Length - 1])
+        {
+            step = TurnStep.ChooseSkill;
+            return;
+        }
+        
         intent_index = index;
         ctx.Target.Clear();
         if (!skill_current.chose)
@@ -191,14 +205,14 @@ public class PjController : BattleChar
         InputManager.GetInputs();
         if (InputManager.hud_horizontal != 0)
         {
-            action_index += InputManager.hud_horizontal;
-            if(action_index < 4){step = TurnStep.ChooseSkill; }
+            SetActionIndex(action_index + InputManager.hud_horizontal);
         }
         if (InputManager.interact) { intent_index = ctx.SelfPosition;  step = TurnStep.ChooseSwapTarget; }
     }
     public override void ChooseSwapTarget()
     {
         InputManager.GetInputs();
+        if (InputManager.esc || InputManager.back) { step = TurnStep.ChooseSkill; return; }
         if (InputManager.hud_horizontal != 0)
         {
             int new_intent = InputManager.hud_horizontal == 1 ? ctx.SelfPosition - 1 : ctx.SelfPosition + 1;
@@ -207,6 +221,13 @@ public class PjController : BattleChar
 
         if (InputManager.interact) { ConfirmSwapTarget(intent_index); }
     }
+
+    public void SetActionIndex(int index)
+    {
+        if(index < 0 || index > 5) return;
+        action_index = index;
+    }
+
     public override void SetRound()
     {
         base.SetRound();

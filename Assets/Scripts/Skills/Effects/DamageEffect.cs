@@ -16,6 +16,7 @@ public class DamageTarget: SkillEffectSO
         {
             DamageInfo info = new DamageInfo(user, target, damage);
             user.DealDamage(info);
+            
         }
     }
 }

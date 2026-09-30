@@ -1,11 +1,7 @@
-using NUnit.Framework;
-using System;
+using System.Linq;
 using System.Collections;
 using System.Collections.Generic;
-using System.Linq;
-using Unity.VisualScripting;
 using UnityEngine;
-using UnityEngine.TextCore.Text;
 public enum TurnStep
 {
     ChooseSkill,
@@ -19,6 +15,8 @@ public enum TurnStep
 
 public class BattleManager : MonoBehaviour
 {
+    
+    public BattleHud hud;
     [SerializeField] List<BattleChar> initiative = new List<BattleChar>();
     [SerializeField] GameObject pj_prefab, enemy_prefab;
     [SerializeField] List<PJSO> test1 = new List<PJSO>();
@@ -34,12 +32,12 @@ public class BattleManager : MonoBehaviour
     [SerializeField] int initiative_index = 0;
     private void Awake()
     {
-        StartBattle(test1, test2);
+        
     }
 
     void Start()
     {
-        
+        StartBattle(test1, test2);
     }
 
     // Update is called once per frame
@@ -59,9 +57,9 @@ public class BattleManager : MonoBehaviour
     {
         while (true)
         {
-            yield return new WaitForSeconds(1f);
             current = initiative[initiative_index];
-            if (!current.CheckAlive()) { StartCoroutine(CharacterDeath(current)); current = null; continue; } 
+            UpdateHud(current);
+            yield return new WaitForSeconds(1f);
             yield return StartCoroutine(current.OnGoingTurn());
             yield return new WaitForSeconds(0.5f);
             initiative_index++;
@@ -100,6 +98,21 @@ public class BattleManager : MonoBehaviour
         SetAllPosition();
         InitiateCharacter();
         SetInitiative();
+    }
+
+    public void UpdateHud(BattleChar b)
+    {
+        if(b is PjController)
+        {
+            hud.pj_panel.DiselectAllSkillIcon();
+            hud.pj_panel.SetCharacter(b);
+            hud.pj_panel.UpdateChildren();
+        }
+        if (b is EnemyController)
+        {
+            hud.enemy_panel.SetCharacter(b);
+            hud.enemy_panel.UpdateChildren();
+        }
     }
 
     void SetInitiative()

@@ -19,3 +19,4 @@ MonoBehaviour:
   targets_start_pos: {x: 1, y: 0}
   targets_end_pos: {x: -3, y: 0}
   relative_pos: 0
+  spr: {fileID: -74641670520355645, guid: d4bb3b631b41c0541af3f92c41f36a90, type: 3}

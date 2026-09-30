@@ -1,8 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
-using Unity.VisualScripting;
-using Unity.VisualScripting.FullSerializer;
 using UnityEngine;
 
 public class EnemyController : BattleChar
@@ -10,7 +8,6 @@ public class EnemyController : BattleChar
     [SerializeField] protected EnemyBehaviourSO behaviourSO;
     [SerializeField] protected int behaviour_index = 0;
     [SerializeField] int original_behaviour = 0;
-    [SerializeField] int most_value_pos = 0;
     void Start()
     {
     }
