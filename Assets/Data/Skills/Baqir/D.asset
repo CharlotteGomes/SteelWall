@@ -14,12 +14,12 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::SkillSO
   Name: D
   Description: 
-  icon: {fileID: 1495585146929241010, guid: 1f2274ad0f543664b8d6cf9f05a8eb8d, type: 3}
+  icon: {fileID: 8614319688527396397, guid: 299bcf00e6e655a41a6df02cf747a129, type: 3}
   anim: {fileID: 1367600477277776395, guid: 0c2e32f538037e8439a72ff027a63ff1, type: 3}
   effects:
   - {fileID: 11400000, guid: 1b6e446b4d8e85549a5e0cabf5dae27f, type: 2}
-  pos: 010000000200000003000000
-  use_pos: 02000000
+  pos: 000000000100000002000000
+  use_pos: 0200000001000000
   acc_base: 85
   crit_mod: 15
   affect_enemy: 1

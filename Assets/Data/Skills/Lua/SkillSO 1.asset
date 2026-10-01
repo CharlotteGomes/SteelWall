@@ -14,14 +14,19 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::SkillSO
   Name: 
   Description: 
-  spr: {fileID: 0}
-  effects: []
-  pos: 
-  use_pos: 
-  acc_base: 100
-  crit_mod: 0
+  icon: {fileID: 2918289801752941239, guid: 03eace0e2712dc24b9953a4e850fccf2, type: 3}
+  anim: {fileID: -8744577047072478711, guid: f84c3e00f587e904eb5abaedbb648a36, type: 3}
+  effects:
+  - {fileID: 11400000, guid: 893e245d2d5292741b913d9661294105, type: 2}
+  - {fileID: 11400000, guid: 32316b6cca5cba64cab386c6bafe9ef8, type: 2}
+  pos: 0000000001000000
+  use_pos: 0000000001000000
+  acc_base: 90
+  crit_mod: 5
   affect_enemy: 1
-  chose: 0
+  chose: 1
+  self: 0
   can_dodge: 1
   can_miss: 1
-  presentation: {fileID: 0}
+  can_crit: 1
+  presentation: {fileID: 11400000, guid: 911474115484dc541a14fc436d73e33d, type: 2}

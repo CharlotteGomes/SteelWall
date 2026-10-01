@@ -13,5 +13,5 @@ MonoBehaviour:
   m_Name: "RecuoAvan\xE7ado Move"
   m_EditorClassIdentifier: Assembly-CSharp::MoveEffectSO
   self: 1
-  sfSO: {fileID: 0}
+  sfSO: {fileID: 11400000, guid: 54834bde134310d488a1209f35580151, type: 2}
   dir: 2

@@ -145,6 +145,7 @@ public class PjController : BattleChar
         {
             if (ctx.SelfPosition == skill_current.use_pos[i])
             {
+                Debug.Log("Ta na pos");
                 step = TurnStep.ChooseTarget;
                 SelectTarget(0);
                 return;
@@ -163,12 +164,6 @@ public class PjController : BattleChar
     {
         if(skill_current == null) { return; }
         if (index < 0 || index >= ctx.Enemies.Count) return;
-        if (index < skill_current.pos[0] || index > skill_current.pos[skill_current.pos.Length - 1])
-        {
-            step = TurnStep.ChooseSkill;
-            return;
-        }
-        
         intent_index = index;
         ctx.Target.Clear();
         if (skill_current.self) { step = TurnStep.ExecutingSkill; return; }

@@ -29,7 +29,7 @@ MonoBehaviour:
   sanity: 40
   crit: 5
   skills:
-  - {fileID: 11400000, guid: 35a2246501ab3c8469123f0288e9356f, type: 2}
-  - {fileID: 11400000, guid: 35a2246501ab3c8469123f0288e9356f, type: 2}
-  - {fileID: 11400000, guid: 35a2246501ab3c8469123f0288e9356f, type: 2}
-  - {fileID: 11400000, guid: 35a2246501ab3c8469123f0288e9356f, type: 2}
+  - {fileID: 11400000, guid: 08ef89475dbe86b49a99abf71143ffd9, type: 2}
+  - {fileID: 11400000, guid: 39d6491f5f3474b45b76eba473b30674, type: 2}
+  - {fileID: 11400000, guid: 1d203312692d24b41967c567b8879642, type: 2}
+  - {fileID: 11400000, guid: 73128c24cdfc3ec4f940641a17bc5d8f, type: 2}

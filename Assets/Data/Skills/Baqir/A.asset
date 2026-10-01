@@ -14,7 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::SkillSO
   Name: A
   Description: 
-  icon: {fileID: -2310969455658145531, guid: 1f2274ad0f543664b8d6cf9f05a8eb8d, type: 3}
+  icon: {fileID: 7905958872146435475, guid: 6a6cbc900b067184a93f73e99944152b, type: 3}
   anim: {fileID: -1058940749459921734, guid: 8476085b3c55a724589e9db23b521ca4, type: 3}
   effects:
   - {fileID: 11400000, guid: 98ce8fb240faf534fb2f4bc0ae794ebd, type: 2}

@@ -13,7 +13,7 @@ MonoBehaviour:
   m_Name: amelia1
   m_EditorClassIdentifier: Assembly-CSharp::PresentationSO
   targets: 1
-  self_start_pos: {x: 0.25, y: 0}
+  self_start_pos: {x: 4, y: 0}
   self_end_pos: {x: -1.5, y: 0}
   targets_start_pos: {x: -0.25, y: 0}
   targets_end_pos: {x: 1.5, y: 0}
