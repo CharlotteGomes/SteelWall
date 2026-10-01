@@ -1,11 +1,10 @@
-using UnityEditor.Build.Content;
 using UnityEngine;
-
+using System.Collections.Generic;
+using UnityEditor.Search;
 public class BattleHud : MonoBehaviour
 {
     public PJBattleHUD pj_hud;
-    public EnemyBattleHUD enemy_hud;    
-
+    public EnemyBattleHUD enemy_hud;
     public void SetCharacter(BattleChar pj, BattleChar n) 
     {
         SetCharacterPJ(pj);

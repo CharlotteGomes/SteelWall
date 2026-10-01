@@ -7,6 +7,8 @@ public class PresentationContext
     public CharacterPresentationState userState;
     public CharacterPresentationState[] targetState;
 
+    public SkillSO skillso;
+
     public CameraPresentationState cameraState;
 
     public PresentationSO presentationSO;

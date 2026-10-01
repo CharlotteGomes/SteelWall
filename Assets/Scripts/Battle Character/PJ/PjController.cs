@@ -5,7 +5,6 @@ using UnityEngine;
 using UnityEngine.InputSystem.HID;
 public class PjController : BattleChar
 {
-    [SerializeField] List<SkillSO> test = new List<SkillSO>();
 
     [SerializeField] protected List<SkillSO> skills_unlocked = new List<SkillSO>();
     [SerializeField] protected List<SkillSO> skills_equipped = new List<SkillSO>();
@@ -31,12 +30,13 @@ public class PjController : BattleChar
     #region Init
     public override void InitStats()
     {
-        foreach (SkillSO wo in test)
+        PJSO pj = battle_char as PJSO;
+        foreach (SkillSO so in pj.skills)
         {
-            AddSkill(wo);
+            AddSkill(so);
         }
         skills_equipped = skills_unlocked;
-        SetFavoritePos(skills_equipped);
+        //SetFavoritePos(skills_equipped);
         base.InitStats();
     }
     #endregion
@@ -171,6 +171,7 @@ public class PjController : BattleChar
         
         intent_index = index;
         ctx.Target.Clear();
+        if (skill_current.self) { step = TurnStep.ExecutingSkill; return; }
         if (!skill_current.chose)
         {
             if (skill_current.affect_enemy)

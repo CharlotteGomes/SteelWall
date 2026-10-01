@@ -30,7 +30,7 @@ public class SkillIcon : MonoBehaviour, IPointerClickHandler
 
     public void UpdateSprite()
     {
-        image.sprite = so.spr; 
+        image.sprite = so.icon; 
     }
 
     private void OnEnable()

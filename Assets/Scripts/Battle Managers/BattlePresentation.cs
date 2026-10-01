@@ -136,9 +136,9 @@ public static class BattlePresentation
         presentation_list.Add(b);
     }
 
-    public static Sprite SetSprites(PresentationSO so, BattleChar b)
+    public static Sprite SetSprites(BattleSprites bs, BattleChar b)
     {
-        return so.self switch
+        return bs switch
         {
             BattleSprites.Hurt => b.spriteSO.hurt,
             BattleSprites.Idle => b.spriteSO.idle,

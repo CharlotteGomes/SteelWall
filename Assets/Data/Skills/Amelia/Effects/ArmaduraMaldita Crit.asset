@@ -1,0 +1,17 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1e52a9ebd87ac4448846f8ad649ac309, type: 3}
+  m_Name: ArmaduraMaldita Crit
+  m_EditorClassIdentifier: Assembly-CSharp::BuffStatsEffectSO
+  self: 1
+  sfSO: {fileID: 11400000, guid: 28db8d6caa1f2564593dbab9a9e454ec, type: 2}
+  so: {fileID: 11400000, guid: 5a818ba05db301543a07016974878b84, type: 2}

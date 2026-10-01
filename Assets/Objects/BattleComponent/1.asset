@@ -13,8 +13,8 @@ MonoBehaviour:
   m_Name: 1
   m_EditorClassIdentifier: Assembly-CSharp::EnemyBehaviourSO
   behaviour:
-  - {fileID: 11400000, guid: 79962291d56c0d346b28c0de426ba936, type: 2}
-  - {fileID: 11400000, guid: 0e6baf26106d6204f8484fe7bc203e39, type: 2}
-  - {fileID: 11400000, guid: 0180c36900014164596a966a99d070f6, type: 2}
-  - {fileID: 11400000, guid: 755f86cc91fa8e349b0187ce092b9c66, type: 2}
+  - {fileID: 11400000, guid: 35a2246501ab3c8469123f0288e9356f, type: 2}
+  - {fileID: 11400000, guid: 35a2246501ab3c8469123f0288e9356f, type: 2}
+  - {fileID: 11400000, guid: 35a2246501ab3c8469123f0288e9356f, type: 2}
+  - {fileID: 11400000, guid: 35a2246501ab3c8469123f0288e9356f, type: 2}
   conditional: []

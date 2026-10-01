@@ -328,6 +328,7 @@ public abstract class BattleChar : MonoBehaviour, IPointerClickHandler
     {
         BattlePresentation.CreateGraph();
         PresentationContext context = new PresentationContext(ctx.Self, ctx.Target.ToArray(), Camera.main, skill_current.presentation);
+        context.skillso = skill_current;
         BattleResult result = new BattleResult();
 
         yield return StartCoroutine(OnGoingSkill(result));

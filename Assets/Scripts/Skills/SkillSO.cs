@@ -6,7 +6,8 @@ using UnityEngine;
 public class SkillSO : ScriptableObject
 {
     public string Name, Description;
-    public Sprite spr;
+    public Sprite icon;
+    public Sprite anim;
     public SkillEffectSO[] effects;
     public int[] pos;
     public int[] use_pos;
@@ -15,9 +16,10 @@ public class SkillSO : ScriptableObject
     public int crit_mod = 0;
     public bool affect_enemy = true;
     public bool chose = false;
+    public bool self=false;
     public bool can_dodge = true;
     public bool can_miss = true;
-
+    public bool can_crit = true;
     public PresentationSO presentation;
 
     public void Execute(BattleChar user, BattleResult result)
