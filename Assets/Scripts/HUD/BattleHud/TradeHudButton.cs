@@ -5,7 +5,7 @@ using UnityEngine.UI;
 public class TradeHudButton : MonoBehaviour, IPointerClickHandler
 {
     [SerializeField] Image image;
-    [SerializeField] AtributtePanel panel;
+    [SerializeField] PJBattleHUD panel;
     [SerializeField] Sprite sprite_pressed, sprite_normal;
     [SerializeField] GameObject atributos, resistencias;
     void Start()

@@ -9,6 +9,14 @@ public class HealEffectSO : SkillEffectSO
 
     public override void Execute(BattleChar user, BattleResult result)
     {
+        if(self)
+        {
+            int heal_amount = unique_value ? max_heal : Random.Range(min_heal, max_heal + 1);
+            HealInfo info = new HealInfo(user, heal_amount, user);
+            user.DealHeal(info);
+            return;
+        }
+
         foreach (BattleChar target in result.hit)
         {
             int heal_amount = unique_value ? max_heal : Random.Range(min_heal, max_heal + 1);

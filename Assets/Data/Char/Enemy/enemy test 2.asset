@@ -12,20 +12,20 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 90cdd82a7ce306d4d904a63b93f66185, type: 3}
   m_Name: enemy test 2
   m_EditorClassIdentifier: Assembly-CSharp::EnemySO
-  Name: Inimigo B
+  Name: Clava medonha
   sprites: {fileID: 11400000, guid: 4c3dc55cd430d5742a127f43a4500ad2, type: 2}
-  life: 1000
-  protect: 0
+  life: 59
+  protect: 15
   dodge: 0
-  damage_min: 10
-  damage_max: 20
-  accuracy: 0
-  spd: 0
-  stun: 0
-  debuff: 0
-  bleed: 0
-  poison: 100
-  move: 0
+  damage_min: 4
+  damage_max: 15
+  accuracy: 1
+  spd: 2
+  stun: 35
+  debuff: 35
+  bleed: 20
+  poison: 5
+  move: 30
   sanity: 0
   crit: 5
   behaviour: {fileID: 11400000, guid: 1295117b36dc8324c80d648feb6b9fdc, type: 2}

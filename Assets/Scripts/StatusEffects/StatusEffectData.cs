@@ -6,16 +6,14 @@ public class StatusEffectData
     public string effectName;
     public StatusEffectSO sfSO;
     public int stacks;
-    public int timeRemaining;
     public BattleChar owner;
     public BattleChar source;
-    public StatusEffectData(BattleChar source, BattleChar owner, StatusEffectSO so)
+    public StatusEffectData(BattleChar source, BattleChar owner, StatusEffectSO so, string efName)
     {
         this.owner = owner;
         this.source = source;
-        this.timeRemaining = so.duration;
         this.stacks = so.stacks;
-        this.effectName = so.effectName;    
+        this.effectName = efName;    
         sfSO = so;
     }
 
@@ -23,6 +21,7 @@ public class StatusEffectData
     public virtual void OnRemove() { }
     public virtual void OnStartTurn() { }
     public virtual void OnEndTurn() { }
+    public virtual void OnUseSkill(BattleResult result) { }
     public virtual void OnDamageDealt(DamageInfo info) { }
     public virtual void OnDamageTaken(DamageInfo info) { }
     public virtual void OnHealGiven(HealInfo info) { }

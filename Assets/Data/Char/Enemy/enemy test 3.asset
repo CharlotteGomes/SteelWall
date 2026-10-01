@@ -12,20 +12,20 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 90cdd82a7ce306d4d904a63b93f66185, type: 3}
   m_Name: enemy test 3
   m_EditorClassIdentifier: Assembly-CSharp::EnemySO
-  Name: Inimigo C
+  Name: "Ac\xF3lito do Rei Oculto"
   sprites: {fileID: 11400000, guid: 668c1841bb6fcb7468d85badd9bd87f2, type: 2}
-  life: 1000
-  protect: 0
-  dodge: 0
-  damage_min: 10
-  damage_max: 20
-  accuracy: 0
-  spd: 10
-  stun: 0
-  debuff: 0
-  bleed: 0
-  poison: 100
-  move: 0
+  life: 37
+  protect: 5
+  dodge: 10
+  damage_min: 4
+  damage_max: 10
+  accuracy: 2
+  spd: 2
+  stun: 5
+  debuff: 20
+  bleed: 10
+  poison: 25
+  move: 15
   sanity: 0
   crit: 5
   behaviour: {fileID: 11400000, guid: 1295117b36dc8324c80d648feb6b9fdc, type: 2}

@@ -2,8 +2,9 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
+using UnityEngine.EventSystems;
 
-public class EnemyController : BattleChar
+public class EnemyController : BattleChar, IPointerEnterHandler
 {
     [SerializeField] protected EnemyBehaviourSO behaviourSO;
     [SerializeField] protected int behaviour_index = 0;
@@ -36,7 +37,7 @@ public class EnemyController : BattleChar
                 b = s.affect_enemy ? ctx.Enemies : ctx.Party; 
                 for(int i = 0; i < s.pos.Length; i++)
                 {
-                    if (i > b.Count) continue;
+                    if (i >= b.Count) continue;
                     fp.AddTarget(b[i]);
                 }
             }
@@ -193,5 +194,10 @@ public class EnemyController : BattleChar
         base.SetRound();
         original_behaviour = behaviour_index;
         step = TurnStep.ChooseSkill;
+    }
+
+    public void OnPointerEnter(PointerEventData eventData)
+    {
+        battle_manager.hud.SetCharacterEnemy(this);
     }
 }

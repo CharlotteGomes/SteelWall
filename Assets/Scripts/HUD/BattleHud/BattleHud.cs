@@ -3,17 +3,29 @@ using UnityEngine;
 
 public class BattleHud : MonoBehaviour
 {
-    public PjController current_pj {get; private set;}
-    public EnemyController current_enemy {get; private set;}
+    public PJBattleHUD pj_hud;
+    public EnemyBattleHUD enemy_hud;    
 
-    public AtributtePanel pj_panel, enemy_panel;
-    void Start()
+    public void SetCharacter(BattleChar pj, BattleChar n) 
     {
+        SetCharacterPJ(pj);
+        SetCharacterEnemy(n);
     }
 
-    void Update()
+    public void SetCharacterPJ(BattleChar c)
+    { 
+        pj_hud.SetCharacter(c);
+        pj_hud.UpdateChildren();
+    }
+    public void SetCharacterEnemy(BattleChar c)
     {
-        
+        enemy_hud.SetCharacter(c);
+        enemy_hud.UpdateChildren();
     }
 
+    public void RefreshHUD()
+    {
+        pj_hud.UpdateChildren();
+        enemy_hud.UpdateChildren();
+    }
 }

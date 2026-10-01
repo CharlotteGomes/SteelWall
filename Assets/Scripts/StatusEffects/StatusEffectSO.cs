@@ -6,8 +6,7 @@ public class StatusEffectSO : ScriptableObject
 {
     public ResistenceType type;
     public string effectName;
-    public Sprite icon;
     public int stacks;
-    public int duration;
+    public Sprite icon;
     public bool resistable;
 }

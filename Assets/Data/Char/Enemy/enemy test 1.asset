@@ -12,20 +12,20 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 90cdd82a7ce306d4d904a63b93f66185, type: 3}
   m_Name: enemy test 1
   m_EditorClassIdentifier: Assembly-CSharp::EnemySO
-  Name: Inimigo A
+  Name: Soldado de Steelwall
   sprites: {fileID: 11400000, guid: 1820d6c53d8889b47ba8083a0e14eeba, type: 2}
-  life: 1000
-  protect: 0
-  dodge: 0
-  damage_min: 10
-  damage_max: 20
-  accuracy: 0
-  spd: 0
-  stun: 0
-  debuff: 0
-  bleed: 0
-  poison: 100
-  move: 0
+  life: 67
+  protect: 10
+  dodge: 5
+  damage_min: 6
+  damage_max: 11
+  accuracy: 3
+  spd: 4
+  stun: 20
+  debuff: 20
+  bleed: 20
+  poison: 20
+  move: 20
   sanity: 0
   crit: 5
   behaviour: {fileID: 11400000, guid: 1295117b36dc8324c80d648feb6b9fdc, type: 2}

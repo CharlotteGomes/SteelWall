@@ -2,6 +2,8 @@ using System.Linq;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using NUnit.Framework.Constraints;
+using NUnit.Framework.Interfaces;
 public enum TurnStep
 {
     ChooseSkill,
@@ -48,8 +50,9 @@ public class BattleManager : MonoBehaviour
 
     public void StartBattle(List<PJSO> pjs, List<EnemySO> enemies)
     {
-        SpawnCharacters(pjs, enemies);
         initiative_index = 0;
+        SpawnCharacters(pjs, enemies);
+        hud.SetCharacter(pj_slot[0], enemy_slot[0]);
         StartCoroutine(TurnOrder());
     }
     
@@ -57,14 +60,33 @@ public class BattleManager : MonoBehaviour
     {
         while (true)
         {
-            current = initiative[initiative_index];
-            UpdateHud(current);
+            StartTurn();
             yield return new WaitForSeconds(1f);
             yield return StartCoroutine(current.OnGoingTurn());
-            yield return new WaitForSeconds(0.5f);
-            initiative_index++;
-            if (initiative_index > initiative.Count - 1) { initiative_index = 0; turn++; }
+            EndTurn();
         }
+    }
+
+    void StartTurn()
+    {
+        current = initiative[initiative_index];
+        current.SetRound();
+        if(current is PjController pj) { hud.SetCharacter(pj, enemy_slot[0]); }
+        if(current is EnemyController enemy) { hud.SetCharacter(pj_slot[0], enemy); }
+        RefreshHUD();
+    }
+
+    void EndTurn()
+    {
+        initiative_index++;
+        if (initiative_index > initiative.Count - 1) { initiative_index = 0; turn++; }
+        StartCoroutine(SyncVisualPositions());
+        RefreshHUD();
+    }
+
+    public void RefreshHUD()
+    {
+        hud.RefreshHUD();
     }
 
     void SpawnCharacters(List<PJSO> pjs, List<EnemySO> enemies)
@@ -100,18 +122,37 @@ public class BattleManager : MonoBehaviour
         SetInitiative();
     }
 
-    public void UpdateHud(BattleChar b)
+    public void CurrentSetTarget(BattleChar b)
     {
-        if(b is PjController)
+        if (current is not PjController p) return;
+        SkillSO so = p.skill_read;
+        switch (b)
         {
-            hud.pj_panel.DiselectAllSkillIcon();
-            hud.pj_panel.SetCharacter(b);
-            hud.pj_panel.UpdateChildren();
-        }
-        if (b is EnemyController)
-        {
-            hud.enemy_panel.SetCharacter(b);
-            hud.enemy_panel.UpdateChildren();
+            case PjController pj:
+                if (current.CurrentStep() == TurnStep.ChooseTarget)
+                {
+                    for (int i = 0; i < so.pos.Length; i++)
+                    {
+                        if (so.pos[i] == GetPosition(pj) && !so.affect_enemy) { current.SelectTarget(i); current.ConfirmTarget(); }
+                    }
+                    break;
+                }
+                if(current.CurrentStep() == TurnStep.ChooseSwapTarget)
+                {
+                    int diff = (int)Mathf.Abs(GetPosition(b) - GetPosition(current));
+                    if(diff == 1) { current.ConfirmSwapTarget(GetPosition(b)); }
+                }
+                break;
+            case EnemyController enemy:
+                if (current.CurrentStep() == TurnStep.ChooseTarget)
+                {
+                    for (int i = 0; i < so.pos.Length; i++)
+                    {
+                        if (so.pos[i] == GetPosition(enemy) && so.affect_enemy) { current.SelectTarget(i); current.ConfirmTarget(); }
+                    }
+                    break;
+                }
+                break;
         }
     }
 
@@ -142,11 +183,11 @@ public class BattleManager : MonoBehaviour
     {
         for(int i = 0; i < pj_slot.Length; i++)
         {
-            if(pj_slot[i] != null) { pj_slot[i].transform.position = (Vector3)(i * 2.5f * Vector2.left) + new Vector3(-3, 1f, -5); }
+            if(pj_slot[i] != null) { pj_slot[i].transform.position = (Vector3)(i * 2.5f * Vector2.left) + new Vector3(-3, -1.25f, -5); ; }
         }
         for(int i = 0; i < enemy_slot.Length; i++)
         {
-            if(enemy_slot[i] != null) { enemy_slot[i].transform.position = (Vector3)(i * 2.5f * Vector2.right) + new Vector3(3, 1f, -5); }
+            if(enemy_slot[i] != null) { enemy_slot[i].transform.position = (Vector3)(i * 2.5f * Vector2.right) + new Vector3(3, -1.25f, -5); }
         }
     }
 
@@ -159,27 +200,52 @@ public class BattleManager : MonoBehaviour
         }
     }
 
-    IEnumerator LerpSetPos(BattleChar a, BattleChar b)
+    IEnumerator SyncVisualPositions()
     {
-        Transform tfA = a.transform;
-        Transform tfB = b.transform;
-        Vector2 EndPosA = tfB.position;
-        Vector2 EndPosB = tfA.position;
-        Vector2 velocityA = Vector2.zero;
-        Vector2 velocityB = Vector2.zero;
-        float smoothness = .1f;
-        float distA = Vector2.Distance(tfA.position, EndPosA);
-        float distB = Vector2.Distance(tfB.position, EndPosB);
-        while (distA > 0.1f || distB > 0.1f)
+        List<Coroutine> movements = new List<Coroutine>();
+
+        for (int i = 0; i < pj_slot.Length; i++)
         {
-            tfA.position = Vector2.SmoothDamp(tfA.position, EndPosA, ref velocityA, smoothness);
-            tfB.position = Vector2.SmoothDamp(tfB.position, EndPosB, ref velocityB, smoothness);
-            distA = Vector2.Distance(tfA.position, EndPosA);
-            distB = Vector2.Distance(tfB.position, EndPosB);
+            if (pj_slot[i] != null)
+            {
+                Vector3 targetPos = (Vector3)(i * 2.5f * Vector2.left) + new Vector3(-3, -1.25f, -5);
+
+                movements.Add(StartCoroutine(MoveToPosition(pj_slot[i].transform, targetPos)));
+            }
+        }
+
+        for (int i = 0; i < enemy_slot.Length; i++)
+        {
+            if (enemy_slot[i] != null)
+            {
+                Vector3 targetPos = (Vector3)(i * 2.5f * Vector2.right) + new Vector3(3, -1.25f, -5);
+
+                movements.Add(StartCoroutine(MoveToPosition(enemy_slot[i].transform, targetPos)));
+            }
+        }
+
+        yield return new WaitForSeconds(0.5f);
+    }
+
+    IEnumerator MoveToPosition(Transform tf, Vector3 target)
+    {
+        Vector3 start = tf.position;
+        float duration = 0.4f;
+        float time = 0f;
+
+        while (time < duration)
+        {
+            time += Time.deltaTime;
+
+            float t = time / duration;
+            t = Mathf.SmoothStep(0f, 1f, t);
+
+            tf.position = Vector3.Lerp(start, target, t);
+
             yield return null;
         }
-        tfA.position = EndPosA;
-        tfB.position = EndPosB;
+
+        tf.position = target;
     }
 
     public void SwapPosition(BattleChar a, BattleChar b)
@@ -203,7 +269,6 @@ public class BattleManager : MonoBehaviour
             enemy_slot[PosA] = b;
             enemy_slot[PosB] = a;
         }
-        StartCoroutine(LerpSetPos(a, b));
         SetContext();
     }
 

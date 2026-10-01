@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
+using UnityEngine.EventSystems;
 using UnityEngine.Playables;
 
 
@@ -25,7 +26,7 @@ public enum StatType
     NOONE,
 }
 
-public abstract class BattleChar : MonoBehaviour
+public abstract class BattleChar : MonoBehaviour, IPointerClickHandler
 {
     public Transform tf { get ; private set; }
     public SpriteRenderer sprite_renderer { get; private set; }
@@ -42,6 +43,7 @@ public abstract class BattleChar : MonoBehaviour
     public CharacterSpriteSO spriteSO { get; private set; }
 
     [SerializeField] protected List<StatusEffectData> StatusEffect = new();
+    [SerializeField] protected List<StatsModifierSO> StatsModifier = new();
     public IReadOnlyList<StatusEffectData> status_effects => StatusEffect.AsReadOnly();
     List<StatusEffectData> onlyapply = new();
 
@@ -50,6 +52,7 @@ public abstract class BattleChar : MonoBehaviour
     [SerializeField] protected SkillSO skill_current;
     [SerializeField] protected TurnStep step;
     protected BattleManager battle_manager;
+    
     #region Init
     public virtual void InitStats()
     {
@@ -100,13 +103,12 @@ public abstract class BattleChar : MonoBehaviour
         battle_manager = battle;
     }
     #endregion
-    //divide por 100 e multiplica pelo valor total
 
     #region Generic
     public void TakeDamage(DamageInfo info)
     {
         Debug.Log($"dano pré defesa: {info.damage}");
-        if(info.ignore_prot) ReduceDamage(info);
+        if(!info.ignore_prot) ReduceDamage(info);
         Debug.Log($"dano pós defese: {info.damage}");
         OnDamageTaken(info);
         if(info.damage>= 0)
@@ -155,7 +157,6 @@ public abstract class BattleChar : MonoBehaviour
     public void GiveStatus(StatusEffectData data)
     {
         OnGiveStatus(data);
-        data.OnApply();
         data.source = this;
         data.owner.ReceiveStatus(data);
     }
@@ -173,6 +174,7 @@ public abstract class BattleChar : MonoBehaviour
             } 
         }
         OnReceiveStatus(data);
+        if(data.stacks == 0) { data.OnApply(); return; }   
         foreach (StatusEffectData dt in StatusEffect)
         {
             if (data.effectName == dt.effectName)
@@ -199,6 +201,39 @@ public abstract class BattleChar : MonoBehaviour
     {
         return life_current <= 0 ? false : true;
     }
+
+    public void ReceiveStatsModifier(StatsModifierSO modifier)
+    {
+        if(modifier != null)
+        {
+            StatsModifier.Add(modifier);
+        }
+    }
+
+    public void RemoveStatsModifier(StatsModifierSO modifier)
+    {
+        if (StatsModifier.Contains(modifier))
+        {
+            StatsModifier.Remove(modifier);
+        }
+    }
+
+    public int GetStatsModifier(StatType t)
+    {
+        List<StatsModifierSO> flat = StatsModifier.FindAll(x => x.flat == true && x.statType == t);
+        List<StatsModifierSO> percent = StatsModifier.FindAll(x => x.flat == false && x.statType == t);
+
+        int value = 0;
+        foreach (StatsModifierSO modifier in flat)
+        {
+            value += modifier.value;
+        }
+        foreach(StatsModifierSO modifier in percent)
+        {
+            value += (int)(GetBaseStat(modifier.statType) * (modifier.value / 100f));
+        }
+        return value;   
+    }
     #endregion
 
     #region Turn Events
@@ -219,6 +254,13 @@ public abstract class BattleChar : MonoBehaviour
         }
     }
 
+    public void OnUseSkill(BattleResult result)
+    {
+        foreach (StatusEffectData status in onlyapply)
+        {
+            status.OnUseSkill(result);
+        }
+    }
     public void OnDamageDealt(DamageInfo info)
     {
         foreach (StatusEffectData status in onlyapply)
@@ -281,7 +323,6 @@ public abstract class BattleChar : MonoBehaviour
     }
     #endregion
 
-
     #region Skill functions
     public virtual IEnumerator StartSkill()
     {
@@ -304,13 +345,6 @@ public abstract class BattleChar : MonoBehaviour
 
     public virtual IEnumerator OnGoingSkill(BattleResult result) 
     {
-        int roll = Random.Range(0, 101);
-
-        result.acc_base = skill_current.acc_base + accuracy;
-        result.acc_roll = roll;
-        result.skill_fail = roll <= skill_current.acc_base || !skill_current.can_miss ? false : true;
-        result.crit = roll <= crit + skill_current.crit_mod;
-        Debug.Log($"{result.acc_roll} {result.acc_base} {result.skill_fail}");
         ResolveSkill(result);
         yield return StartCoroutine(FinishingSkill(result));
     }
@@ -324,7 +358,15 @@ public abstract class BattleChar : MonoBehaviour
 
     public void ResolveSkill(BattleResult result)
     {
-        foreach(BattleChar n in ctx.Target)
+        int roll = Random.Range(0, 101);
+        result.acc_base = skill_current.acc_base + accuracy;
+        result.acc_roll = roll;
+        OnUseSkill(result);
+        result.skill_fail = roll <= skill_current.acc_base || !skill_current.can_miss ? false : true;
+        result.crit = roll <= crit + skill_current.crit_mod;
+        Debug.Log($"{result.acc_roll} {result.acc_base}");
+
+        foreach (BattleChar n in ctx.Target)
         {
             int hitChance = result.acc_base - n.dodge;
 
@@ -358,7 +400,7 @@ public abstract class BattleChar : MonoBehaviour
     public void ConfirmSwapTarget(int index)
     {
         if (battle_manager == null) return;
-        if (index == ctx.SelfPosition) return;
+        if (index == ctx.SelfPosition || index < 0 || index >= ctx.Party.Count) return;
 
         BattleChar target = ctx.Party[index];
 
@@ -391,14 +433,31 @@ public abstract class BattleChar : MonoBehaviour
         ctx.Target.Add(list[pos]);
     }
 
+    public void SetStep(TurnStep s)
+    {
+        step = s;
+    }
+
     public virtual void SetRound()
     {
         if(ctx.Target.Count >= 1) ctx.Target.Clear();
         OnStartTurn();
-        battle_manager.UpdateHud(this);
+        battle_manager.RefreshHUD();
     }
 
-    public int GetStat(StatType stat)
+    public TurnStep CurrentStep()
+    {
+        return step;
+    }
+
+    public int GetSelfPos()
+    {
+        return ctx.SelfPosition;
+    }
+
+
+
+    public int GetBaseStat(StatType stat)
     {
         return stat switch
         {
@@ -422,7 +481,21 @@ public abstract class BattleChar : MonoBehaviour
         };
     }
 
+    public int GetStat(StatType stat)
+    {
+        int baseValue = GetBaseStat(stat);
+        int modifier = GetStatsModifier(stat);
+
+        return baseValue + modifier;
+    }
+
     #endregion 
+
+    public void OnPointerClick(PointerEventData eventData)
+    {
+        battle_manager.CurrentSetTarget(this);
+    }
+
     protected virtual void Awake()
     {
         sprite_renderer = GetComponent<SpriteRenderer>();

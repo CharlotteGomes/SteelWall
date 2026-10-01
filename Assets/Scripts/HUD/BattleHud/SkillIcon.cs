@@ -4,14 +4,12 @@ using UnityEngine.UI;
 public class SkillIcon : MonoBehaviour, IPointerClickHandler
 {
     Image image;
-    [SerializeField] AtributtePanel panel;
+    [SerializeField] PJBattleHUD panel;
     public SkillSO so { get; private set; }
-    public OnSelect onSelect { get; private set; }
     public bool select = false;
     void Start()
     {
         image = GetComponent<Image>();
-        onSelect = GetComponent<OnSelect>();
     }
 
     // Update is called once per frame
@@ -38,6 +36,5 @@ public class SkillIcon : MonoBehaviour, IPointerClickHandler
     private void OnEnable()
     {
         image = GetComponent<Image>();
-        onSelect = GetComponent<OnSelect>();
     }
 }
