@@ -326,22 +326,8 @@ public abstract class BattleChar : MonoBehaviour, IPointerClickHandler
     #region Skill functions
     public virtual IEnumerator StartSkill()
     {
-        BattlePresentation.CreateGraph();
-        PresentationContext context = new PresentationContext(ctx.Self, ctx.Target.ToArray(), Camera.main, skill_current.presentation);
-        context.skillso = skill_current;
         BattleResult result = new BattleResult();
-
         yield return StartCoroutine(OnGoingSkill(result));
-        result.AddBuild(new BuildAttackStage(context));
-        result.AddBuild(new BuildReturnStage(context));
-        var presentation = result.BuildFinalResult();
-
-        var output = ScriptPlayableOutput.Create(BattlePresentation.graph, "Battle Presentation");
-
-        output.SetSourcePlayable(presentation);
-        BattlePresentation.graph.Play();
-        yield return new WaitForSeconds((float)presentation.GetDuration());
-        BattlePresentation.graph.Destroy();
     }
 
     public virtual IEnumerator OnGoingSkill(BattleResult result) 
