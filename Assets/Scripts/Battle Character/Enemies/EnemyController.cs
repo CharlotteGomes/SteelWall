@@ -50,9 +50,6 @@ public class EnemyController : BattleChar, IPointerEnterHandler
 
     public override IEnumerator OnGoingTurn()
     {
-        SetRound();
-        if(behaviour_index > behaviourSO.behaviour.Count - 1) { behaviour_index = 0; }
-
         while (step != TurnStep.Finish)
         {
             switch (step)
@@ -86,70 +83,17 @@ public class EnemyController : BattleChar, IPointerEnterHandler
         skill_current = behaviourSO.behaviour[behaviour_index]; 
         for (int i = 0; i < skill_current.use_pos.Length; i++)
         {
-            if (ctx.SelfPosition == skill_current.use_pos[i]) { step = TurnStep.ChooseTarget; return; }
+            if (ctx.SelfPosition == skill_current.use_pos[i]) { step = TurnStep.ChooseTarget; skill_current_data = new SkillData(skill_current, ctx); return; }
         }
         BehaviourUpdate();
     }
 
     protected override void ChoosingTarget()
     {
-        List<int> range = new List<int>();
-        
-        for (int i = 0; i < skill_current.pos.Length; i++)
-        {
-            if (skill_current.affect_enemy)
-            {
-                if (skill_current.pos[i] < ctx.Enemies.Count) { range.Add(skill_current.pos[i]); continue; }
-            }
-
-            if (!skill_current.affect_enemy)
-            {
-                if (skill_current.pos[i] < ctx.Party.Count) { range.Add(skill_current.pos[i]); continue; }
-            }
-        }
-
-        int random = Random.Range(0, range.Count);
-
-        if (random < range.Count)
-        {
-            SelectTarget(range[random]);
-            ConfirmTarget();
-            return;
-        }
-        BehaviourUpdate();
-    }
-
-    public override void SelectTarget(int index)
-    {
-        if (skill_current == null) { return; }
-        if (index < 0 || index >= ctx.Enemies.Count) return;
-        ctx.Target.Clear();
-        if (!skill_current.chose)
-        {
-            if (skill_current.affect_enemy)
-            {
-                foreach (int p in skill_current.pos)
-                {
-                    if (p < ctx.Enemies.Count) SetTarget(p, ctx.Enemies);
-                }
-                return;
-            }
-
-            foreach (int p in skill_current.pos)
-            {
-                if (p < ctx.Party.Count) SetTarget(p, ctx.Party);
-            }
-            return;
-        }
-
-        if (skill_current.affect_enemy)
-        {
-            ctx.Target.Clear();
-            SetTarget(index, ctx.Enemies);
-            return;
-        }
-        ctx.Target.Clear();
-        SetTarget(index, ctx.Party);
+        if(skill_current_data == null || skill_current_data.targets.Count == 0) { BehaviourUpdate(); return; }  
+        int random = Random.Range(0, skill_current_data.targets.Count);
+        SelectTarget(random);
+        ConfirmTarget();
     }
 
     public override void ConfirmTarget()

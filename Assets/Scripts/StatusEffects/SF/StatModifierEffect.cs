@@ -3,7 +3,7 @@ using UnityEngine;
 public class StatModifierEffect : StatusEffectData
 {
     StatsModifierSO modifier;
-    public StatModifierEffect(BattleChar source, BattleChar owner, StatusEffectSO so, StatsModifierSO modifier, string efName) : base(source, owner, so, efName)
+    public StatModifierEffect(BattleChar source, BattleChar owner, int stacks, StatusEffectSO so, StatsModifierSO modifier, bool resist) : base(source, owner, stacks, so, resist)
     {
         this.modifier = modifier;
     }
@@ -16,10 +16,10 @@ public class StatModifierEffect : StatusEffectData
     public override void OnEndTurn()
     {
         stacks--;
-        if (stacks <= 0)
-        {
-           owner.RemoveStatsModifier(modifier);
-           owner.StatusRemove(this);
-        }
+    }
+
+    public override void OnRemove()
+    {
+        owner.RemoveStatsModifier(modifier);
     }
 }

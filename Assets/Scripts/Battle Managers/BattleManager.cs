@@ -80,6 +80,7 @@ public class BattleManager : MonoBehaviour
     {
         initiative_index++;
         if (initiative_index > initiative.Count - 1) { initiative_index = 0; turn++; }
+        current.OnEndTurn();
         StartCoroutine(SyncVisualPositions());
         RefreshHUD();
     }

@@ -3,7 +3,7 @@ using UnityEngine;
 public class DamageModifierEffect : StatusEffectData
 {
     int value;
-    public DamageModifierEffect(BattleChar source, BattleChar owner, StatusEffectSO so, int value, string efName) : base(source, owner, so, efName)
+    public DamageModifierEffect(BattleChar source, BattleChar owner, StatusEffectSO so, int stacks, int value, bool resist) : base(source, owner, stacks, so, resist)
     {
         this.value = value;
     }
@@ -11,6 +11,6 @@ public class DamageModifierEffect : StatusEffectData
     public override void OnDamageDealt(DamageInfo info)
     {
         info.damage += (info.damage * value) / 100;
-        owner.StatusRemove(this);
+        stacks--;
     }
 }

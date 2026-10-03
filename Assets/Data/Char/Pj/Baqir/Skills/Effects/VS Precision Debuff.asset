@@ -1,0 +1,19 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1e52a9ebd87ac4448846f8ad649ac309, type: 3}
+  m_Name: VS Precision Debuff
+  m_EditorClassIdentifier: Assembly-CSharp::BuffStatsEffectSO
+  self: 0
+  sfSO: {fileID: 11400000, guid: 88ed456854953d44ca86ad7f4ce4c2ff, type: 2}
+  stacks: 2
+  resist: 1
+  so: {fileID: 11400000, guid: b0408d4982bdf074981e5fcf3636da8f, type: 2}

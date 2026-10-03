@@ -13,7 +13,5 @@ MonoBehaviour:
   m_Name: Move
   m_EditorClassIdentifier: Assembly-CSharp::StatusEffectSO
   type: 4
-  effectName: 
-  stacks: 0
+  effectName: Move
   icon: {fileID: 0}
-  resistable: 1

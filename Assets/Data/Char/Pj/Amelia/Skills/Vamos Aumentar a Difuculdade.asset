@@ -1,0 +1,35 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 45d7d4bb2d4ace2438d3b000cc197d4e, type: 3}
+  m_Name: Vamos Aumentar a Difuculdade
+  m_EditorClassIdentifier: Assembly-CSharp::SkillSO
+  Name: Vamos Aumentar a Difuculdade
+  Description: 
+  icon: {fileID: -8045637315960439886, guid: b9c8df128a3b8274f861cfd51b788ec7, type: 3}
+  anim: {fileID: -1337553829370455850, guid: e26dbe9c84bc53e4abbb367132101fb6, type: 3}
+  effects:
+  - {fileID: 11400000, guid: 7088226576d1a7845825ac913c4e86f9, type: 2}
+  - {fileID: 11400000, guid: 34893c8a7da4e194a9429c4541b3635e, type: 2}
+  - {fileID: 11400000, guid: eba1be770aef3ae4bbca95ac65d7bcc7, type: 2}
+  - {fileID: 11400000, guid: 25a5240dabae53a44a9bf38a516c74ea, type: 2}
+  - {fileID: 11400000, guid: 8ea4d9cabd8df464499606ab7638fc86, type: 2}
+  modifiers: []
+  pos: 
+  use_pos: 0000000001000000
+  acc_base: 100
+  crit_mod: 0
+  affect_enemy: 1
+  chose: 1
+  self: 1
+  can_dodge: 0
+  can_miss: 0
+  can_crit: 0

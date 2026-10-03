@@ -1,0 +1,32 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 45d7d4bb2d4ace2438d3b000cc197d4e, type: 3}
+  m_Name: Revigorar
+  m_EditorClassIdentifier: Assembly-CSharp::SkillSO
+  Name: 
+  Description: 
+  icon: {fileID: 7905958872146435475, guid: 7b36b0752a8714f43bc9e0d7b55d7d9c, type: 3}
+  anim: {fileID: 0}
+  effects:
+  - {fileID: 11400000, guid: a480fcc8a91584c409bc30e729ca966b, type: 2}
+  - {fileID: 11400000, guid: 5fa1c8fa1a33a1942b0845dd7b933543, type: 2}
+  modifiers: []
+  pos: 00000000010000000200000003000000
+  use_pos: 0200000003000000
+  acc_base: 100
+  crit_mod: 0
+  affect_enemy: 0
+  chose: 1
+  self: 0
+  can_dodge: 0
+  can_miss: 0
+  can_crit: 0

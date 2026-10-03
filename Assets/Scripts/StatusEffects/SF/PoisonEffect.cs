@@ -4,7 +4,7 @@ using UnityEngine;
 public class PoisonEffect : StatusEffectData
 {
     public int tier;
-    public PoisonEffect(BattleChar source, BattleChar owner, StatusEffectSO so, int tier, string efName) : base(source, owner, so, efName)
+    public PoisonEffect(BattleChar source, BattleChar owner, int stacks, StatusEffectSO so, int tier, bool resist) : base(source, owner, stacks, so, resist)
     {
         this.tier = tier;
     }
@@ -14,9 +14,5 @@ public class PoisonEffect : StatusEffectData
         DamageInfo info = new DamageInfo(source, owner, stacks * tier, true);
         owner.TakeDamage(info);
         stacks--;
-        if(stacks <= 0)
-        {
-            owner.StatusRemove(this);
-        }
     }
 }

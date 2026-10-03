@@ -8,12 +8,14 @@ public class StatusEffectData
     public int stacks;
     public BattleChar owner;
     public BattleChar source;
-    public StatusEffectData(BattleChar source, BattleChar owner, StatusEffectSO so, string efName)
+    public bool resistiable;
+    public StatusEffectData(BattleChar source, BattleChar owner, int stacks, StatusEffectSO so, bool resist)
     {
         this.owner = owner;
         this.source = source;
-        this.stacks = so.stacks;
-        this.effectName = efName;    
+        this.stacks = stacks;
+        this.effectName = so.effectName;
+        resistiable = resist;
         sfSO = so;
     }
 

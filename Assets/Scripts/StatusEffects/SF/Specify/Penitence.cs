@@ -2,7 +2,7 @@ using UnityEngine;
 
 public class Penitence : StatusEffectData
 {
-    public Penitence(BattleChar source, BattleChar owner, StatusEffectSO so, string efName) : base(source, owner, so, efName)
+    public Penitence(BattleChar source, BattleChar owner, int stacks, StatusEffectSO so, bool resist) : base(source, owner, stacks, so, resist)
     {
 
     }

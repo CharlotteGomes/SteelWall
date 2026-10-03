@@ -1,6 +1,8 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.ComponentModel;
+using System.Linq;
 using UnityEngine;
 using UnityEngine.InputSystem.HID;
 public class PjController : BattleChar
@@ -10,7 +12,7 @@ public class PjController : BattleChar
     [SerializeField] protected List<SkillSO> skills_equipped = new List<SkillSO>();
     public IReadOnlyList<SkillSO> read_skills => skills_equipped;
     public SkillSO skill_read => skill_current;
-    public int intent_index { get; private set; } = 0;
+    [SerializeField] int intent_index = 0; 
     protected override void Awake()
     {
         base.Awake();
@@ -145,9 +147,10 @@ public class PjController : BattleChar
         {
             if (ctx.SelfPosition == skill_current.use_pos[i])
             {
-                Debug.Log("Ta na pos");
                 step = TurnStep.ChooseTarget;
-                SelectTarget(0);
+                skill_current_data = new SkillData(skill_current, ctx);
+                intent_index = 0;
+                SelectTarget(intent_index);
                 return;
             }
         }
@@ -155,46 +158,17 @@ public class PjController : BattleChar
     protected override void ChoosingTarget()
     {
         InputManager.GetInputs();
-        if(InputManager.esc || InputManager.back) { step = TurnStep.ChooseSkill; ctx.Target.Clear(); return; }
-        if (InputManager.hud_horizontal != 0) SelectTarget(intent_index + InputManager.hud_horizontal);
+        if(InputManager.esc || InputManager.back) { step = TurnStep.ChooseSkill; ctx.Target.Clear(); skill_current_data = null; return; }
+        if (InputManager.hud_horizontal != 0) SelectTarget(intent_index - InputManager.hud_horizontal);
         if (InputManager.interact) ConfirmTarget();
     }
 
     public override void SelectTarget(int index)
     {
-        if(skill_current == null) { return; }
-        if (index < 0 || index >= ctx.Enemies.Count) return;
+        base.SelectTarget(index);
+        if (index < 0 || index >= skill_current_data.targets.Count) return;
         intent_index = index;
-        ctx.Target.Clear();
-        if (skill_current.self) { step = TurnStep.ExecutingSkill; return; }
-        if (!skill_current.chose)
-        {
-            if (skill_current.affect_enemy)
-            {
-                foreach (int p in skill_current.pos)
-                {
-                    if (p < ctx.Enemies.Count) SetTarget(p, ctx.Enemies);
-                }
-                return;
-            }
-
-            foreach (int p in skill_current.pos)
-            {
-                if (p < ctx.Party.Count) SetTarget(p, ctx.Party);
-            }
-            return;
-        }
-        
-        if (skill_current.affect_enemy)
-        {
-            ctx.Target.Clear();
-            SetTarget(intent_index, ctx.Enemies);
-            return;
-        }
-        ctx.Target.Clear();
-        SetTarget(intent_index, ctx.Party);
     }
-
     public override void ConfirmTarget() 
     {
         if (skill_current == null) return;
@@ -240,7 +214,7 @@ public class PjController : BattleChar
             SetIntentIndex(new_intent, ctx.Party);
         }
 
-        if (InputManager.interact) { ConfirmSwapTarget(intent_index); }
+        if (InputManager.interact) { ConfirmSwapTarget(0); }
     }
 
     public void SelectSkipTurn()
@@ -272,8 +246,7 @@ public class PjController : BattleChar
 
     public void SetIntentIndex(int index, List<BattleChar> list)
     {
-        if (index < 0 || index >= list.Count) return;
-        intent_index = index;   
+        
     }
 
     public override void SetRound()

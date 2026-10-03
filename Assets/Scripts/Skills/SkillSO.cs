@@ -1,5 +1,4 @@
-using JetBrains.Annotations;
-using System.Collections;
+using System.Collections.Generic;
 using UnityEngine;
 
 [CreateAssetMenu(fileName = "SkillSO", menuName = "Scriptable Objects/SkillSO/Skill")]
@@ -8,7 +7,8 @@ public class SkillSO : ScriptableObject
     public string Name, Description;
     public Sprite icon;
     public Sprite anim;
-    public SkillEffectSO[] effects;
+    public List<SkillEffectSO> effects;
+    public List<SkillModifiersSO> modifiers;
     public int[] pos;
     public int[] use_pos;
 
@@ -20,13 +20,4 @@ public class SkillSO : ScriptableObject
     public bool can_dodge = true;
     public bool can_miss = true;
     public bool can_crit = true;
-    public PresentationSO presentation;
-
-    public void Execute(BattleChar user, BattleResult result)
-    {
-        foreach(var effect in effects)
-        {
-            effect.Execute(user, result);
-        }
-    }
 }

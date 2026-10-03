@@ -44,12 +44,12 @@ public abstract class BattleChar : MonoBehaviour, IPointerClickHandler
 
     [SerializeField] protected List<StatusEffectData> StatusEffect = new();
     [SerializeField] protected List<StatsModifierSO> StatsModifier = new();
+    
     public IReadOnlyList<StatusEffectData> status_effects => StatusEffect.AsReadOnly();
-    List<StatusEffectData> onlyapply = new();
-
     
     public BattleContext Context => ctx;
     [SerializeField] protected SkillSO skill_current;
+    [SerializeField] protected SkillData skill_current_data;
     [SerializeField] protected TurnStep step;
     protected BattleManager battle_manager;
     
@@ -138,6 +138,7 @@ public abstract class BattleChar : MonoBehaviour, IPointerClickHandler
 
     public void ReceiveHeal(HealInfo info)
     {
+        Debug.Log($"ME CURARAM EM {info.heal_amount}");
         OnHealReceived(info);
         if(info.heal_amount >= 0)
         {
@@ -163,7 +164,9 @@ public abstract class BattleChar : MonoBehaviour, IPointerClickHandler
 
     public void ReceiveStatus(StatusEffectData data)
     {
-        if (data.sfSO.resistable == true) {
+        Debug.Log(data.effectName);
+        OnReceiveStatus(data);
+        if (data.resistiable == true) {
             foreach (StatusResistence st in Resistences)
             {
                 if (st.resist == data.sfSO.type)
@@ -173,16 +176,8 @@ public abstract class BattleChar : MonoBehaviour, IPointerClickHandler
                 }
             } 
         }
-        OnReceiveStatus(data);
+        
         if(data.stacks == 0) { data.OnApply(); return; }   
-        foreach (StatusEffectData dt in StatusEffect)
-        {
-            if (data.effectName == dt.effectName)
-            {
-                dt.stacks += data.stacks;
-                return;
-            }
-        }
         StatusEffect.Add(data);
         data.OnApply();
     }
@@ -239,86 +234,105 @@ public abstract class BattleChar : MonoBehaviour, IPointerClickHandler
     #region Turn Events
     public void OnStartTurn()
     {
-        onlyapply = StatusEffect.ToList();
-        foreach(StatusEffectData status in onlyapply)
+        foreach(StatusEffectData status in StatusEffect)
         {
             status.OnStartTurn();
         }
+        CheckStatusEffect();
     }
 
     public void OnEndTurn()
     {
-        foreach (StatusEffectData status in onlyapply)
+        foreach (StatusEffectData status in StatusEffect)
         {
             status.OnEndTurn();
         }
+        CheckStatusEffect();
     }
 
     public void OnUseSkill(BattleResult result)
     {
-        foreach (StatusEffectData status in onlyapply)
+        foreach (StatusEffectData status in StatusEffect)
         {
             status.OnUseSkill(result);
         }
+        CheckStatusEffect();
     }
     public void OnDamageDealt(DamageInfo info)
     {
-        foreach (StatusEffectData status in onlyapply)
+        foreach (StatusEffectData status in StatusEffect)
         {
             status.OnDamageDealt(info);
         }
+        CheckStatusEffect();
     }
 
     public void OnDamageTaken(DamageInfo info)
     {
-        foreach (StatusEffectData status in onlyapply)
+        foreach (StatusEffectData status in StatusEffect)
         {
             status.OnDamageTaken(info);
         }
+        CheckStatusEffect();
     }
 
     public void OnHealGiven(HealInfo info)
     {
-        foreach(StatusEffectData status in onlyapply)
+        foreach(StatusEffectData status in StatusEffect)
         {
             status.OnHealGiven(info);
         }
+        CheckStatusEffect();
     }
     public void OnHealReceived(HealInfo info) 
     {
-        foreach(StatusEffectData status in onlyapply)
+        foreach(StatusEffectData status in StatusEffect)
         {
             status.OnHealReceived(info);
         }
+        CheckStatusEffect();
     }
     public void OnReceiveStatus(StatusEffectData status)
     {
-        foreach(StatusEffectData s in onlyapply)
+        foreach(StatusEffectData s in StatusEffect)
         {
             s.OnReceiveStatus(status.sfSO);
         }
+        CheckStatusEffect();
     }
 
     public void OnGiveStatus(StatusEffectData status)
     {
-        foreach(StatusEffectData s in onlyapply)
+        foreach(StatusEffectData s in StatusEffect)
         {
             s.OnGiveStatus(status.sfSO);
         }
+        CheckStatusEffect();
     }   
 
     public void OnStatusRemoved(StatusEffectData status)
     {
-        foreach(StatusEffectData s in onlyapply)
+        foreach(StatusEffectData s in StatusEffect)
         {
             s.OnStatusRemoved(status.sfSO);
         }
+        CheckStatusEffect();
     }
 
     public void OnCharacterDeath() {
-        foreach(StatusEffectData status in onlyapply)
+        foreach(StatusEffectData status in StatusEffect)
         {
             status.OnCharacterDeath();
+        }
+        CheckStatusEffect();
+    }
+
+    public void CheckStatusEffect()
+    {
+        List<StatusEffectData> s = StatusEffect.ToList();
+        foreach (StatusEffectData status in s)
+        {
+            if(status.stacks <= 0) {StatusRemove(status); }
         }
     }
     #endregion
@@ -339,25 +353,25 @@ public abstract class BattleChar : MonoBehaviour, IPointerClickHandler
     public virtual IEnumerator FinishingSkill(BattleResult result)
     {
         if (result.skill_fail) yield break ;
-        skill_current.Execute(this, result);
+        skill_current_data.Execute(this, result);
         yield return null;
     }
 
     public void ResolveSkill(BattleResult result)
     {
         int roll = Random.Range(0, 101);
-        result.acc_base = skill_current.acc_base + accuracy;
+        result.acc_base = skill_current_data.acc_base + GetStat(StatType.ACCURACY);
         result.acc_roll = roll;
         OnUseSkill(result);
-        result.skill_fail = roll <= skill_current.acc_base || !skill_current.can_miss ? false : true;
-        result.crit = roll <= crit + skill_current.crit_mod;
+        result.skill_fail = result.acc_roll <= result.acc_base || !skill_current.can_miss ? false : true;
+        result.crit = roll <= GetStat(StatType.CRIT) + skill_current_data.crit_mod && skill_current_data.original_skill.can_crit;
         Debug.Log($"{result.acc_roll} {result.acc_base}");
 
         foreach (BattleChar n in ctx.Target)
         {
             int hitChance = result.acc_base - n.dodge;
 
-            if (result.acc_roll > hitChance)
+            if (result.acc_roll > hitChance && skill_current_data.original_skill.can_dodge)
             {
                 Debug.Log($"{n.name} desviou");
                 result.dodge.Add(n);
@@ -381,7 +395,20 @@ public abstract class BattleChar : MonoBehaviour, IPointerClickHandler
 
     protected abstract void ChoosingTarget();
 
-    public abstract void SelectTarget(int index);
+    public virtual void SelectTarget(int index)
+    {
+        if (skill_current_data == null) { return; }
+        if (index < 0 || index >= skill_current_data.targets.Count) return;
+        ctx.Target.Clear();
+        if (!skill_current.chose)
+        {
+            ctx.Target = skill_current_data.targets.ToList();
+            return;
+        }
+
+        ctx.Target.Add(skill_current_data.targets[index]);
+        skill_current_data.Prepare();
+    }
     public abstract void ConfirmTarget();
     public abstract void ChooseSwapTarget();
     public void ConfirmSwapTarget(int index)
@@ -409,20 +436,16 @@ public abstract class BattleChar : MonoBehaviour, IPointerClickHandler
         ctx.Enemies = enemies;
         ctx.SelfPosition = pos;
     }
-
-    public void SetTarget(int pos, List<BattleChar> list)
-    {
-        if(pos > list.Count - 1)
-        {
-            Debug.LogError("Target position is out of range");
-            return;
-        }
-        ctx.Target.Add(list[pos]);
-    }
-
     public void SetStep(TurnStep s)
     {
         step = s;
+    }
+
+    public void SetTarget(BattleChar c)
+    {
+        if(skill_current_data != null && skill_current_data.targets.Contains(c))
+        ctx.Target.Clear();
+        ctx.Target.Add(c);  
     }
 
     public virtual void SetRound()
@@ -441,8 +464,6 @@ public abstract class BattleChar : MonoBehaviour, IPointerClickHandler
     {
         return ctx.SelfPosition;
     }
-
-
 
     public int GetBaseStat(StatType stat)
     {
