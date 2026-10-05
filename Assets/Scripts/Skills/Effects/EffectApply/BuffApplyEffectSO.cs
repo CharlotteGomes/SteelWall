@@ -1,7 +1,7 @@
 using UnityEngine;
 
 [CreateAssetMenu(fileName = "Buff", menuName = "Scriptable Objects/SkillSO/Effects/Status Effect/BuffEffect")]
-public class BuffStatsEffectSO : ApplyStatusEffect
+public class BuffApplyEffectSO : ApplyStatusEffect
 {
     public StatsModifierSO so;
     public override void Execute(BattleChar user, BattleResult result)

@@ -45,14 +45,13 @@ public class BattleManager : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        if (Input.GetKeyDown(KeyCode.Space)) { SwapPosition(pj_slot[0], pj_slot[1]);}
+        if (Input.GetKeyDown(KeyCode.Space)) { hud.lifeManager.SpawnBars(initiative); }
     }
 
     public void StartBattle(List<PJSO> pjs, List<EnemySO> enemies)
     {
         initiative_index = 0;
         SpawnCharacters(pjs, enemies);
-        hud.SetCharacter(pj_slot[0], enemy_slot[0]);
         StartCoroutine(TurnOrder());
     }
     
@@ -81,14 +80,12 @@ public class BattleManager : MonoBehaviour
         initiative_index++;
         if (initiative_index > initiative.Count - 1) { initiative_index = 0; turn++; }
         current.OnEndTurn();
+        RefreshHUD(); 
         StartCoroutine(SyncVisualPositions());
-        RefreshHUD();
+        
     }
 
-    public void RefreshHUD()
-    {
-        hud.RefreshHUD();
-    }
+    
 
     void SpawnCharacters(List<PJSO> pjs, List<EnemySO> enemies)
     {
@@ -96,31 +93,45 @@ public class BattleManager : MonoBehaviour
         {
             GameObject pj = Instantiate(pj_prefab);
             PjController ctrl = pj.GetComponent<PjController>();
-            pj_slot[i] = ctrl; 
-            ctrl.sprite_renderer.sortingOrder = -1 * i;
-            pj.name = pjs[i].Name;
-
-            ctrl.SetBattleChar(pjs[i]);
-            initiative.Add(ctrl);
+            InitiateCharacter(ctrl, pjs[i]);
+            PlaceCharacters(ctrl);
         }
 
         for(int i = 0; i < enemies.Count; i++)
         {
             GameObject n = Instantiate(enemy_prefab);
             EnemyController ctrl = n.GetComponent<EnemyController>();
-            enemy_slot[i] = ctrl;
-            ctrl.sprite_renderer.flipX = true;
-            ctrl.sprite_renderer.sortingOrder = -1 * i;
-            n.name = enemies[i].Name;
-
-            
-            ctrl.SetBattleChar(enemies[i]);
-            initiative.Add(ctrl);
+            InitiateCharacter(ctrl, enemies[i]);
+            PlaceCharacters(ctrl);
         }
+
+        SetInitiative();
+        SetCharacterSpriteRender();
         SetContext();
         SetAllPosition();
-        InitiateCharacter();
-        SetInitiative();
+    }
+
+    public void RefreshHUD()
+    {
+        hud.RefreshHUD();
+    }
+
+    void SetCharacterSpriteRender()
+    {
+        for (int i = 0; i < pj_slot.Length; i++) 
+        {
+            if (pj_slot[i] == null) continue;
+            BattleChar pj = pj_slot[i];
+            pj.sprite_renderer.sortingOrder = 100 + (-1 * i); 
+        }
+
+        for (int i = 0; i < enemy_slot.Length; i++)
+        {
+            if (enemy_slot[i] == null) continue;
+            BattleChar n = enemy_slot[i];
+            n.sprite_renderer.sortingOrder = 100 + (-1 * i);
+            n.sprite_renderer.flipX =true;
+        }
     }
 
     public void CurrentSetTarget(BattleChar b)
@@ -157,6 +168,49 @@ public class BattleManager : MonoBehaviour
         }
     }
 
+    public bool CanOccupy(BattleChar character, int TargetPos)
+    {
+        int size = character.GetSize() - 1;
+
+        if (character is EnemyController n)
+        {
+            if (TargetPos + size >= enemy_slot.Length) return false;
+        }
+        if (TargetPos + size >= pj_slot.Length) return false;
+        return true;
+    }
+
+    public void PlaceCharacters(BattleChar character)
+    {
+        int size = character.GetSize();
+        int j = 0;
+        if (character is EnemyController)
+        {
+            for (int i = 0; i < enemy_slot.Length; i++)
+            {
+                if (j == size) break;
+                if (CheckOccupyPos(enemy_slot, i)) continue;
+
+                enemy_slot[i] = character;
+                j++;
+            }
+            return;
+        }
+        for (int i = 0; i < pj_slot.Length; i++)
+        {
+            if (j == size) break;
+            if (CheckOccupyPos(pj_slot, i)) continue;
+
+            pj_slot[i] = character;
+            j++;
+        }
+    }
+
+    public bool CheckOccupyPos(BattleChar[] list, int pos)
+    {
+        return list[pos] != null;
+    }
+
     void SetInitiative()
     {
         initiative = initiative.OrderByDescending(a => a.GetStat(StatType.SPD)).ToList();   
@@ -182,36 +236,58 @@ public class BattleManager : MonoBehaviour
 
     void SetAllPosition()
     {
-        for(int i = 0; i < pj_slot.Length; i++)
+        List<BattleChar> off = new List<BattleChar>();
+        for (int i = 0; i < pj_slot.Length; i++)
         {
-            if(pj_slot[i] != null) { pj_slot[i].transform.position = (Vector3)(i * 2.5f * Vector2.left) + new Vector3(-3, -1.25f, -5); ; }
+            if (off.Contains(pj_slot[i])) continue;
+            if(pj_slot[i] != null) { pj_slot[i].transform.position = GetWorldPos(i, pj_slot[i]); }
+            off.Add(pj_slot[i]);
         }
         for(int i = 0; i < enemy_slot.Length; i++)
         {
-            if(enemy_slot[i] != null) { enemy_slot[i].transform.position = (Vector3)(i * 2.5f * Vector2.right) + new Vector3(3, -1.25f, -5); }
+            if (off.Contains(enemy_slot[i])) continue;
+            if (enemy_slot[i] != null) { enemy_slot[i].transform.position = GetWorldPos(i, enemy_slot[i]); }
+            off.Add(enemy_slot[i]);
         }
     }
 
-    void InitiateCharacter()
+    Vector3 GetWorldPos(int i, BattleChar c)
+{
+    int size = c.GetSize();
+
+    float center = i + (size - 1) / 2f;
+
+    if (c is EnemyController)
     {
-        foreach(BattleChar b in initiative)
-        {
-            b.SetBattleManager(this);
-            b.InitStats();
-        }
+        return (Vector3)(center * 2.5f * Vector2.right)
+            + new Vector3(3, -1.25f, -5);
+    }
+
+    return (Vector3)(center * 2.5f * Vector2.left)
+        + new Vector3(-3, -1.25f, -5);
+}
+
+    void InitiateCharacter(BattleChar b, BattleCharSO so)
+    {
+        initiative.Add(b);
+        b.SetBattleChar(so);
+        b.SetBattleManager(this);
+        b.InitStats();
     }
 
     IEnumerator SyncVisualPositions()
     {
         List<Coroutine> movements = new List<Coroutine>();
-
+        List<BattleChar> off = new List<BattleChar>();
         for (int i = 0; i < pj_slot.Length; i++)
         {
             if (pj_slot[i] != null)
             {
-                Vector3 targetPos = (Vector3)(i * 2.5f * Vector2.left) + new Vector3(-3, -1.25f, -5);
+                if (off.Contains(pj_slot[i])) continue;
+                Vector2 targetPos = GetWorldPos(i, pj_slot[i]);
 
                 movements.Add(StartCoroutine(MoveToPosition(pj_slot[i].transform, targetPos)));
+                off.Add(pj_slot[i]);
             }
         }
 
@@ -219,9 +295,11 @@ public class BattleManager : MonoBehaviour
         {
             if (enemy_slot[i] != null)
             {
-                Vector3 targetPos = (Vector3)(i * 2.5f * Vector2.right) + new Vector3(3, -1.25f, -5);
+                if (off.Contains(enemy_slot[i])) continue;
+                Vector2 targetPos = GetWorldPos(i, enemy_slot[i]);
 
                 movements.Add(StartCoroutine(MoveToPosition(enemy_slot[i].transform, targetPos)));
+                off.Add(enemy_slot[i]);
             }
         }
 
@@ -242,34 +320,32 @@ public class BattleManager : MonoBehaviour
             t = Mathf.SmoothStep(0f, 1f, t);
 
             tf.position = Vector3.Lerp(start, target, t);
-
+            hud.lifeManager.MoveBars();
             yield return null;
         }
 
         tf.position = target;
     }
 
-    public void SwapPosition(BattleChar a, BattleChar b)
+
+    public void SwapPosition(BattleChar c, int pos)
     {
-        int PosA = GetPosition(a);
-        int PosB = GetPosition(b);
-        int OrderA = a.sprite_renderer.sortingOrder;
-        int OrderB = b.sprite_renderer.sortingOrder;
-        a.sprite_renderer.sortingOrder = OrderB;
-        b.sprite_renderer.sortingOrder = OrderA;
-        if (a == null || b == null || PosA == -1|| PosB == -1) { return;}
+        if (c == null ) { return;}
 
-        if(a is PjController && b is PjController)
+        if(c is PjController)
         {
-            pj_slot[PosA] = b;
-            pj_slot[PosB] = a;
+            List<BattleChar> pj = pj_slot.Where(x => x != c).ToList();
+            pj.Insert(pos, c);
+            pj_slot = pj.ToArray();
         }
 
-        if(a is EnemyController && b is EnemyController)
+        if(c is EnemyController)
         {
-            enemy_slot[PosA] = b;
-            enemy_slot[PosB] = a;
+            List<BattleChar> n = enemy_slot.Where(x => x != c).ToList();
+            n.Insert(pos, c);
+            enemy_slot = n.ToArray();
         }
+        SetCharacterSpriteRender();
         SetContext();
     }
 

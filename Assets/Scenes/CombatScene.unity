@@ -439,7 +439,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::StatsToText
   statType1: 12
-  statType2: 15
+  statType2: 16
 --- !u!114 &67913273
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -971,7 +971,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::StatsToText
   statType1: 15
-  statType2: 15
+  statType2: 16
 --- !u!1 &273719719
 GameObject:
   m_ObjectHideFlags: 0
@@ -1413,6 +1413,7 @@ MonoBehaviour:
   - {fileID: 11400000, guid: eb62ec11013488044b653913cf7bf190, type: 2}
   - {fileID: 11400000, guid: 259cb2d259e8a36459ea02b56bdb6c41, type: 2}
   - {fileID: 11400000, guid: 554927b8abf935b45bf3016710121f2a, type: 2}
+  - {fileID: 11400000, guid: 554927b8abf935b45bf3016710121f2a, type: 2}
   test2:
   - {fileID: 11400000, guid: 8a4f46d4c0e488744bce85ef183e6d7a, type: 2}
   - {fileID: 11400000, guid: 49f29ddd1180df641bb948092fdcbc5a, type: 2}
@@ -1580,7 +1581,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::StatsToText
   statType1: 4
-  statType2: 15
+  statType2: 16
 --- !u!1 &598381348
 GameObject:
   m_ObjectHideFlags: 0
@@ -1670,7 +1671,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::StatsToText
   statType1: 4
-  statType2: 15
+  statType2: 16
 --- !u!114 &616246303
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2359,7 +2360,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::StatsToText
   statType1: 0
-  statType2: 15
+  statType2: 16
 --- !u!114 &835012696
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -3373,7 +3374,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::StatsToText
   statType1: 10
-  statType2: 15
+  statType2: 16
 --- !u!114 &1103808782
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -3804,7 +3805,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::StatsToText
   statType1: 3
-  statType2: 15
+  statType2: 16
 --- !u!1 &1290082948
 GameObject:
   m_ObjectHideFlags: 0
@@ -3946,7 +3947,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::StatsToText
   statType1: 13
-  statType2: 15
+  statType2: 16
 --- !u!114 &1314773319
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -4047,6 +4048,56 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1314773316}
   m_CullTransparentMesh: 1
+--- !u!1 &1328683295
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1328683296}
+  - component: {fileID: 1328683297}
+  m_Layer: 5
+  m_Name: LIFE_BARS
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!224 &1328683296
+RectTransform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1328683295}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 2125972867}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  m_AnchorMin: {x: 0.5, y: 0.5}
+  m_AnchorMax: {x: 0.5, y: 0.5}
+  m_AnchoredPosition: {x: 0, y: 0}
+  m_SizeDelta: {x: 100, y: 100}
+  m_Pivot: {x: 0.5, y: 0.5}
+--- !u!114 &1328683297
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1328683295}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: bb4a76c22d19a2044814d0beff90e950, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::LifeBarManager
+  life_bar: {fileID: 6035722527045672168, guid: 743a86ccc563426458911862a5bc2e56, type: 3}
+  lifeBars: []
 --- !u!1 &1368977839
 GameObject:
   m_ObjectHideFlags: 0
@@ -4581,7 +4632,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::StatsToText
   statType1: 5
-  statType2: 15
+  statType2: 16
 --- !u!1 &1577058739
 GameObject:
   m_ObjectHideFlags: 0
@@ -4841,8 +4892,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 45a3a20792d6df845a44bf9095b4dfdd, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::StatsToText
-  statType1: 5
-  statType2: 14
+  statType1: 6
+  statType2: 16
 --- !u!1 &1614349044
 GameObject:
   m_ObjectHideFlags: 0
@@ -4972,7 +5023,7 @@ Camera:
   far clip plane: 1000
   field of view: 60
   orthographic: 1
-  orthographic size: 7
+  orthographic size: 7.5
   m_Depth: -1
   m_CullingMask:
     serializedVersion: 2
@@ -5217,7 +5268,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::StatsToText
   statType1: 5
-  statType2: 15
+  statType2: 16
 --- !u!114 &1745364896
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -5369,7 +5420,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::StatsToText
   statType1: 9
-  statType2: 15
+  statType2: 16
 --- !u!114 &1758935651
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -5521,7 +5572,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::StatsToText
   statType1: 11
-  statType2: 15
+  statType2: 16
 --- !u!114 &1836331388
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -5763,7 +5814,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::StatsToText
   statType1: 15
-  statType2: 15
+  statType2: 16
 --- !u!114 &1910934707
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -6095,6 +6146,7 @@ RectTransform:
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 277423819}
+  - {fileID: 1328683296}
   m_Father: {fileID: 1740078901}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
@@ -6116,6 +6168,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::BattleHud
   pj_hud: {fileID: 273719721}
   enemy_hud: {fileID: 1940584918}
+  lifeManager: {fileID: 1328683297}
 --- !u!1660057539 &9223372036854775807
 SceneRoots:
   m_ObjectHideFlags: 0

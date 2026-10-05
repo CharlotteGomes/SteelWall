@@ -13,7 +13,7 @@ public class SkillData
     public List<SkillEffectSO> effects = new List<SkillEffectSO>();
 
     public BattleContext ctx { get; private set; }
-    public List<BattleChar> targets { get; private set; } = new List<BattleChar>();
+    public List<BattleChar> targets = new List<BattleChar>();
     
     public SkillData(SkillSO skill, BattleContext ctx)
     {
@@ -36,8 +36,19 @@ public class SkillData
         targets.Clear();
 
         if(original_skill.self) { targets.Add(ctx.Self); return; }
-        if (original_skill.affect_enemy) { targets = ctx.Enemies.FindAll(x => original_skill.pos.Contains(x.GetSelfPos())).ToList(); return; }
-        targets = ctx.Party.FindAll(x => original_skill.pos.Contains(x.GetSelfPos())).ToList();
+        if (original_skill.affect_enemy)
+        { 
+            foreach(var n in ctx.Enemies)
+            {
+                if (targets.Contains(n) || !original_skill.pos.Contains(n.GetSelfPos())) continue;
+                targets.Add(n);
+            }
+            return; }
+        foreach (var n in ctx.Party)
+        {
+            if (targets.Contains(n) || !original_skill.pos.Contains(n.GetSelfPos())) continue;
+            targets.Add(n);
+        }
     }
 
     public void SetEffects()

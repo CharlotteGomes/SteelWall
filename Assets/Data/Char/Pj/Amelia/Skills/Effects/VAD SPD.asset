@@ -13,7 +13,7 @@ MonoBehaviour:
   m_Name: VAD SPD
   m_EditorClassIdentifier: Assembly-CSharp::BuffStatsEffectSO
   self: 1
-  sfSO: {fileID: 11400000, guid: a18c53e78baba3f428956a754c1a0cc1, type: 2}
+  sfSO: {fileID: 11400000, guid: bf9beeedb75247d4fa5629f71cf0e146, type: 2}
   stacks: 2
   resist: 0
   so: {fileID: 11400000, guid: 56b497f717bdc1d4eb5088dd8c151d68, type: 2}

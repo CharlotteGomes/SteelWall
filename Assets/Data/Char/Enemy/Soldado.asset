@@ -21,6 +21,7 @@ MonoBehaviour:
   damage_max: 11
   accuracy: 3
   spd: 4
+  move_range: 0
   stun: 20
   debuff: 20
   bleed: 20
@@ -28,4 +29,5 @@ MonoBehaviour:
   move: 20
   sanity: 0
   crit: 5
+  size: 2
   behaviour: {fileID: 11400000, guid: 1295117b36dc8324c80d648feb6b9fdc, type: 2}

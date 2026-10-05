@@ -22,7 +22,7 @@ MonoBehaviour:
   - {fileID: 11400000, guid: 06a1322c4602e9a4bb4af5263fbf3eeb, type: 2}
   modifiers: []
   pos: 0000000001000000
-  use_pos: 0300000004000000
+  use_pos: 0200000003000000
   acc_base: 95
   crit_mod: 5
   affect_enemy: 1

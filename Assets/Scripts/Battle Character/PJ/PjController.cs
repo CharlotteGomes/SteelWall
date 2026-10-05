@@ -159,7 +159,11 @@ public class PjController : BattleChar
     {
         InputManager.GetInputs();
         if(InputManager.esc || InputManager.back) { step = TurnStep.ChooseSkill; ctx.Target.Clear(); skill_current_data = null; return; }
-        if (InputManager.hud_horizontal != 0) SelectTarget(intent_index - InputManager.hud_horizontal);
+        if (InputManager.hud_horizontal != 0)
+        {
+            if (skill_current.affect_enemy) {SelectTarget(intent_index + InputManager.hud_horizontal); return;}
+            SelectTarget(intent_index - InputManager.hud_horizontal);
+        }
         if (InputManager.interact) ConfirmTarget();
     }
 
@@ -210,11 +214,12 @@ public class PjController : BattleChar
         if (InputManager.esc || InputManager.back) { step = TurnStep.MoveAction; return; }
         if (InputManager.hud_horizontal != 0)
         {
-            int new_intent = InputManager.hud_horizontal == 1 ? ctx.SelfPosition - 1 : ctx.SelfPosition + 1;
+
+            int new_intent = Mathf.Abs(InputManager.hud_horizontal - intent_index) - ctx.SelfPosition > move  ? intent_index : intent_index - InputManager.hud_horizontal ;
             SetIntentIndex(new_intent, ctx.Party);
         }
 
-        if (InputManager.interact) { ConfirmSwapTarget(0); }
+        if (InputManager.interact) { ConfirmSwapTarget(intent_index); }
     }
 
     public void SelectSkipTurn()
@@ -246,7 +251,8 @@ public class PjController : BattleChar
 
     public void SetIntentIndex(int index, List<BattleChar> list)
     {
-        
+        if (index < 0 || index >= list.Count) return;
+        intent_index = index;
     }
 
     public override void SetRound()

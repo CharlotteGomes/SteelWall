@@ -28,9 +28,14 @@ public class StatusEffectData
     public virtual void OnDamageTaken(DamageInfo info) { }
     public virtual void OnHealGiven(HealInfo info) { }
     public virtual void OnHealReceived(HealInfo info) { }
-    public virtual void OnGiveStatus(StatusEffectSO status) { }
-    public virtual void OnReceiveStatus(StatusEffectSO status) { }  
-    public virtual void OnStatusRemoved(StatusEffectSO status) { }
+    public virtual void OnGiveStatus(StatusEffectData status) { }
+    public virtual void OnReceiveStatus(StatusEffectData status) { }  
+    public virtual void OnStatusRemoved(StatusEffectData status) { }
+
+    public virtual void OnStackPile(StatusEffectData status)
+    {
+        stacks += status.stacks;
+    }
 
     public virtual void OnCharacterDeath() { }
 }

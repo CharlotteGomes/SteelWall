@@ -4,6 +4,7 @@ public class BattleHud : MonoBehaviour
 {
     public PJBattleHUD pj_hud;
     public EnemyBattleHUD enemy_hud;
+    public LifeBarManager lifeManager;
     public void SetCharacter(BattleChar pj, BattleChar n) 
     {
         SetCharacterPJ(pj);
@@ -25,5 +26,6 @@ public class BattleHud : MonoBehaviour
     {
         pj_hud.UpdateChildren();
         enemy_hud.UpdateChildren();
+        lifeManager.UpdateLifeBars();
     }
 }

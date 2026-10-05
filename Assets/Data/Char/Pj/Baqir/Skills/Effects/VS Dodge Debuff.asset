@@ -16,4 +16,4 @@ MonoBehaviour:
   sfSO: {fileID: 11400000, guid: 57bba740bed8df846bae585098ba324d, type: 2}
   stacks: 2
   resist: 1
-  so: {fileID: 0}
+  so: {fileID: 11400000, guid: bfbe77f78ab9a1446aad030b42bf298d, type: 2}

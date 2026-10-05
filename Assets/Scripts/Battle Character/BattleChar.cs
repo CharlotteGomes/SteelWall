@@ -17,6 +17,7 @@ public enum StatType
     ACCURACY,
     LIFE_MAX,
     LIFE_CURRENT,
+    MOVE,
     R_STUN,
     R_MOVE,
     R_DEBUFF,
@@ -32,9 +33,10 @@ public abstract class BattleChar : MonoBehaviour, IPointerClickHandler
     public SpriteRenderer sprite_renderer { get; private set; }
 
     [Header("BattleInfo")]
+    [SerializeField] protected int size;
     [SerializeField] protected int life_max;
     [SerializeField] protected int life_current;
-    [SerializeField] protected int protect, dodge, damage_min, damage_max, accuracy, spd, crit;
+    [SerializeField] protected int protect, dodge, damage_min, damage_max, accuracy, spd, crit, move;
     public List<StatusResistence> Resistences = new List<StatusResistence>();
     [SerializeField] protected BattleCharSO battle_char;
     [SerializeField] protected BattleContext ctx;
@@ -56,7 +58,9 @@ public abstract class BattleChar : MonoBehaviour, IPointerClickHandler
     #region Init
     public virtual void InitStats()
     {
+        name = battle_char.name;
         spriteSO = battle_char.sprites;
+        size = battle_char.size;
         life_max = battle_char.life;
         life_current = life_max;
         protect = battle_char.protect;
@@ -66,6 +70,7 @@ public abstract class BattleChar : MonoBehaviour, IPointerClickHandler
         accuracy = battle_char.accuracy;
         spd = battle_char.spd;
         crit = battle_char.crit;
+        move = battle_char.move_range;
         sprite_renderer.sprite = spriteSO.idle;
 
         Resistences.Add(new StatusResistence(ResistenceType.STUN, battle_char.stun));
@@ -158,7 +163,6 @@ public abstract class BattleChar : MonoBehaviour, IPointerClickHandler
     public void GiveStatus(StatusEffectData data)
     {
         OnGiveStatus(data);
-        data.source = this;
         data.owner.ReceiveStatus(data);
     }
 
@@ -176,8 +180,11 @@ public abstract class BattleChar : MonoBehaviour, IPointerClickHandler
                 }
             } 
         }
-        
-        if(data.stacks == 0) { data.OnApply(); return; }   
+        if(data.stacks == 0) { data.OnApply(); return; }
+        foreach (var s in StatusEffect)
+        {
+            if (data.effectName == s.effectName) { s.OnStackPile(data); return; }
+        }
         StatusEffect.Add(data);
         data.OnApply();
     }
@@ -215,8 +222,8 @@ public abstract class BattleChar : MonoBehaviour, IPointerClickHandler
 
     public int GetStatsModifier(StatType t)
     {
-        List<StatsModifierSO> flat = StatsModifier.FindAll(x => x.flat == true && x.statType == t);
-        List<StatsModifierSO> percent = StatsModifier.FindAll(x => x.flat == false && x.statType == t);
+        List<StatsModifierSO> flat = StatsModifier.FindAll(x => x.flat == true && x.statType == t).ToList();
+        List<StatsModifierSO> percent = StatsModifier.FindAll(x => x.flat == false && x.statType == t).ToList();
 
         int value = 0;
         foreach (StatsModifierSO modifier in flat)
@@ -227,6 +234,7 @@ public abstract class BattleChar : MonoBehaviour, IPointerClickHandler
         {
             value += (int)(GetBaseStat(modifier.statType) * (modifier.value / 100f));
         }
+        if(value != 0 || flat.Count !=0 || percent.Count !=0) Debug.Log($" {this.name} {t.ToString()}: {value} ({flat.Count} {percent.Count})");
         return value;   
     }
     #endregion
@@ -296,7 +304,7 @@ public abstract class BattleChar : MonoBehaviour, IPointerClickHandler
     {
         foreach(StatusEffectData s in StatusEffect)
         {
-            s.OnReceiveStatus(status.sfSO);
+            s.OnReceiveStatus(status);
         }
         CheckStatusEffect();
     }
@@ -305,7 +313,7 @@ public abstract class BattleChar : MonoBehaviour, IPointerClickHandler
     {
         foreach(StatusEffectData s in StatusEffect)
         {
-            s.OnGiveStatus(status.sfSO);
+            s.OnGiveStatus(status);
         }
         CheckStatusEffect();
     }   
@@ -314,7 +322,7 @@ public abstract class BattleChar : MonoBehaviour, IPointerClickHandler
     {
         foreach(StatusEffectData s in StatusEffect)
         {
-            s.OnStatusRemoved(status.sfSO);
+            s.OnStatusRemoved(status);
         }
         CheckStatusEffect();
     }
@@ -415,13 +423,7 @@ public abstract class BattleChar : MonoBehaviour, IPointerClickHandler
     {
         if (battle_manager == null) return;
         if (index == ctx.SelfPosition || index < 0 || index >= ctx.Party.Count) return;
-
-        BattleChar target = ctx.Party[index];
-
-        if (target == null) return;
-
-        battle_manager.SwapPosition(this, target);
-
+        battle_manager.SwapPosition(this, index);
         step = TurnStep.Finish;
     }
 
@@ -452,7 +454,6 @@ public abstract class BattleChar : MonoBehaviour, IPointerClickHandler
     {
         if(ctx.Target.Count >= 1) ctx.Target.Clear();
         OnStartTurn();
-        battle_manager.RefreshHUD();
     }
 
     public TurnStep CurrentStep()
@@ -463,6 +464,11 @@ public abstract class BattleChar : MonoBehaviour, IPointerClickHandler
     public int GetSelfPos()
     {
         return ctx.SelfPosition;
+    }
+
+    public int GetSize()
+    {
+        return size;
     }
 
     public int GetBaseStat(StatType stat)
@@ -478,6 +484,7 @@ public abstract class BattleChar : MonoBehaviour, IPointerClickHandler
             StatType.ACCURACY => accuracy,
             StatType.DODGE => dodge,
             StatType.CRIT => crit,
+            StatType.MOVE => move,
             StatType.R_STUN => Resistences[0].value,
             StatType.R_DEBUFF => Resistences[1].value,
             StatType.R_BLEED => Resistences[2].value,

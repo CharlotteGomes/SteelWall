@@ -115,7 +115,7 @@ public class EnemyController : BattleChar, IPointerEnterHandler
 
         int dir = mostvaluepos - ctx.SelfPosition;
         int intent = ctx.SelfPosition + (int)Mathf.Sign(dir);
-        battle_manager.SwapPosition(this, ctx.Party[intent]);
+        battle_manager.SwapPosition(this, intent);
         step = TurnStep.Finish;
     }
 
@@ -131,6 +131,9 @@ public class EnemyController : BattleChar, IPointerEnterHandler
         }
         step = TurnStep.ChooseSkill;
     }
+    #endregion
+
+    #region info 
     #endregion
 
     public override void SetRound()

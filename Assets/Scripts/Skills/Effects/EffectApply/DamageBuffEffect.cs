@@ -1,6 +1,6 @@
 using UnityEngine;
 
-[CreateAssetMenu(fileName = "Move", menuName = "Scriptable Objects/SkillSO/Effects/Status Effect/DamageBuff")]
+[CreateAssetMenu(fileName = "DamageModifier", menuName = "Scriptable Objects/SkillSO/Effects/Status Effect/DamageBuff")]
 public class DamageBuffEffect : ApplyStatusEffect
 {
     public int value;
