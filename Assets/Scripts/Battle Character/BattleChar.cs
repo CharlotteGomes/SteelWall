@@ -68,7 +68,8 @@ public abstract class BattleChar : MonoBehaviour, IPointerClickHandler
     public Action<BattleChar[]> OnBattleCharSelect;
 
     public Action OnMoveActionSelect;
-    public Action<int, int> OnMoveConfirm;
+    public Action<BattleContext> OnMoveConfirm;
+    public Action OnMoveCancel;
 
     public Action OnSkipSelect;
 
@@ -424,6 +425,7 @@ public abstract class BattleChar : MonoBehaviour, IPointerClickHandler
         if (!skill_current.chose)
         {
             ctx.Target = skill_current_data.targets.ToList();
+            skill_current_data.Prepare();
             return;
         }
 

@@ -1,7 +1,7 @@
 using UnityEngine;
 using System.Collections.Generic;
 using JetBrains.Annotations;
-
+using System.Linq;
 public class IndicatorManager : MonoBehaviour
 {
     [SerializeField] GameObject prefab;
@@ -53,6 +53,36 @@ public class IndicatorManager : MonoBehaviour
         }
     }
 
+    public void SetMoveIndicators(BattleContext ctx) 
+    {
+        for(int i = -ctx.Self.GetStat(StatType.MOVE); i <= ctx.Self.GetStat(StatType.MOVE); i++)
+        {
+            
+            int pos = i + ctx.SelfPosition;
+            Debug.Log($"{i} {pos}");
+            if (pos < 0 || pos > ctx.Party.Count) continue;
+            if (ctx.Party[pos] == null || ctx.Party[pos] == ctx.Self) continue;
+            GameObject inst = Instantiate(prefab, this.transform);
+            Indicator ind = inst.GetComponent<Indicator>();
+            ind.SetChar(ctx.Party[pos]);
+            ind.SetSprites(ind_move, smk_move);
+            indicators.Add(ind);
+        }
+    }
+
+    public void SelectIndicators(BattleChar[] c)
+    {
+        for(int i = 0; i < c.Length; i++)
+        {
+            if(c[i] == turn_indicator.character) { turn_indicator.Select(true); Debug.Log("Confirmou o indicator");  continue; }
+            for(int j = 0; j < indicators.Count; j++) 
+            {
+                if(indicators[j].character == c[i]) { indicators[j].Select(true); Debug.Log($"Setou o {c[i]}"); continue; }
+                indicators[j].Select(false);
+            }
+        }
+    }
+
     public void DeleteAllIndicators()
     {
         foreach(Indicator ind in indicators)
@@ -67,13 +97,16 @@ public class IndicatorManager : MonoBehaviour
         Destroy(turn_indicator.gameObject);
         turn_indicator = null;
     }
-
+    
     public void SubscribeEvents(BattleChar c)
     {
         c.OnStartMyTurn += SetTurnIndicator;
         c.OnSkillConfirm += SetTargetIndicators;
         c.OnSkillCancel += SetTurnIndicatorDefault;
         c.OnSkillCancel += DeleteAllIndicators;
+        c.OnMoveCancel += DeleteAllIndicators;
+        c.OnBattleCharSelect += SelectIndicators;
+        c.OnMoveConfirm += SetMoveIndicators;
         c.OnEndMyTurn += DeleteAllIndicators;
         c.OnEndMyTurn += DeleteTurnIndicator;
     }
@@ -84,6 +117,9 @@ public class IndicatorManager : MonoBehaviour
         c.OnSkillConfirm -= SetTargetIndicators;
         c.OnSkillCancel -= SetTurnIndicatorDefault;
         c.OnSkillCancel -= DeleteAllIndicators;
+        c.OnMoveCancel -= DeleteAllIndicators;
+        c.OnBattleCharSelect -= SelectIndicators;
+        c.OnMoveConfirm -= SetMoveIndicators;
         c.OnEndMyTurn -= DeleteAllIndicators;
         c.OnEndMyTurn -= DeleteTurnIndicator;
     }

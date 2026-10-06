@@ -15,7 +15,6 @@ public class PJBattleHUD : StatsPanel
 
     void Update()
     {
-        if (Input.GetKeyDown(KeyCode.F)) { UpdateChildren(); }
     }
 
     public override void UpdateChildren()
@@ -32,6 +31,7 @@ public class PJBattleHUD : StatsPanel
     public void SetSkill(SkillSO so)
     {
         if (character is not PjController pj) return;
+        pj.OnSkillCancel?.Invoke();
         pj.SetSkill(so);
         pj.ConfirmSkill();
         SelectSkill(so);
@@ -53,6 +53,7 @@ public class PJBattleHUD : StatsPanel
     public void SetMoveAction()
     {
         if (character is not PjController pj) return;
+        pj.OnMoveCancel?.Invoke();
         SelectMoveButton();
         pj.ConfirmMoveAction();
     }
