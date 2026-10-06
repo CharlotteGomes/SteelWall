@@ -27,8 +27,8 @@ MonoBehaviour:
   use_pos: 0000000001000000
   acc_base: 100
   crit_mod: 0
-  affect_enemy: 1
-  chose: 1
+  affect_enemy: 0
+  chose: 0
   self: 1
   can_dodge: 0
   can_miss: 0

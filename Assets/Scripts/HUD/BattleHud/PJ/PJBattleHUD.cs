@@ -33,17 +33,16 @@ public class PJBattleHUD : StatsPanel
     {
         if (character is not PjController pj) return;
         pj.SetSkill(so);
-        pj.SelectChooseSkill();
         pj.ConfirmSkill();
-        SelectSkill(pj.FindSkillIndex(so));
+        SelectSkill(so);
     }
 
-    public void SelectSkill(int index = -1)
+    public void SelectSkill(SkillSO so)
     {
         if (character is not PjController pj) return;
         for(int i = 0; i < pj.read_skills.Count; i++)
         {
-            if (i == index)
+            if (pj.read_skills[i] == so)
             {
                 SetButtonSelect<SkillIcon>(skillIcon[i]);
                 continue;
@@ -54,7 +53,7 @@ public class PJBattleHUD : StatsPanel
     public void SetMoveAction()
     {
         if (character is not PjController pj) return;
-        pj.SelectMoveAction();
+        SelectMoveButton();
         pj.ConfirmMoveAction();
     }
 
@@ -63,16 +62,9 @@ public class PJBattleHUD : StatsPanel
         SetButtonSelect<SwapButton>(swapButton);
     }
 
-    public void SetSkipTurn()
+    public void SelectSkipButton()
     {
-        if (character is not PjController pj) return;
-        pj.SelectSkipTurn();
-
-    }
-
-    public void SelectSkipButton(bool select = true)
-    {
-
+        SetButtonSelect<SkipButton>(skipButton);
     }
 
     public void DisableButtonSelect()
@@ -83,7 +75,23 @@ public class PJBattleHUD : StatsPanel
     public void SetButtonSelect<T>(T target) where T : MonoBehaviour
     {
         if(!buttonSelect.gameObject.activeSelf) buttonSelect.gameObject.SetActive(true);
-        buttonSelect.SelectParent(target.transform);
-        buttonSelect.GoToParent();
+        RectTransform rect = target.GetComponent<RectTransform>();
+        StartCoroutine(buttonSelect.LerpTransform(rect));
+    }
+
+    public override void SubscriveEvents(BattleChar character)
+    {
+        base.SubscriveEvents(character);
+        character.OnSkillSelect += SelectSkill;
+        character.OnMoveActionSelect += SelectMoveButton;
+        character.OnSkipSelect += SelectSkipButton;
+    }
+
+    public override void UnsubscriveEvents(BattleChar character)
+    {
+        base.UnsubscriveEvents(character);
+        character.OnSkillSelect -= SelectSkill;
+        character.OnMoveActionSelect -= SelectMoveButton;
+        character.OnSkipSelect -= SelectMoveButton;
     }
 }

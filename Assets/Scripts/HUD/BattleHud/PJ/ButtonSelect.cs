@@ -4,10 +4,10 @@ using UnityEngine;
 
 public class ButtonSelect : MonoBehaviour
 {
-    Transform tf;
+    RectTransform tf;
     void Start()
     {
-        tf = transform;
+        tf = GetComponent<RectTransform>();
     }
 
     void Update()
@@ -17,22 +17,15 @@ public class ButtonSelect : MonoBehaviour
 
     private void OnEnable()
     {
-        tf = transform;
+        tf = GetComponent<RectTransform>();
     }
-
-    public void SelectParent(Transform parent)
+  
+    public IEnumerator LerpTransform(RectTransform _tf)
     {
-        tf.SetParent(parent);
-    }
-   
-    public void GoToParent()
-    {
-        StartCoroutine(LerpPosition());
-    }
-    IEnumerator LerpPosition()
-    {
-        Vector2 StartPos = tf.localPosition;
-        Vector2 EndPos = Vector2.zero;
+        Vector2 StartPos = tf.position;
+        Vector2 EndPos = _tf.position;
+        Vector2 StartScale = tf.sizeDelta;
+        Vector2 EndScale = _tf.sizeDelta + Vector2.one * 35;
         float t = 0f;
         float duration = 0.35f;
 
@@ -40,10 +33,12 @@ public class ButtonSelect : MonoBehaviour
         {
             t += Time.deltaTime / duration; 
             float curve = 1f - Mathf.Pow(1f - t, 3f);
-            tf.localPosition = Vector2.Lerp(StartPos, EndPos, curve);
+            tf.position = Vector2.Lerp(StartPos, EndPos, curve);
+            tf.sizeDelta = Vector2.Lerp(StartScale, EndScale, curve);
             yield return null;
         }
-        tf.localPosition = EndPos;
+        tf.position = EndPos;
+        tf.sizeDelta = EndScale;
         yield return null;
     }
 }

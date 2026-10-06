@@ -7,7 +7,7 @@ public class SkipButton : MonoBehaviour, IPointerClickHandler
 
     public void OnPointerClick(PointerEventData eventData)
     {
-        panel.SetSkipTurn();
+        panel.SelectSkipButton();
     }
 
     void Start()

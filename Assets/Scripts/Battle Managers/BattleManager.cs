@@ -45,13 +45,15 @@ public class BattleManager : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        if (Input.GetKeyDown(KeyCode.Space)) { hud.lifeManager.SpawnBars(initiative); }
+
     }
 
     public void StartBattle(List<PJSO> pjs, List<EnemySO> enemies)
     {
         initiative_index = 0;
         SpawnCharacters(pjs, enemies);
+        hud.SetCharacters(pj_slot[0], enemy_slot[0]);   
+        hud.lifeManager.SpawnBars(initiative);
         StartCoroutine(TurnOrder());
     }
     
@@ -60,28 +62,29 @@ public class BattleManager : MonoBehaviour
         while (true)
         {
             StartTurn();
-            yield return new WaitForSeconds(1f);
+            yield return new WaitForSeconds(.5f);
             yield return StartCoroutine(current.OnGoingTurn());
             EndTurn();
+            yield return StartCoroutine(SyncVisualPositions());
         }
     }
 
     void StartTurn()
     {
         current = initiative[initiative_index];
+        hud.OnStartTurn(current);
         current.SetRound();
-        if(current is PjController pj) { hud.SetCharacter(pj, enemy_slot[0]); }
-        if(current is EnemyController enemy) { hud.SetCharacter(pj_slot[0], enemy); }
         RefreshHUD();
     }
 
     void EndTurn()
     {
+        current.OnEndTurn();
+        hud.UnsubscribeEvents(current);
         initiative_index++;
         if (initiative_index > initiative.Count - 1) { initiative_index = 0; turn++; }
-        current.OnEndTurn();
+        
         RefreshHUD(); 
-        StartCoroutine(SyncVisualPositions());
         
     }
 
@@ -131,40 +134,6 @@ public class BattleManager : MonoBehaviour
             BattleChar n = enemy_slot[i];
             n.sprite_renderer.sortingOrder = 100 + (-1 * i);
             n.sprite_renderer.flipX =true;
-        }
-    }
-
-    public void CurrentSetTarget(BattleChar b)
-    {
-        if (current is not PjController p) return;
-        SkillSO so = p.skill_read;
-        switch (b)
-        {
-            case PjController pj:
-                if (current.CurrentStep() == TurnStep.ChooseTarget)
-                {
-                    for (int i = 0; i < so.pos.Length; i++)
-                    {
-                        if (so.pos[i] == GetPosition(pj) && !so.affect_enemy) { current.SelectTarget(i); current.ConfirmTarget(); }
-                    }
-                    break;
-                }
-                if(current.CurrentStep() == TurnStep.ChooseSwapTarget)
-                {
-                    int diff = (int)Mathf.Abs(GetPosition(b) - GetPosition(current));
-                    if(diff == 1) { current.ConfirmSwapTarget(GetPosition(b)); }
-                }
-                break;
-            case EnemyController enemy:
-                if (current.CurrentStep() == TurnStep.ChooseTarget)
-                {
-                    for (int i = 0; i < so.pos.Length; i++)
-                    {
-                        if (so.pos[i] == GetPosition(enemy) && so.affect_enemy) { current.SelectTarget(i); current.ConfirmTarget(); }
-                    }
-                    break;
-                }
-                break;
         }
     }
 
@@ -218,18 +187,23 @@ public class BattleManager : MonoBehaviour
 
     void SetContext()
     {
+        List<BattleChar> off = new List<BattleChar>();
         for(int i = 0; i < pj_slot.Length; i++)
         {
             if (pj_slot[i] != null)
             {
+                if (off.Contains(pj_slot[i])) continue;
                 pj_slot[i].CreateContext(pj_slot.Where(b => b != null).ToList(), enemy_slot.Where(b => b != null).ToList(), i);
+                off.Add(pj_slot[i]);
             }
         }
         for (int i = 0; i < enemy_slot.Length; i++)
         {
             if (enemy_slot[i] != null)
             {
+                if (off.Contains(enemy_slot[i])) continue;
                 enemy_slot[i].CreateContext(enemy_slot.Where(b => b != null).ToList(), pj_slot.Where(b => b != null).ToList(), i);
+                off.Add(pj_slot[i]);
             }
         }
     }
@@ -303,7 +277,10 @@ public class BattleManager : MonoBehaviour
             }
         }
 
-        yield return new WaitForSeconds(0.5f);
+        foreach (var move in movements)
+        {
+            yield return move;
+        }
     }
 
     IEnumerator MoveToPosition(Transform tf, Vector3 target)
@@ -331,7 +308,7 @@ public class BattleManager : MonoBehaviour
     public void SwapPosition(BattleChar c, int pos)
     {
         if (c == null ) { return;}
-
+        Debug.Log($"{c.name} se moveu");
         if(c is PjController)
         {
             List<BattleChar> pj = pj_slot.Where(x => x != c).ToList();

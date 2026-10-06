@@ -18,6 +18,7 @@ public class StatsPanel : MonoBehaviour
     public void SetCharacter(BattleChar character)
     {
         this.character = character;
+        UpdateChildren();
     }
 
     public virtual void UpdateChildren()
@@ -27,6 +28,32 @@ public class StatsPanel : MonoBehaviour
             if (!t.isActiveAndEnabled) continue;
             t.UpdateCharacter(character);
             t.UpdateText();
+        }
+    }
+
+    public virtual void SubscriveEvents(BattleChar character)
+    {
+
+    }
+
+    public virtual void UnsubscriveEvents(BattleChar character)
+    {
+
+    }
+
+    protected void OnEnable()
+    {
+        if(character != null)
+        {
+            SubscriveEvents(character);
+        }
+    }
+
+    protected void OnDisable()
+    {
+        if(character != null)
+        {
+            UnsubscriveEvents(character);
         }
     }
 }

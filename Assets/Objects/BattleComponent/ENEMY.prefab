@@ -105,6 +105,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e9a167cde03b6094f8a7e6bf4b1a1540, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::EnemyController
+  size: 0
   life_max: 0
   life_current: 0
   protect: 0
@@ -114,6 +115,7 @@ MonoBehaviour:
   accuracy: 0
   spd: 0
   crit: 0
+  move: 0
   Resistences: []
   battle_char: {fileID: 0}
   ctx:
@@ -127,6 +129,11 @@ MonoBehaviour:
   StatusEffect: []
   StatsModifier: []
   skill_current: {fileID: 0}
+  skill_current_data:
+    acc_base: 0
+    crit_mod: 0
+    effects: []
+    targets: []
   step: 0
   behaviourSO: {fileID: 0}
   behaviour_index: 0
@@ -168,7 +175,7 @@ BoxCollider2D:
   m_Offset: {x: 0, y: 2.5}
   m_SpriteTilingProperty:
     border: {x: 0, y: 0, z: 0, w: 0}
-    pivot: {x: 0.3, y: 0}
+    pivot: {x: 0, y: 0}
     oldSize: {x: 3.578125, y: 4.796875}
     newSize: {x: 1, y: 1}
     adaptiveTilingThreshold: 0.5

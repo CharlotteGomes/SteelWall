@@ -1,9 +1,12 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using UnityEditor;
 using UnityEngine;
 using UnityEngine.EventSystems;
-using UnityEngine.Playables;
+using UnityEngine.Rendering;
+
 
 
 public enum StatType
@@ -54,7 +57,22 @@ public abstract class BattleChar : MonoBehaviour, IPointerClickHandler
     [SerializeField] protected SkillData skill_current_data;
     [SerializeField] protected TurnStep step;
     protected BattleManager battle_manager;
-    
+
+    [Header("Actions")]
+    public Action<BattleChar> OnStartMyTurn;
+
+    public Action<SkillSO> OnSkillSelect;
+    public Action<SkillData> OnSkillConfirm;
+    public Action OnSkillCancel;
+
+    public Action<BattleChar[]> OnBattleCharSelect;
+
+    public Action OnMoveActionSelect;
+    public Action<int, int> OnMoveConfirm;
+
+    public Action OnSkipSelect;
+
+    public Action OnEndMyTurn;
     #region Init
     public virtual void InitStats()
     {
@@ -175,7 +193,7 @@ public abstract class BattleChar : MonoBehaviour, IPointerClickHandler
             {
                 if (st.resist == data.sfSO.type)
                 {
-                    int roll = Random.Range(0, 101);
+                    int roll = UnityEngine.Random.Range(0, 101);
                     if (roll < st.value) {return; }
                 }
             } 
@@ -234,7 +252,6 @@ public abstract class BattleChar : MonoBehaviour, IPointerClickHandler
         {
             value += (int)(GetBaseStat(modifier.statType) * (modifier.value / 100f));
         }
-        if(value != 0 || flat.Count !=0 || percent.Count !=0) Debug.Log($" {this.name} {t.ToString()}: {value} ({flat.Count} {percent.Count})");
         return value;   
     }
     #endregion
@@ -367,7 +384,7 @@ public abstract class BattleChar : MonoBehaviour, IPointerClickHandler
 
     public void ResolveSkill(BattleResult result)
     {
-        int roll = Random.Range(0, 101);
+        int roll = UnityEngine.Random.Range(0, 101);
         result.acc_base = skill_current_data.acc_base + GetStat(StatType.ACCURACY);
         result.acc_roll = roll;
         OnUseSkill(result);
@@ -399,10 +416,6 @@ public abstract class BattleChar : MonoBehaviour, IPointerClickHandler
     #region Turn
     public abstract IEnumerator OnGoingTurn();
 
-    protected abstract void ChoosingSkill();
-
-    protected abstract void ChoosingTarget();
-
     public virtual void SelectTarget(int index)
     {
         if (skill_current_data == null) { return; }
@@ -417,7 +430,6 @@ public abstract class BattleChar : MonoBehaviour, IPointerClickHandler
         ctx.Target.Add(skill_current_data.targets[index]);
         skill_current_data.Prepare();
     }
-    public abstract void ConfirmTarget();
     public abstract void ChooseSwapTarget();
     public void ConfirmSwapTarget(int index)
     {
@@ -454,6 +466,12 @@ public abstract class BattleChar : MonoBehaviour, IPointerClickHandler
     {
         if(ctx.Target.Count >= 1) ctx.Target.Clear();
         OnStartTurn();
+        OnStartMyTurn?.Invoke(this);
+    }
+
+    public virtual void EndRound()
+    {
+        OnEndMyTurn?.Invoke();
     }
 
     public TurnStep CurrentStep()
@@ -508,7 +526,6 @@ public abstract class BattleChar : MonoBehaviour, IPointerClickHandler
 
     public void OnPointerClick(PointerEventData eventData)
     {
-        battle_manager.CurrentSetTarget(this);
     }
 
     protected virtual void Awake()

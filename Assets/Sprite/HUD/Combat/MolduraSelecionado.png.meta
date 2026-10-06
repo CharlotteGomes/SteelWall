@@ -37,17 +37,17 @@ TextureImporter:
   maxTextureSize: 2048
   textureSettings:
     serializedVersion: 2
-    filterMode: 0
+    filterMode: 2
     aniso: 1
     mipBias: 0
-    wrapU: 1
-    wrapV: 1
-    wrapW: 1
+    wrapU: 0
+    wrapV: 0
+    wrapW: 0
   nPOTScale: 0
   lightmap: 0
   compressionQuality: 50
   spriteMode: 2
-  spriteExtrude: 0
+  spriteExtrude: 1
   spriteMeshType: 0
   alignment: 0
   spritePivot: {x: 0.5, y: 0.5}
@@ -73,10 +73,10 @@ TextureImporter:
   - serializedVersion: 4
     buildTarget: DefaultTexturePlatform
     maxTextureSize: 2048
-    resizeAlgorithm: 0
+    resizeAlgorithm: 1
     textureFormat: -1
-    textureCompression: 0
-    compressionQuality: 50
+    textureCompression: 1
+    compressionQuality: 98
     crunchedCompression: 0
     allowsAlphaSplitting: 0
     overridden: 0
@@ -103,13 +103,13 @@ TextureImporter:
       name: MolduraSelecionado_0
       rect:
         serializedVersion: 2
-        x: 191
-        y: 128
-        width: 83
-        height: 83
-      alignment: 9
+        x: 195
+        y: 130
+        width: 75
+        height: 80
+      alignment: 0
       pivot: {x: 0.5, y: 0.5}
-      border: {x: 22, y: 22, z: 22, w: 22}
+      border: {x: 30, y: 32, z: 29, w: 32}
       customData: 
       outline: []
       physicsShape: []
@@ -125,7 +125,7 @@ TextureImporter:
     customData: 
     physicsShape: []
     bones: []
-    spriteID: 386dbfa13d627ff4584d89e17c4f39d6
+    spriteID: 061e5685c3957cd4db61841ae2b9ec81
     internalID: 0
     vertices: []
     indices: 
