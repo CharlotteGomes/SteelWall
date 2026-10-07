@@ -5,6 +5,12 @@ TextureImporter:
   - first:
       213: 3127519081373786364
     second: IndicadorAlvoAtaque_0
+  - first:
+      213: -8159830878673416210
+    second: IndicadorAlvoAtaque_1
+  - first:
+      213: -5947206351956446176
+    second: IndicadorAlvoAtaque_2
   externalObjects: {}
   serializedVersion: 13
   mipmaps:
@@ -106,10 +112,10 @@ TextureImporter:
         x: 441
         y: 273
         width: 148
-        height: 42
-      alignment: 9
-      pivot: {x: 0.5, y: 0}
-      border: {x: 72, y: 21, z: 72, w: 21}
+        height: 37
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
       customData: 
       outline: []
       physicsShape: []
@@ -121,11 +127,55 @@ TextureImporter:
       indices: 
       edges: []
       weights: []
+    - serializedVersion: 2
+      name: IndicadorAlvoAtaque_1
+      rect:
+        serializedVersion: 2
+        x: 457
+        y: 295
+        width: 16
+        height: 17
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: eef48696c0572ce80800000000000000
+      internalID: -8159830878673416210
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: IndicadorAlvoAtaque_2
+      rect:
+        serializedVersion: 2
+        x: 557
+        y: 295
+        width: 16
+        height: 17
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 02470b12557477da0800000000000000
+      internalID: -5947206351956446176
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
     outline: []
     customData: 
     physicsShape: []
     bones: []
-    spriteID: 9a1569f39576440438236dc42b91df26
+    spriteID: 
     internalID: 0
     vertices: []
     indices: 
@@ -136,6 +186,8 @@ TextureImporter:
       entries: []
     nameFileIdTable:
       IndicadorAlvoAtaque_0: 3127519081373786364
+      IndicadorAlvoAtaque_1: -8159830878673416210
+      IndicadorAlvoAtaque_2: -5947206351956446176
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 

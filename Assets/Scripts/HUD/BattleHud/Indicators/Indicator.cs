@@ -1,10 +1,10 @@
 using System.Collections;
 using UnityEngine;
 using UnityEngine.UI;
-
+using TwentyFiveSlicer.Runtime;
 public class Indicator : MonoBehaviour
 {
-    public Image ind_image, smk_image;
+    public TwentyFiveSliceImage ind_image, smk_image;
     public bool animate = true;
     [SerializeField] CanvasGroup group;
     public BattleChar character { get; private set; }   
@@ -47,7 +47,7 @@ public class Indicator : MonoBehaviour
     public void Select(bool select)
     {
         if (select) {group.alpha = 1; return; }
-        group.alpha = .65f;
+        group.alpha = .75f;
     }
 
     public IEnumerator StartIndAnimation(BattleChar c)

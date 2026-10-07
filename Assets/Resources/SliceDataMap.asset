@@ -1,0 +1,88 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5ee6ab8e2d694af5b566d6fc4ca02ee4, type: 3}
+  m_Name: SliceDataMap
+  m_EditorClassIdentifier: Twentyfiveslicer.Runtime::TwentyFiveSlicer.Runtime.SliceDataMap
+  sliceDataMap:
+    items:
+    - key: {fileID: 3127519081373786364, guid: 4a0ec0c9248e8284491f573b2cddea4f, type: 3}
+      value:
+        verticalBorders:
+        - 20.280613
+        - 29.655613
+        - 70.408165
+        - 79.40051
+        horizontalBorders:
+        - 2.9478457
+        - 43.0839
+        - 56.689342
+        - 97.50567
+    - key: {fileID: -7473969756465631131, guid: 60df3437619f98c4687ae59ab8c9e91b, type: 3}
+      value:
+        verticalBorders:
+        - 20.280613
+        - 29.655613
+        - 70.408165
+        - 79.40051
+        horizontalBorders:
+        - 2.9478457
+        - 43.0839
+        - 56.689342
+        - 97.50567
+    - key: {fileID: -4177173196514654937, guid: 8ba6222f558cfb34da541153bcf5adca, type: 3}
+      value:
+        verticalBorders:
+        - 20.280613
+        - 29.655613
+        - 70.408165
+        - 79.40051
+        horizontalBorders:
+        - 2.9478457
+        - 43.0839
+        - 56.689342
+        - 97.50567
+    - key: {fileID: 1081777506117646132, guid: 035beeea4dad5484cb59f945f1052c55, type: 3}
+      value:
+        verticalBorders:
+        - 20.280613
+        - 29.655613
+        - 70.408165
+        - 79.40051
+        horizontalBorders:
+        - 2.9478457
+        - 43.0839
+        - 56.689342
+        - 97.50567
+    - key: {fileID: 6058148027723920006, guid: 5fbec11d58c493d49909dd981715591e, type: 3}
+      value:
+        verticalBorders:
+        - 13.565341
+        - 29.289772
+        - 70.71023
+        - 86.43466
+        horizontalBorders:
+        - 10.113636
+        - 46.022728
+        - 58.863636
+        - 96.36364
+    - key: {fileID: -7943561362711680037, guid: 0907aee6f30872d46a2318bab742cdec, type: 3}
+      value:
+        verticalBorders:
+        - 13.565341
+        - 29.289772
+        - 70.71023
+        - 86.43466
+        horizontalBorders:
+        - 10.113636
+        - 46.022728
+        - 58.863636
+        - 96.36364

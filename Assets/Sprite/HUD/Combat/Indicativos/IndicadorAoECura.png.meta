@@ -1,10 +1,16 @@
 fileFormatVersion: 2
-guid: 5fbec11d58c493d49909dd981715591e
+guid: b7879f5f57a5ff644acf84c1f6e94172
 TextureImporter:
   internalIDToNameTable:
   - first:
-      213: -6713867878216932414
-    second: IndicadorAlvoCura_0
+      213: 2175375637057263952
+    second: IndicadorAoECura_0
+  - first:
+      213: -1420376230410994940
+    second: IndicadorAoECura_1
+  - first:
+      213: 7849265518729218941
+    second: IndicadorAoECura_2
   externalObjects: {}
   serializedVersion: 13
   mipmaps:
@@ -100,23 +106,67 @@ TextureImporter:
     serializedVersion: 2
     sprites:
     - serializedVersion: 2
-      name: IndicadorAlvoCura_0
+      name: IndicadorAoECura_0
       rect:
         serializedVersion: 2
-        x: 441
-        y: 273
-        width: 148
-        height: 42
+        x: 404
+        y: 279
+        width: 32
+        height: 24
       alignment: 0
-      pivot: {x: 0.5, y: 0.5}
-      border: {x: 72, y: 21, z: 72, w: 21}
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
       customData: 
       outline: []
       physicsShape: []
       tessellationDetail: -1
       bones: []
-      spriteID: 2c369f18cbc83d2a0800000000000000
-      internalID: -6713867878216932414
+      spriteID: 05956d3cd9c703e10800000000000000
+      internalID: 2175375637057263952
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: IndicadorAoECura_1
+      rect:
+        serializedVersion: 2
+        x: 414
+        y: 301
+        width: 12
+        height: 7
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 40bb1fa085fc94ce0800000000000000
+      internalID: -1420376230410994940
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: IndicadorAoECura_2
+      rect:
+        serializedVersion: 2
+        x: 414
+        y: 274
+        width: 12
+        height: 7
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: d7bc39fe6613eec60800000000000000
+      internalID: 7849265518729218941
       vertices: []
       indices: 
       edges: []
@@ -125,7 +175,7 @@ TextureImporter:
     customData: 
     physicsShape: []
     bones: []
-    spriteID: c07438c3dcda1dc439766cc7da27d8a7
+    spriteID: 
     internalID: 0
     vertices: []
     indices: 
@@ -135,7 +185,9 @@ TextureImporter:
     spriteCustomMetadata:
       entries: []
     nameFileIdTable:
-      IndicadorAlvoCura_0: -6713867878216932414
+      IndicadorAoECura_0: 2175375637057263952
+      IndicadorAoECura_1: -1420376230410994940
+      IndicadorAoECura_2: 7849265518729218941
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 
