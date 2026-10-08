@@ -76,7 +76,7 @@ public class IndicatorManager : MonoBehaviour
             
             int pos = i + ctx.SelfPosition;
             Debug.Log($"{i} {pos}");
-            if (pos < 0 || pos > ctx.Party.Count) continue;
+            if (pos < 0 || pos >= ctx.Party.Count) continue;
             if (ctx.Party[pos] == null || ctx.Party[pos] == ctx.Self) continue;
             GameObject inst = Instantiate(prefab, this.transform);
             Indicator ind = inst.GetComponent<Indicator>();

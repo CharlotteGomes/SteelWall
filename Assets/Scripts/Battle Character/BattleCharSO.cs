@@ -10,5 +10,4 @@ public abstract class BattleCharSO : ScriptableObject
     public int move_range = 1;
     public int stun, debuff, bleed, poison, move, sanity;
     public int crit = 5;
-    public int size = 1;
 }

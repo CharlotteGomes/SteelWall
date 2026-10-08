@@ -36,7 +36,6 @@ public abstract class BattleChar : MonoBehaviour, IPointerClickHandler
     public SpriteRenderer sprite_renderer { get; private set; }
 
     [Header("BattleInfo")]
-    [SerializeField] protected int size;
     [SerializeField] protected int life_max;
     [SerializeField] protected int life_current;
     [SerializeField] protected int protect, dodge, damage_min, damage_max, accuracy, spd, crit, move;
@@ -75,12 +74,12 @@ public abstract class BattleChar : MonoBehaviour, IPointerClickHandler
     public Action OnSkipSelect;
 
     public Action OnEndMyTurn;
+
     #region Init
     public virtual void InitStats()
     {
         name = battle_char.name;
         spriteSO = battle_char.sprites;
-        size = battle_char.size;
         life_max = battle_char.life;
         life_current = life_max;
         protect = battle_char.protect;
@@ -127,6 +126,15 @@ public abstract class BattleChar : MonoBehaviour, IPointerClickHandler
     {
         battle_manager = battle;
     }
+    public void CreateContext(List<BattleChar> allies, List<BattleChar> enemies, int pos)
+    {
+        if (ctx == null) ctx = new BattleContext();
+        ctx.Self = this;
+        ctx.Party = allies;
+        ctx.Enemies = enemies;
+        ctx.SelfPosition = pos;
+    }
+
     #endregion
 
     #region Generic
@@ -444,15 +452,8 @@ public abstract class BattleChar : MonoBehaviour, IPointerClickHandler
 
     #endregion
 
-    #region Info
-    public void CreateContext(List<BattleChar> allies, List<BattleChar> enemies, int pos)
-    {
-        if(ctx == null) ctx = new BattleContext();
-        ctx.Self = this;
-        ctx.Party = allies;
-        ctx.Enemies = enemies;
-        ctx.SelfPosition = pos;
-    }
+    #region Turn Info
+
     public void SetStep(TurnStep s)
     {
         step = s;
@@ -460,36 +461,28 @@ public abstract class BattleChar : MonoBehaviour, IPointerClickHandler
 
     public void SetTarget(BattleChar c)
     {
-        if(skill_current_data != null && skill_current_data.targets.Contains(c))
-        ctx.Target.Clear();
-        ctx.Target.Add(c);  
+        if (skill_current_data != null && skill_current_data.targets.Contains(c))
+            ctx.Target.Clear();
+        ctx.Target.Add(c);
+    }
+    
+    public bool CanUseSkill(SkillSO so)
+    {
+        for (int i = 0; i < so.use_pos.Length; i++)
+        {
+            if (ctx.SelfPosition == so.use_pos[i]) return true;
+        }
+        return false;
     }
 
-    public virtual void SetRound()
-    {
-        if(ctx.Target.Count >= 1) ctx.Target.Clear();
-        OnStartTurn();
-        OnStartMyTurn?.Invoke(this);
-    }
+    #endregion
 
-    public virtual void EndRound()
-    {
-        OnEndMyTurn?.Invoke();
-    }
-
-    public TurnStep CurrentStep()
-    {
-        return step;
-    }
+    #region Status
+    
 
     public int GetSelfPos()
     {
         return ctx.SelfPosition;
-    }
-
-    public int GetSize()
-    {
-        return size;
     }
 
     public int GetBaseStat(StatType stat)
@@ -525,7 +518,26 @@ public abstract class BattleChar : MonoBehaviour, IPointerClickHandler
         return baseValue + modifier;
     }
 
-    #endregion 
+    #endregion
+
+    #region Round
+    public virtual void SetRound()
+    {
+        if (ctx.Target.Count >= 1) ctx.Target.Clear();
+        OnStartTurn();
+        OnStartMyTurn?.Invoke(this);
+    }
+
+    public virtual void EndRound()
+    {
+        OnEndMyTurn?.Invoke();
+    }
+
+    public TurnStep CurrentStep()
+    {
+        return step;
+    }
+    #endregion
 
     public void OnPointerClick(PointerEventData eventData)
     {

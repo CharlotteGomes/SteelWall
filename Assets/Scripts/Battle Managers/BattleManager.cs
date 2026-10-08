@@ -137,41 +137,26 @@ public class BattleManager : MonoBehaviour
         }
     }
 
-    public bool CanOccupy(BattleChar character, int TargetPos)
-    {
-        int size = character.GetSize() - 1;
-
-        if (character is EnemyController n)
-        {
-            if (TargetPos + size >= enemy_slot.Length) return false;
-        }
-        if (TargetPos + size >= pj_slot.Length) return false;
-        return true;
-    }
 
     public void PlaceCharacters(BattleChar character)
     {
-        int size = character.GetSize();
-        int j = 0;
         if (character is EnemyController)
         {
             for (int i = 0; i < enemy_slot.Length; i++)
             {
-                if (j == size) break;
                 if (CheckOccupyPos(enemy_slot, i)) continue;
 
                 enemy_slot[i] = character;
-                j++;
+                break;
             }
             return;
         }
         for (int i = 0; i < pj_slot.Length; i++)
         {
-            if (j == size) break;
             if (CheckOccupyPos(pj_slot, i)) continue;
 
             pj_slot[i] = character;
-            j++;
+            break;
         }
     }
 
@@ -226,20 +211,16 @@ public class BattleManager : MonoBehaviour
     }
 
     Vector3 GetWorldPos(int i, BattleChar c)
-{
-    int size = c.GetSize();
-
-    float center = i + (size - 1) / 2f;
-
-    if (c is EnemyController)
     {
-        return (Vector3)(center * 2.5f * Vector2.right)
-            + new Vector3(3, -1.25f, -5);
-    }
+        if (c is EnemyController)
+        {
+            return (Vector3)(i * 2.5f * Vector2.right)
+                + new Vector3(3, -1.25f, -5);
+        }
 
-    return (Vector3)(center * 2.5f * Vector2.left)
-        + new Vector3(-3, -1.25f, -5);
-}
+        return (Vector3)(i * 2.5f * Vector2.left)
+            + new Vector3(-3, -1.25f, -5);
+    }
 
     void InitiateCharacter(BattleChar b, BattleCharSO so)
     {

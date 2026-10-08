@@ -33,7 +33,7 @@ public class Indicator : MonoBehaviour
     public void SetPosition()
     {
         transform.position = (Vector2)character.transform.position + Vector2.down * .05f;
-        transform.localScale = new Vector2(((1 + (float)character.GetSize()) / 2), 1);
+        transform.localScale = Vector2.one;
     }
 
     public void SetSprites(Sprite ind,  Sprite smk)
@@ -47,12 +47,12 @@ public class Indicator : MonoBehaviour
     public void Select(bool select)
     {
         if (select) {group.alpha = 1; return; }
-        group.alpha = .70f;
+        group.alpha = .30f;
     }
 
     public IEnumerator StartIndAnimation(BattleChar c)
     {
-        float size = ((1 + (float)c.GetSize()) / 2);
+        float size = transform.localScale.x;
         float originalScale =  size;
         float targetScale = 1.25f * size;
         float t = 0f;

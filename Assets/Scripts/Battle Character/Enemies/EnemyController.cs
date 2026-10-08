@@ -55,11 +55,11 @@ public class EnemyController : BattleChar, IPointerEnterHandler
             switch (step)
             {
                 case TurnStep.ChooseSkill:
-                    ChoosingSkill();
+                    StartCoroutine(ChoosingSkill());
                     break;
 
                 case TurnStep.ChooseTarget:
-                    yield return StartCoroutine(ChooseTarget());
+                    yield return StartCoroutine(ChoosingTarget());
                     break;
 
                 case TurnStep.ChooseSwapTarget:
@@ -76,13 +76,46 @@ public class EnemyController : BattleChar, IPointerEnterHandler
         OnEndMyTurn?.Invoke();
     }
 
+    IEnumerator ChoosingSkill()
+    {
+        SetSkill(behaviourSO.behaviour[behaviour_index]);
+        if(!CanUseSkill(skill_current))
+        {
+            BehaviourUpdate();
+            yield break;
+        }
+        yield return StartCoroutine(ConfirmSkill());
+    }
+
+    IEnumerator ConfirmSkill()
+    {
+        if(skill_current == null) { BehaviourUpdate(); yield break; }
+        skill_current_data = new SkillData(skill_current, ctx);
+        if(skill_current_data.targets.Count <= 0) { BehaviourUpdate(); yield break; }
+        OnSkillConfirm?.Invoke(skill_current_data);
+        SetStep(TurnStep.ChooseTarget);
+    }
+
+    IEnumerator ChoosingTarget()
+    {
+        int random = Random.Range(0, skill_current_data.targets.Count);
+        SelectTarget(random);
+        if(ctx.Target.Count <= 0) { BehaviourUpdate(); yield break; }
+        OnBattleCharSelect?.Invoke(ctx.Target.ToArray());
+        yield return StartCoroutine(ConfirmTarget());
+    }
+
+    IEnumerator ConfirmTarget()
+    {
+        yield return new WaitForSeconds(0.75f);
+        SetStep(TurnStep.ExecutingSkill);
+    }
+
+    /*
     protected void ChoosingSkill()
     {
         skill_current = behaviourSO.behaviour[behaviour_index]; 
-        for (int i = 0; i < skill_current.use_pos.Length; i++)
-        {
-            if (ctx.SelfPosition == skill_current.use_pos[i]) {SetStep(TurnStep.ChooseTarget) ; OnSkillSelect?.Invoke(skill_current); return; }
-        }
+        
         Debug.Log("Choosing skill");
         BehaviourUpdate();
     }
@@ -111,7 +144,7 @@ public class EnemyController : BattleChar, IPointerEnterHandler
         OnSkillConfirm?.Invoke(skill_current_data);
         yield return new WaitForSeconds(.75f);
         step = TurnStep.ExecutingSkill;
-    }
+    }*/
 
     public override void ChooseSwapTarget() 
     {
@@ -132,7 +165,6 @@ public class EnemyController : BattleChar, IPointerEnterHandler
 
     void BehaviourUpdate()
     {
-        Debug.Log($"{name} beheviour update {behaviour_index}");
         behaviour_index++;
         if (behaviour_index > behaviourSO.behaviour.Count - 1) { behaviour_index = 0; }
         if (behaviour_index == original_behaviour)

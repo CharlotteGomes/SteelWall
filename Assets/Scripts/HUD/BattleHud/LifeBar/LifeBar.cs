@@ -36,6 +36,6 @@ public class LifeBar : MonoBehaviour
 
     public void SetSize()
     {
-        transform.localScale = new Vector2(((float)(1 + character.GetSize()) / 2), 1);
+        transform.localScale = Vector2.one;
     }
 }
