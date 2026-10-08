@@ -1,10 +1,10 @@
 fileFormatVersion: 2
-guid: 44772392d0f86944b805a30cca9d017c
+guid: 5bc2fe2d12d44564b8a67c2a763f5018
 TextureImporter:
   internalIDToNameTable:
   - first:
-      213: 6894840679937274686
-    second: MolduraSelecionado_0
+      213: -1788090871122158859
+    second: IndicadorAtivoBrilho_0
   externalObjects: {}
   serializedVersion: 13
   mipmaps:
@@ -37,21 +37,21 @@ TextureImporter:
   maxTextureSize: 2048
   textureSettings:
     serializedVersion: 2
-    filterMode: 0
+    filterMode: 1
     aniso: 1
     mipBias: 0
-    wrapU: 0
-    wrapV: 0
-    wrapW: 0
+    wrapU: 1
+    wrapV: 1
+    wrapW: 1
   nPOTScale: 0
   lightmap: 0
   compressionQuality: 50
   spriteMode: 2
   spriteExtrude: 1
-  spriteMeshType: 0
+  spriteMeshType: 1
   alignment: 0
   spritePivot: {x: 0.5, y: 0.5}
-  spritePixelsToUnits: 96
+  spritePixelsToUnits: 100
   spriteBorder: {x: 0, y: 0, z: 0, w: 0}
   spriteGenerateFallbackPhysicsShape: 1
   alphaUsage: 1
@@ -100,13 +100,13 @@ TextureImporter:
     serializedVersion: 2
     sprites:
     - serializedVersion: 2
-      name: MolduraSelecionado_0
+      name: IndicadorAtivoBrilho_0
       rect:
         serializedVersion: 2
-        x: 195
-        y: 130
-        width: 76
-        height: 83
+        x: 434
+        y: 284
+        width: 158
+        height: 64
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -115,8 +115,8 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: -1
       bones: []
-      spriteID: e33f29661156faf50800000000000000
-      internalID: 6894840679937274686
+      spriteID: 5fa15a093dc6f27e0800000000000000
+      internalID: -1788090871122158859
       vertices: []
       indices: 
       edges: []
@@ -135,7 +135,7 @@ TextureImporter:
     spriteCustomMetadata:
       entries: []
     nameFileIdTable:
-      MolduraSelecionado_0: 6894840679937274686
+      IndicadorAtivoBrilho_0: -1788090871122158859
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 

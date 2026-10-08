@@ -168,8 +168,6 @@ public class PjController : BattleChar
         if (index < 0 || index >= skill_current_data.targets.Count) return;
         intent_index = index;
         OnBattleCharSelect?.Invoke(ctx.Target.ToArray());
-
-        Debug.Log(ctx.Target.ToArray().Length);
     }
     public void ConfirmTarget() 
     {
@@ -198,6 +196,7 @@ public class PjController : BattleChar
     {
         intent_index = ctx.SelfPosition; step = TurnStep.ChooseSwapTarget;
         OnMoveConfirm?.Invoke(ctx);
+        SelectSwapTarget(ctx.SelfPosition, 1);
     }
 
     public override void ChooseSwapTarget()
@@ -206,17 +205,30 @@ public class PjController : BattleChar
         if (InputManager.esc || InputManager.back) { OnMoveCancel?.Invoke(); step = TurnStep.MoveAction; return; }
         if (InputManager.hud_horizontal != 0)
         {
-
             int new_intent = Mathf.Abs(InputManager.hud_horizontal - intent_index) - ctx.SelfPosition > move  ? intent_index : intent_index - InputManager.hud_horizontal ;
+            int dir = (int)Mathf.Sign(new_intent - intent_index);
+            Debug.Log($"{new_intent} {dir}");
+            SelectSwapTarget(new_intent, dir);
         }
 
         if (InputManager.interact) { ConfirmSwapTarget(intent_index); }
     }
-    // 0, 1, eu, 3
-    void SelectSwapTarget(int i)
+    void SelectSwapTarget(int i, int dir)
     {
-        // 0 1 3
-        List<BattleChar> l = ctx.Party.Where(x => x != ctx.Self).ToList();
+        if (i < 0 || i >= ctx.Party.Count) return;
+        if (i == ctx.SelfPosition)
+        {
+            if (i + dir >= 0 && i + dir < ctx.Party.Count)
+            {
+                intent_index = i + dir;
+                Debug.Log("Passou direto");
+                OnSwapTargetSelect.Invoke(ctx.Party[intent_index]);
+                return;
+            }
+            return;
+        }
+        intent_index = i;
+        OnSwapTargetSelect.Invoke(ctx.Party[intent_index]);
     } 
 
     public void SkipTurn()

@@ -70,6 +70,7 @@ public abstract class BattleChar : MonoBehaviour, IPointerClickHandler
     public Action OnMoveActionSelect;
     public Action<BattleContext> OnMoveConfirm;
     public Action OnMoveCancel;
+    public Action<BattleChar> OnSwapTargetSelect;
 
     public Action OnSkipSelect;
 

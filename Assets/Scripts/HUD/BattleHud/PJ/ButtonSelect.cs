@@ -25,7 +25,7 @@ public class ButtonSelect : MonoBehaviour
         Vector2 StartPos = tf.position;
         Vector2 EndPos = _tf.position;
         Vector2 StartScale = tf.sizeDelta;
-        Vector2 EndScale = _tf.sizeDelta + Vector2.one * 35;
+        Vector2 EndScale = _tf.sizeDelta + new Vector2(10, 26);
         float t = 0f;
         float duration = 0.35f;
 

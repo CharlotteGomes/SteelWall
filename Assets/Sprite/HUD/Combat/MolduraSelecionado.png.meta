@@ -1,5 +1,5 @@
 fileFormatVersion: 2
-guid: 196e57e7e1dfd7644b9acd2b8dca25d2
+guid: 44772392d0f86944b805a30cca9d017c
 TextureImporter:
   internalIDToNameTable:
   - first:
@@ -37,7 +37,7 @@ TextureImporter:
   maxTextureSize: 2048
   textureSettings:
     serializedVersion: 2
-    filterMode: 2
+    filterMode: 0
     aniso: 1
     mipBias: 0
     wrapU: 0
@@ -73,10 +73,10 @@ TextureImporter:
   - serializedVersion: 4
     buildTarget: DefaultTexturePlatform
     maxTextureSize: 2048
-    resizeAlgorithm: 1
+    resizeAlgorithm: 0
     textureFormat: -1
     textureCompression: 1
-    compressionQuality: 98
+    compressionQuality: 50
     crunchedCompression: 0
     allowsAlphaSplitting: 0
     overridden: 0
@@ -103,20 +103,42 @@ TextureImporter:
       name: MolduraSelecionado_0
       rect:
         serializedVersion: 2
-        x: 195
-        y: 130
-        width: 75
-        height: 80
+        x: 196
+        y: 131
+        width: 66
+        height: 81
       alignment: 0
       pivot: {x: 0.5, y: 0.5}
-      border: {x: 30, y: 32, z: 29, w: 32}
+      border: {x: 0, y: 0, z: 0, w: 0}
       customData: 
       outline: []
       physicsShape: []
-      tessellationDetail: -1
+      tessellationDetail: 0
       bones: []
-      spriteID: e33f29661156faf50800000000000000
+      spriteID: b93b7dbe6b9924d4992440289a093608
       internalID: 6894840679937274686
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: MolduraSelecionado_1
+      rect:
+        serializedVersion: 2
+        x: 264
+        y: 163
+        width: 6
+        height: 14
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: f3b168d2438cf82498b3fda74b671cb2
+      internalID: 951972819
       vertices: []
       indices: 
       edges: []
@@ -125,7 +147,7 @@ TextureImporter:
     customData: 
     physicsShape: []
     bones: []
-    spriteID: 061e5685c3957cd4db61841ae2b9ec81
+    spriteID: 5d14700572525694792306175181e4e0
     internalID: 0
     vertices: []
     indices: 
@@ -133,9 +155,14 @@ TextureImporter:
     weights: []
     secondaryTextures: []
     spriteCustomMetadata:
-      entries: []
+      entries:
+      - key: SpriteEditor.SliceSettings
+        value: '{"sliceOnImport":true,"gridCellCount":{"x":1.0,"y":1.0},"gridSpriteSize":{"x":64.0,"y":64.0},"gridSpriteOffset":{"x":0.0,"y":0.0},"gridSpritePadding":{"x":0.0,"y":0.0},"pivot":{"x":0.5,"y":0.5},"pivotPixels":{"x":0.0,"y":0.0},"autoSlicingMethod":0,"spriteAlignment":0,"pivotUnitMode":0,"slicingType":0,"keepEmptyRects":false,"isAlternate":false}'
+      - key: SpriteEditor.SliceOnImport
+        value: True
     nameFileIdTable:
       MolduraSelecionado_0: 6894840679937274686
+      MolduraSelecionado_1: 951972819
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 

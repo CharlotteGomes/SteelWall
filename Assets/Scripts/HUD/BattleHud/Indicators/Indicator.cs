@@ -47,7 +47,7 @@ public class Indicator : MonoBehaviour
     public void Select(bool select)
     {
         if (select) {group.alpha = 1; return; }
-        group.alpha = .75f;
+        group.alpha = .70f;
     }
 
     public IEnumerator StartIndAnimation(BattleChar c)

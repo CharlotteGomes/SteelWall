@@ -2,6 +2,7 @@ using UnityEngine;
 using System.Collections.Generic;
 using JetBrains.Annotations;
 using System.Linq;
+using Unity.Collections.LowLevel.Unsafe;
 public class IndicatorManager : MonoBehaviour
 {
     [SerializeField] GameObject prefab;
@@ -36,6 +37,7 @@ public class IndicatorManager : MonoBehaviour
     public void SetTurnIndicatorDefault()
     {
         turn_indicator.SetSprites(ind_turn, null);
+        turn_indicator.Select(true);
     }
 
     public void SetTargetIndicators(SkillData data)
@@ -44,12 +46,26 @@ public class IndicatorManager : MonoBehaviour
         {
             Sprite ind_spr = data.original_skill.affect_enemy ? ind_atk : ind_ally;
             Sprite smk_spr = data.original_skill.affect_enemy ? smk_atk : smk_ally;
-            if(turn_indicator != null && turn_indicator.character == c) { turn_indicator.SetSprites(ind_spr, smk_spr); continue; }
+            if(turn_indicator != null && turn_indicator.character == c) { turn_indicator.SetSprites(ind_spr, smk_spr); turn_indicator.Select(false); continue; }
             GameObject inst = Instantiate(prefab, this.transform);
             Indicator ind = inst.GetComponent<Indicator>();
             ind.SetChar(c);
             ind.SetSprites(ind_spr, smk_spr);
+            ind.Select(false);
             indicators.Add(ind);
+        }
+    }
+    public void SelectIndicators(BattleChar[] c)
+    {
+        for (int i = 0; i < c.Length; i++)
+        {
+            if (turn_indicator.character == c[i]) { turn_indicator.Select(true); }
+            else turn_indicator.Select(false);
+                for (int j = 0; j < indicators.Count; j++)
+                {
+                    if (indicators[j].character == c[i]) { indicators[j].Select(true); continue; }
+                    indicators[j].Select(false);
+                }
         }
     }
 
@@ -70,16 +86,16 @@ public class IndicatorManager : MonoBehaviour
         }
     }
 
-    public void SelectIndicators(BattleChar[] c)
+    public void SelectMoveIndicators(BattleChar c)
     {
-        for(int i = 0; i < c.Length; i++)
+        foreach(Indicator indicator in indicators)
         {
-            if(c[i] == turn_indicator.character) { turn_indicator.Select(true); Debug.Log("Confirmou o indicator");  continue; }
-            for(int j = 0; j < indicators.Count; j++) 
+            if (indicator.character == c)
             {
-                if(indicators[j].character == c[i]) { indicators[j].Select(true); Debug.Log($"Setou o {c[i]}"); continue; }
-                indicators[j].Select(false);
+                indicator.Select(true);
+                continue;
             }
+            indicator.Select(false);
         }
     }
 
@@ -107,6 +123,7 @@ public class IndicatorManager : MonoBehaviour
         c.OnMoveCancel += DeleteAllIndicators;
         c.OnBattleCharSelect += SelectIndicators;
         c.OnMoveConfirm += SetMoveIndicators;
+        c.OnSwapTargetSelect += SelectMoveIndicators;
         c.OnEndMyTurn += DeleteAllIndicators;
         c.OnEndMyTurn += DeleteTurnIndicator;
     }
@@ -120,6 +137,7 @@ public class IndicatorManager : MonoBehaviour
         c.OnMoveCancel -= DeleteAllIndicators;
         c.OnBattleCharSelect -= SelectIndicators;
         c.OnMoveConfirm -= SetMoveIndicators;
+        c.OnSwapTargetSelect -= SelectMoveIndicators;
         c.OnEndMyTurn -= DeleteAllIndicators;
         c.OnEndMyTurn -= DeleteTurnIndicator;
     }

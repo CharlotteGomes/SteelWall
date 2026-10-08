@@ -69,7 +69,6 @@ public class EnemyController : BattleChar, IPointerEnterHandler
 
                 case TurnStep.ExecutingSkill:
                     yield return StartCoroutine(StartSkill());
-                    behaviour_index++;
                     step = TurnStep.Finish;
                     break;
             }
@@ -152,6 +151,7 @@ public class EnemyController : BattleChar, IPointerEnterHandler
     public override void SetRound()
     {
         base.SetRound();
+        BehaviourUpdate();
         original_behaviour = behaviour_index;
         step = TurnStep.ChooseSkill;
     }
