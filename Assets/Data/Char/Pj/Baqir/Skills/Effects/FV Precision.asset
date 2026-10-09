@@ -14,6 +14,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::BuffStatsEffectSO
   self: 0
   sfSO: {fileID: 11400000, guid: a81cc591d3ab8954f8f4222d49dd6adf, type: 2}
-  stacks: 10
+  stacks: 1
   resist: 0
   so: {fileID: 11400000, guid: 403df3d06c66956479404844b5ff5278, type: 2}
