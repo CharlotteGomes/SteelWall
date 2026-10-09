@@ -71,6 +71,7 @@ public class IndicatorManager : MonoBehaviour
 
     public void SetMoveIndicators(BattleContext ctx) 
     {
+        SetTurnIndicatorDefault();
         for(int i = -ctx.Self.GetStat(StatType.MOVE); i <= ctx.Self.GetStat(StatType.MOVE); i++)
         {
             
@@ -126,6 +127,7 @@ public class IndicatorManager : MonoBehaviour
         c.OnSwapTargetSelect += SelectMoveIndicators;
         c.OnEndMyTurn += DeleteAllIndicators;
         c.OnEndMyTurn += DeleteTurnIndicator;
+        c.OnDeath += UnsubscribeEvents;
     }
 
     public void UnsubscribeEvents(BattleChar c)
@@ -140,6 +142,7 @@ public class IndicatorManager : MonoBehaviour
         c.OnSwapTargetSelect -= SelectMoveIndicators;
         c.OnEndMyTurn -= DeleteAllIndicators;
         c.OnEndMyTurn -= DeleteTurnIndicator;
+        c.OnDeath -= UnsubscribeEvents;
     }
 
     public void OnDestroy()

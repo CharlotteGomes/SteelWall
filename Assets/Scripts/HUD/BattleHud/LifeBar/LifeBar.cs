@@ -2,7 +2,7 @@ using UnityEngine;
 
 public class LifeBar : MonoBehaviour
 {
-    [SerializeField] BattleChar character;
+    public BattleChar character { get; private set; }
     [SerializeField] LifeBarFill fill;
     [SerializeField] BackLifeBar backFill;
     void Start()

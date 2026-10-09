@@ -32,12 +32,30 @@ public class LifeBarManager : MonoBehaviour
     {
         foreach (BattleChar c in list)
         {
-            GameObject bar = Instantiate(life_bar, transform);
-            bar.transform.SetParent(this.gameObject.transform);
-            LifeBar life = bar.GetComponent<LifeBar>();
-            life.SetCharacter(c);
-            lifeBars.Add(life);
+            IndividualSpawn(c);
         }
+    }
+
+    public void IndividualDelete(BattleChar c)
+    {
+        foreach(LifeBar l in lifeBars)
+        {
+            if(l.character == c)
+            {
+                lifeBars.Remove(l);
+                Destroy(l.gameObject);
+                break;
+            }
+        }
+    }
+
+    public void IndividualSpawn(BattleChar c)
+    {
+        GameObject bar = Instantiate(life_bar, transform);
+        bar.transform.SetParent(this.gameObject.transform);
+        LifeBar life = bar.GetComponent<LifeBar>();
+        life.SetCharacter(c);
+        lifeBars.Add(life);
     }
 
     public void MoveBars()

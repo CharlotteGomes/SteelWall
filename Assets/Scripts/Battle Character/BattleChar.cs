@@ -36,6 +36,7 @@ public abstract class BattleChar : MonoBehaviour, IPointerClickHandler
     public SpriteRenderer sprite_renderer { get; private set; }
 
     [Header("BattleInfo")]
+    public bool its_alive_form = true;
     [SerializeField] protected int life_max;
     [SerializeField] protected int life_current;
     [SerializeField] protected int protect, dodge, damage_min, damage_max, accuracy, spd, crit, move;
@@ -74,6 +75,8 @@ public abstract class BattleChar : MonoBehaviour, IPointerClickHandler
     public Action OnSkipSelect;
 
     public Action OnEndMyTurn;
+
+    public Action<BattleChar> OnDeath;
 
     #region Init
     public virtual void InitStats()
@@ -232,6 +235,12 @@ public abstract class BattleChar : MonoBehaviour, IPointerClickHandler
         return life_current <= 0 ? false : true;
     }
 
+    public void CharacterDeath()
+    {
+        OnCharacterDeath();
+        OnDeath?.Invoke(this);
+        Destroy(gameObject);
+    }
     public void ReceiveStatsModifier(StatsModifierSO modifier)
     {
         if(modifier != null)
@@ -424,7 +433,7 @@ public abstract class BattleChar : MonoBehaviour, IPointerClickHandler
     #endregion
 
     #region Turn
-    public abstract IEnumerator OnGoingTurn();
+    public virtual IEnumerator OnGoingTurn() { yield return null; }
 
     public virtual void SelectTarget(int index)
     {
@@ -441,7 +450,7 @@ public abstract class BattleChar : MonoBehaviour, IPointerClickHandler
         ctx.Target.Add(skill_current_data.targets[index]);
         skill_current_data.Prepare();
     }
-    public abstract void ChooseSwapTarget();
+    public virtual void ChooseSwapTarget() { }
     public void ConfirmSwapTarget(int index)
     {
         if (battle_manager == null) return;

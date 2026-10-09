@@ -1581,6 +1581,7 @@ MonoBehaviour:
   initiative: []
   pj_prefab: {fileID: 2813120227586499364, guid: d172619bd3216044a88d9b8865cf2355, type: 3}
   enemy_prefab: {fileID: 1574995437504366707, guid: 2ba2f2b7e18d7404c8a37ebb4d11473a, type: 3}
+  tomb_prefab: {fileID: 187309501256958208, guid: 2d86d3214d081e44faf63ff0614b71a5, type: 3}
   test1:
   - {fileID: 11400000, guid: eb62ec11013488044b653913cf7bf190, type: 2}
   - {fileID: 11400000, guid: 259cb2d259e8a36459ea02b56bdb6c41, type: 2}

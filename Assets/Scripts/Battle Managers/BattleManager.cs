@@ -20,7 +20,7 @@ public class BattleManager : MonoBehaviour
     
     public BattleHud hud;
     [SerializeField] List<BattleChar> initiative = new List<BattleChar>();
-    [SerializeField] GameObject pj_prefab, enemy_prefab;
+    [SerializeField] GameObject pj_prefab, enemy_prefab, tomb_prefab;
     [SerializeField] List<PJSO> test1 = new List<PJSO>();
     [SerializeField] List<EnemySO> test2 = new List<EnemySO>();
 
@@ -57,6 +57,11 @@ public class BattleManager : MonoBehaviour
         StartCoroutine(TurnOrder());
     }
     
+    public void EndBattle()
+    {
+
+    }
+
     IEnumerator TurnOrder()
     {
         while (true)
@@ -71,6 +76,7 @@ public class BattleManager : MonoBehaviour
 
     void StartTurn()
     {
+        CheckCharactersAlive();
         current = initiative[initiative_index];
         hud.OnStartTurn(current);
         current.SetRound();
@@ -87,8 +93,6 @@ public class BattleManager : MonoBehaviour
         RefreshHUD(); 
         
     }
-
-    
 
     void SpawnCharacters(List<PJSO> pjs, List<EnemySO> enemies)
     {
@@ -112,6 +116,23 @@ public class BattleManager : MonoBehaviour
         SetCharacterSpriteRender();
         SetContext();
         SetAllPosition();
+    }
+
+    public void CheckCharactersAlive()
+    {
+        List<BattleChar> all_chars = new List<BattleChar>();
+        List<BattleChar> death_chars = new List<BattleChar>();
+        for(int i = 0; i < 4; i++)
+        {
+            if (pj_slot[i] != null) all_chars.Add(pj_slot[i]);
+            if (enemy_slot[i] != null) all_chars.Add(enemy_slot[i]);
+        }
+
+        foreach(BattleChar ch in all_chars)
+        {
+            if (ch.CheckAlive()) continue;
+            StartCoroutine(CharacterDeath(ch));
+        }
     }
 
     public void RefreshHUD()
@@ -212,7 +233,8 @@ public class BattleManager : MonoBehaviour
 
     Vector3 GetWorldPos(int i, BattleChar c)
     {
-        if (c is EnemyController)
+        BattleChar[] battleChar = enemy_slot.Where(b => b == c).ToArray();
+        if (battleChar.Length > 0)
         {
             return (Vector3)(i * 2.5f * Vector2.right)
                 + new Vector3(3, -1.25f, -5);
@@ -314,21 +336,16 @@ public class BattleManager : MonoBehaviour
 
     public void SlotRemove(BattleChar b)
     {
-        switch(b)
+        for(int i = 0; i < 4; i++)
         {
-            case PjController pj:
-                for(int i = 0; i < pj_slot.Length; i++)
-                {
-                    if(pj_slot[i] == pj) { pj_slot[i] = null; break; }
-                }
-                break;
-            case EnemyController enemy:
-                for(int i = 0; i < enemy_slot.Length; i++)
-                {
-                    if(enemy_slot[i] == enemy) { enemy_slot[i] = null; break; }
-                }
-                break;
+            if(pj_slot[i] == b) pj_slot[i] = null;
+            if(enemy_slot[i] == b) enemy_slot[i] = null;
         }
+    }
+
+    public void HudRemoveCharInfo(BattleChar c)
+    {
+        hud.lifeManager.IndividualDelete(c);
     }
 
     public int GetPosition(BattleChar b)
@@ -352,11 +369,26 @@ public class BattleManager : MonoBehaviour
     {
         InitiativeRemove(b);
         SlotRemove(b);
+        HudRemoveCharInfo(b);
+        if(b is not BattleObjects) { SpawnTomb(b); }
         SetContext();
+        SetAllPosition();
+        b.CharacterDeath();
+        hud.lifeManager.MoveBars();
         yield return null;
     }
 
-    void UpdatePos()
+    void SpawnTomb(BattleChar b)
     {
+        GameObject tomb = Instantiate(tomb_prefab);
+        BattleTomb battleTomb = tomb.GetComponent<BattleTomb>();
+        hud.lifeManager.IndividualSpawn(battleTomb);
+        if (b is EnemyController)
+        {
+            enemy_slot[b.GetSelfPos()] = battleTomb;
+            return;
+        }
+
+        pj_slot[b.GetSelfPos()] = battleTomb;
     }
 }
