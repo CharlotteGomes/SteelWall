@@ -5,7 +5,6 @@ using UnityEngine.SceneManagement;
 public class GM : MonoBehaviour
 {
     public static GM instance { get; private set; } //Singleton
-    public PartyManager party_manager;
     public BattleManager battle_manager;
 
     private void Awake()
