@@ -41,7 +41,7 @@ public abstract class BattleChar : MonoBehaviour, IPointerClickHandler
     [SerializeField] protected int life_current;
     [SerializeField] protected int protect, dodge, damage_min, damage_max, accuracy, spd, crit, move;
     public List<StatusResistence> Resistences = new List<StatusResistence>();
-    [SerializeField] protected BattleCharSO battle_char;
+    [SerializeField] protected BattleCharData battle_char;
     [SerializeField] protected BattleContext ctx;
     [SerializeField] protected List<FavoritePos> favorite_pos = new();
 
@@ -81,7 +81,7 @@ public abstract class BattleChar : MonoBehaviour, IPointerClickHandler
     #region Init
     public virtual void InitStats()
     {
-        name = battle_char.name;
+        name = battle_char.Name;
         spriteSO = battle_char.sprites;
         life_max = battle_char.life;
         life_current = life_max;
@@ -120,7 +120,7 @@ public abstract class BattleChar : MonoBehaviour, IPointerClickHandler
         }
     }
 
-    public void SetBattleChar(BattleCharSO battle_char)
+    public void SetBattleChar(BattleCharData battle_char)
     {
         this.battle_char = battle_char;
     }

@@ -21,8 +21,6 @@ public class BattleManager : MonoBehaviour
     public BattleHud hud;
     [SerializeField] List<BattleChar> initiative = new List<BattleChar>();
     [SerializeField] GameObject pj_prefab, enemy_prefab, tomb_prefab;
-    [SerializeField] List<PJSO> test1 = new List<PJSO>();
-    [SerializeField] List<EnemySO> test2 = new List<EnemySO>();
 
     [SerializeField] BattleChar[] pj_slot = new BattleChar[4];
     [SerializeField] BattleChar[] enemy_slot = new BattleChar[4];
@@ -39,7 +37,6 @@ public class BattleManager : MonoBehaviour
 
     void Start()
     {
-        StartBattle(test1, test2);
     }
 
     // Update is called once per frame
@@ -48,7 +45,7 @@ public class BattleManager : MonoBehaviour
 
     }
 
-    public void StartBattle(List<PJSO> pjs, List<EnemySO> enemies)
+    public void StartBattle(List<PJData> pjs, List<EnemyData> enemies)
     {
         initiative_index = 0;
         SpawnCharacters(pjs, enemies);
@@ -94,7 +91,7 @@ public class BattleManager : MonoBehaviour
         
     }
 
-    void SpawnCharacters(List<PJSO> pjs, List<EnemySO> enemies)
+    void SpawnCharacters(List<PJData> pjs, List<EnemyData> enemies)
     {
         for (int i = 0; i < pjs.Count; i++)
         {
@@ -244,10 +241,10 @@ public class BattleManager : MonoBehaviour
             + new Vector3(-3, -1.25f, -5);
     }
 
-    void InitiateCharacter(BattleChar b, BattleCharSO so)
+    void InitiateCharacter(BattleChar b, BattleCharData data)
     {
         initiative.Add(b);
-        b.SetBattleChar(so);
+        b.SetBattleChar(data);
         b.SetBattleManager(this);
         b.InitStats();
     }

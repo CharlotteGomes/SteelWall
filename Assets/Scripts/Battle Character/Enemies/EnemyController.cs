@@ -19,8 +19,8 @@ public class EnemyController : BattleChar, IPointerEnterHandler
     #region Init
     public override void InitStats()
     {
-        EnemySO so = battle_char as EnemySO;
-        behaviourSO = so.behaviour;
+        EnemyData data = battle_char as EnemyData;
+        behaviourSO = data.behaviour;
         base.InitStats();
         life_current = life_max;
         SetFavoritePos(behaviourSO.behaviour);

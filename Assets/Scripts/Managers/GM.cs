@@ -1,13 +1,12 @@
 using System;
 using System.Collections;
 using UnityEngine;
-
+using UnityEngine.SceneManagement;
 public class GM : MonoBehaviour
 {
     public static GM instance { get; private set; } //Singleton
     public PartyManager party_manager;
     public BattleManager battle_manager;
-    [SerializeField] Action game_state; //Current State
 
     private void Awake()
     {
@@ -29,14 +28,6 @@ public class GM : MonoBehaviour
     
     void Update()
     {
-        game_state?.Invoke(); //game_state exists? Play Event
-    }
-
-    public void RunCoroutine(IEnumerator coroutine) //Static classes cannot run coroutines, so I created this method
-    {
-        if (coroutine != null)
-        {
-            StartCoroutine(coroutine);
-        }
+        //if (Input.GetKeyDown(KeyCode.Space)) { SceneManager.LoadScene("CombatScene"); }
     }
 }

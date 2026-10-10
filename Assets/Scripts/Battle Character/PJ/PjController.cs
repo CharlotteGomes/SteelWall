@@ -8,11 +8,11 @@ using UnityEngine.InputSystem.HID;
 public class PjController : BattleChar
 {
 
-    [SerializeField] protected List<SkillSO> skills_unlocked = new List<SkillSO>();
     [SerializeField] protected List<SkillSO> skills_equipped = new List<SkillSO>();
     public IReadOnlyList<SkillSO> read_skills => skills_equipped;
     public SkillSO skill_read => skill_current;
     [SerializeField] int intent_index = 0; 
+
     protected override void Awake()
     {
         base.Awake();
@@ -32,42 +32,10 @@ public class PjController : BattleChar
     #region Init
     public override void InitStats()
     {
-        PJSO pj = battle_char as PJSO;
-        foreach (SkillSO so in pj.skills)
-        {
-            AddSkill(so);
-        }
-        skills_equipped = skills_unlocked;
-        //SetFavoritePos(skills_equipped);
+        PJData pj = battle_char as PJData;
+        skills_equipped = pj.SkillEquipped.ToList();
         base.InitStats();
     }
-    #endregion
-
-    #region Skill Functions
-    protected void ReduceCooldown()
-    {
-        foreach (SkillSO dt in skills_equipped)
-        {
-        }
-    }
-
-    public void AddSkill(SkillSO data)
-    {
-        if(skills_unlocked.Contains(data)) return;
-        skills_unlocked.Add(data);
-    }
-
-    public void EquipSkill(SkillSO data)
-    {
-        if (skills_equipped.Contains(data)) return;
-        skills_equipped.Add(data);
-    }
-    public void UnequipSkill(SkillSO data)
-    {
-        if (!skills_equipped.Contains(data)) return;
-        skills_equipped.Remove(data);
-    }
-
     #endregion
 
     #region Turn
