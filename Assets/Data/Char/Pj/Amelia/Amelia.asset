@@ -1,0 +1,35 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 28137ed61fa8be54292ee8e5964522a3, type: 3}
+  m_Name: Amelia
+  m_EditorClassIdentifier: Assembly-CSharp::PJSO
+  Name: Amelia
+  sprites: {fileID: 11400000, guid: 14113c5381d319c4faf83d5a2fc65aca, type: 2}
+  life: 27
+  protect: 10
+  dodge: 15
+  damage_min: 14
+  damage_max: 23
+  accuracy: 4
+  spd: 8
+  stun: 5
+  debuff: 15
+  bleed: 25
+  poison: 25
+  move: 50
+  sanity: 20
+  crit: 10
+  skills:
+  - {fileID: 11400000, guid: 1d9a00aefa95da949b42572a4791aed2, type: 2}
+  - {fileID: 11400000, guid: f20ff7c6181362b45aa1d899987ebd9f, type: 2}
+  - {fileID: 11400000, guid: 046f819456a24ec4aa06af01c3e28ec0, type: 2}
+  - {fileID: 11400000, guid: aea4eb4858404e34e8067fee0619fd64, type: 2}

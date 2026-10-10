@@ -1,0 +1,31 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 45d7d4bb2d4ace2438d3b000cc197d4e, type: 3}
+  m_Name: test
+  m_EditorClassIdentifier: Assembly-CSharp::SkillSO
+  Name: penitence
+  Description: 
+  icon: {fileID: 8614319688527396397, guid: ff028b82718110547a8395c865e0aad0, type: 3}
+  anim: {fileID: 0}
+  effects:
+  - {fileID: 11400000, guid: dc82e7cb98b5385438113f398cfb04c4, type: 2}
+  modifiers: []
+  pos: 
+  use_pos: 00000000010000000200000003000000
+  acc_base: 100
+  crit_mod: 0
+  affect_enemy: 0
+  chose: 0
+  self: 1
+  can_dodge: 0
+  can_miss: 0
+  can_crit: 0

@@ -1,0 +1,33 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 45d7d4bb2d4ace2438d3b000cc197d4e, type: 3}
+  m_Name: Corte Lacerante
+  m_EditorClassIdentifier: Assembly-CSharp::SkillSO
+  Name: 
+  Description: 
+  icon: {fileID: 8614319688527396397, guid: 37d32dfb3b3dbdf4a99547fee4314f10, type: 3}
+  anim: {fileID: 0}
+  effects:
+  - {fileID: 11400000, guid: 4831c328aa5c1aa42a94580b670f0ed5, type: 2}
+  - {fileID: 11400000, guid: 76a673b2506fd4e42a0154720a961143, type: 2}
+  modifiers:
+  - {fileID: 11400000, guid: bbbc88f0d1e74bd48a22f5ae1ea7e6cf, type: 2}
+  pos: 0000000001000000
+  use_pos: 0100000002000000
+  acc_base: 100
+  crit_mod: 5
+  affect_enemy: 1
+  chose: 1
+  self: 0
+  can_dodge: 1
+  can_miss: 1
+  can_crit: 1

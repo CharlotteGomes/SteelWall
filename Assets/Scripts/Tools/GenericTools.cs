@@ -1,0 +1,18 @@
+using UnityEngine;
+using UnityEngine.Playables;
+using System.Collections;
+using UnityEngine.Animations;
+public static class GenericTools
+{
+    public static bool CheckHorizontal()
+    {
+        if (InputManager.horizontal != 0) return true;
+        return false;
+    }
+
+    public static bool CheckVertical()
+    {
+        if (InputManager.vertical != 0) return true;
+        return false;
+    }
+}

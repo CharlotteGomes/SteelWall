@@ -1,0 +1,37 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 28137ed61fa8be54292ee8e5964522a3, type: 3}
+  m_Name: Lua
+  m_EditorClassIdentifier: Assembly-CSharp::PJSO
+  Name: Lua
+  sprites: {fileID: 11400000, guid: 2df220cb0c678924f8b62d6422da8a74, type: 2}
+  life: 42
+  protect: 20
+  dodge: 5
+  damage_min: 9
+  damage_max: 16
+  accuracy: 4
+  spd: 2
+  move_range: 2
+  stun: 25
+  debuff: 20
+  bleed: 35
+  poison: 10
+  move: 30
+  sanity: 40
+  crit: 5
+  size: 1
+  skills:
+  - {fileID: 11400000, guid: 8582b97d83b913e4397713eafa0dc8b0, type: 2}
+  - {fileID: 11400000, guid: f20ff7c6181362b45aa1d899987ebd9f, type: 2}
+  - {fileID: 11400000, guid: f20ff7c6181362b45aa1d899987ebd9f, type: 2}
+  - {fileID: 11400000, guid: 046f819456a24ec4aa06af01c3e28ec0, type: 2}
