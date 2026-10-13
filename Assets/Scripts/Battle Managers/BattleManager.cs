@@ -19,8 +19,11 @@ public class BattleManager : MonoBehaviour
 {
     
     public BattleHud hud;
+
     [SerializeField] List<BattleChar> initiative = new List<BattleChar>();
     [SerializeField] GameObject pj_prefab, enemy_prefab, tomb_prefab;
+
+    [SerializeField] List<BattleCharSO> pjs, enemy;
 
     [SerializeField] BattleChar[] pj_slot = new BattleChar[4];
     [SerializeField] BattleChar[] enemy_slot = new BattleChar[4];
@@ -37,6 +40,12 @@ public class BattleManager : MonoBehaviour
 
     void Start()
     {
+        List<PJData> pjs_data = new();
+        List<EnemyData> enemy_data = new();    
+
+        foreach(BattleCharSO p in pjs) { pjs_data.Add(new PJData(p as PJSO)); }
+        foreach(BattleCharSO n in enemy) { enemy_data.Add(new EnemyData(n as EnemySO)); }
+        StartBattle(pjs_data, enemy_data);
     }
 
     // Update is called once per frame

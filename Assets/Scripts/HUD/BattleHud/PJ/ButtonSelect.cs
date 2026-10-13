@@ -22,6 +22,7 @@ public class ButtonSelect : MonoBehaviour
   
     public IEnumerator LerpTransform(RectTransform _tf)
     {
+        Canvas.ForceUpdateCanvases();
         Vector2 StartPos = tf.position;
         Vector2 EndPos = _tf.position;
         Vector2 StartScale = tf.sizeDelta;
