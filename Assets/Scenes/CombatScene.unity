@@ -6338,6 +6338,46 @@ PrefabInstance:
       propertyPath: hud
       value: 
       objectReference: {fileID: 2125972868}
+    - target: {fileID: 2168740237297369963, guid: 4af1ad84fd98ecb48be180ca9968fe6a, type: 3}
+      propertyPath: pjs.Array.size
+      value: 4
+      objectReference: {fileID: 0}
+    - target: {fileID: 2168740237297369963, guid: 4af1ad84fd98ecb48be180ca9968fe6a, type: 3}
+      propertyPath: enemy.Array.size
+      value: 4
+      objectReference: {fileID: 0}
+    - target: {fileID: 2168740237297369963, guid: 4af1ad84fd98ecb48be180ca9968fe6a, type: 3}
+      propertyPath: 'pjs.Array.data[0]'
+      value: 
+      objectReference: {fileID: 11400000, guid: eb62ec11013488044b653913cf7bf190, type: 2}
+    - target: {fileID: 2168740237297369963, guid: 4af1ad84fd98ecb48be180ca9968fe6a, type: 3}
+      propertyPath: 'pjs.Array.data[1]'
+      value: 
+      objectReference: {fileID: 11400000, guid: 259cb2d259e8a36459ea02b56bdb6c41, type: 2}
+    - target: {fileID: 2168740237297369963, guid: 4af1ad84fd98ecb48be180ca9968fe6a, type: 3}
+      propertyPath: 'pjs.Array.data[2]'
+      value: 
+      objectReference: {fileID: 11400000, guid: 554927b8abf935b45bf3016710121f2a, type: 2}
+    - target: {fileID: 2168740237297369963, guid: 4af1ad84fd98ecb48be180ca9968fe6a, type: 3}
+      propertyPath: 'pjs.Array.data[3]'
+      value: 
+      objectReference: {fileID: 11400000, guid: 554927b8abf935b45bf3016710121f2a, type: 2}
+    - target: {fileID: 2168740237297369963, guid: 4af1ad84fd98ecb48be180ca9968fe6a, type: 3}
+      propertyPath: 'enemy.Array.data[0]'
+      value: 
+      objectReference: {fileID: 11400000, guid: 8a4f46d4c0e488744bce85ef183e6d7a, type: 2}
+    - target: {fileID: 2168740237297369963, guid: 4af1ad84fd98ecb48be180ca9968fe6a, type: 3}
+      propertyPath: 'enemy.Array.data[1]'
+      value: 
+      objectReference: {fileID: 11400000, guid: 49f29ddd1180df641bb948092fdcbc5a, type: 2}
+    - target: {fileID: 2168740237297369963, guid: 4af1ad84fd98ecb48be180ca9968fe6a, type: 3}
+      propertyPath: 'enemy.Array.data[2]'
+      value: 
+      objectReference: {fileID: 11400000, guid: 527fc9db6c0dccc468590bed8fbf6a54, type: 2}
+    - target: {fileID: 2168740237297369963, guid: 4af1ad84fd98ecb48be180ca9968fe6a, type: 3}
+      propertyPath: 'enemy.Array.data[3]'
+      value: 
+      objectReference: {fileID: 11400000, guid: 527fc9db6c0dccc468590bed8fbf6a54, type: 2}
     - target: {fileID: 8917519997379622332, guid: 4af1ad84fd98ecb48be180ca9968fe6a, type: 3}
       propertyPath: m_Name
       value: -----BATTLE-MANAGER------

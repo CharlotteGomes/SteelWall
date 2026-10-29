@@ -1,4 +1,3 @@
-using Unity.Profiling.Editor;
 using UnityEngine;
 using UnityEngine.UI;
 public class LifeBarFill : MonoBehaviour

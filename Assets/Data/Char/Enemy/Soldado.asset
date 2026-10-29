@@ -29,5 +29,4 @@ MonoBehaviour:
   move: 20
   sanity: 0
   crit: 5
-  size: 2
-  behaviour: {fileID: 11400000, guid: 1295117b36dc8324c80d648feb6b9fdc, type: 2}
+  behaviour: {fileID: 11400000, guid: 05c8cca256095384c808f5d80a176dd0, type: 2}
