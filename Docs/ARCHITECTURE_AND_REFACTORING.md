@@ -39,8 +39,8 @@ Criar testes EditMode para cálculos puros (resistências, modificadores, seleç
 - Unity — Serialization best practices: https://docs.unity.com/en-us/engine/6000.5/manual/scripting/compilation-and-code-reload/script-serialization/best-practices
 - Unity — Organizing your project: https://activation.unity3d.com/how-to/organizing-your-project
 - Unity — ScriptableObjects and modular architecture: https://unity.com/how-to/get-started-with-scriptableobjects-demo
-- Reddit r/Unity3D — Assembly definitions as dependency boundaries: https://www.reddit.com/r/Unity3D/comments/18zq4d2
-- Reddit r/Unity3D — Incremental assembly-definition adoption: https://www.reddit.com/r/Unity3D/comments/yai721
-- Reddit r/Unity3D — Organizing by functional domain: https://www.reddit.com/r/Unity3D/comments/1elhbeq
+- Reddit r/Unity3D — Organização de projetos Unity grandes e separação entre conteúdo próprio e assets de terceiros: https://www.reddit.com/r/Unity3D/comments/1vp9iib/how_do_you_organize_large_unity_projects/
+- Reddit r/unity — Discussão sobre feature folders, assemblies e estrutura por domínio: https://www.reddit.com/r/unity/comments/1qn4j8w/the_folder_structure_mistake_that_kills_unity/
+- Reddit r/Unity3D — Organização de sistemas reutilizáveis, ScriptableObjects e pacotes: https://www.reddit.com/r/Unity3D/comments/1q48kv6/best_way_to_organize_systems/
 
 Discussões comunitárias são experiências práticas, não especificações. A documentação oficial da Unity é a referência para serialização e compilação.
