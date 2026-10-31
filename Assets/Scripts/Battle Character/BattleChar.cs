@@ -105,6 +105,7 @@ public abstract class BattleChar : MonoBehaviour, IPointerClickHandler
     public virtual void SetFavoritePos(List<SkillSO> so_list)
     {
         favorite_pos.Clear();
+        if (so_list == null) return;
         for(int ii = 0;  ii < 4; ii++)
         {
             favorite_pos.Add(new FavoritePos());
@@ -289,7 +290,7 @@ public abstract class BattleChar : MonoBehaviour, IPointerClickHandler
 
     public void OnEndTurn()
     {
-        foreach (StatusEffectData status in StatusEffect)
+        foreach (StatusEffectData status in StatusEffect.ToList())
         {
             status.OnEndTurn();
         }
@@ -298,7 +299,7 @@ public abstract class BattleChar : MonoBehaviour, IPointerClickHandler
 
     public void OnUseSkill(BattleResult result)
     {
-        foreach (StatusEffectData status in StatusEffect)
+        foreach (StatusEffectData status in StatusEffect.ToList())
         {
             status.OnUseSkill(result);
         }
@@ -306,7 +307,7 @@ public abstract class BattleChar : MonoBehaviour, IPointerClickHandler
     }
     public void OnDamageDealt(DamageInfo info)
     {
-        foreach (StatusEffectData status in StatusEffect)
+        foreach (StatusEffectData status in StatusEffect.ToList())
         {
             status.OnDamageDealt(info);
         }
@@ -315,7 +316,7 @@ public abstract class BattleChar : MonoBehaviour, IPointerClickHandler
 
     public void OnDamageTaken(DamageInfo info)
     {
-        foreach (StatusEffectData status in StatusEffect)
+        foreach (StatusEffectData status in StatusEffect.ToList())
         {
             status.OnDamageTaken(info);
         }
@@ -398,9 +399,10 @@ public abstract class BattleChar : MonoBehaviour, IPointerClickHandler
 
     public virtual IEnumerator FinishingSkill(BattleResult result)
     {
-        if (result.skill_fail) yield break ;
-        skill_current_data.Execute(this, result);
-        skill_current_data.Dispose();
+        if (!result.skill_fail && skill_current_data != null)
+            skill_current_data.Execute(this, result);
+
+        skill_current_data?.Dispose();
         skill_current_data = null;
         yield return null;
     }
