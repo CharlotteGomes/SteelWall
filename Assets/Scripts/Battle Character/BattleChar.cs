@@ -486,6 +486,7 @@ public abstract class BattleChar : MonoBehaviour, IPointerClickHandler
     
     public bool CanUseSkill(SkillSO so)
     {
+        if (so == null || so.use_pos == null || ctx == null) return false;
         for (int i = 0; i < so.use_pos.Length; i++)
         {
             if (ctx.SelfPosition == so.use_pos[i]) return true;
