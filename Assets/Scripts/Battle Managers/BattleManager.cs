@@ -40,11 +40,32 @@ public class BattleManager : MonoBehaviour
 
     void Start()
     {
-        List<PJData> pjs_data = new();
-        List<EnemyData> enemy_data = new();    
+        if (pjs == null || enemy == null)
+        {
+            Debug.LogError("BattleManager character data lists are not assigned.", this);
+            return;
+        }
 
-        foreach(BattleCharSO p in pjs) { pjs_data.Add(new PJData(p as PJSO)); }
-        foreach(BattleCharSO n in enemy) { enemy_data.Add(new EnemyData(n as EnemySO)); }
+        List<PJData> pjs_data = new();
+        List<EnemyData> enemy_data = new();
+        foreach (BattleCharSO player in pjs)
+        {
+            if (player is not PJSO playerData)
+            {
+                Debug.LogError("A player entry is missing or is not a PJSO asset.", this);
+                return;
+            }
+            pjs_data.Add(new PJData(playerData));
+        }
+        foreach (BattleCharSO enemyAsset in enemy)
+        {
+            if (enemyAsset is not EnemySO enemyData)
+            {
+                Debug.LogError("An enemy entry is missing or is not an EnemySO asset.", this);
+                return;
+            }
+            enemy_data.Add(new EnemyData(enemyData));
+        }
         StartBattle(pjs_data, enemy_data);
     }
 
@@ -140,8 +161,11 @@ public class BattleManager : MonoBehaviour
 
     void EndTurn()
     {
-        current.OnEndTurn();
-        hud.UnsubscribeEvents(current);
+        if (current != null)
+        {
+            current.OnEndTurn();
+            hud.UnsubscribeEvents(current);
+        }
         initiative_index++;
         if (initiative_index > initiative.Count - 1) { initiative_index = 0; turn++; }
         
@@ -263,12 +287,17 @@ public class BattleManager : MonoBehaviour
             + new Vector3(-3, -1.25f, -5);
     }
 
-    void InitiateCharacter(BattleChar b, BattleCharData data)
+    void InitiateCharacter(BattleChar character, BattleCharData data)
     {
-        initiative.Add(b);
-        b.SetBattleChar(data);
-        b.SetBattleManager(this);
-        b.InitStats();
+        if (character == null || data == null || character.sprite_renderer == null)
+        {
+            Debug.LogError("Character prefab is missing its controller, SpriteRenderer, or character data.", this);
+            return;
+        }
+        character.SetBattleChar(data);
+        character.SetBattleManager(this);
+        character.InitStats();
+        initiative.Add(character);
     }
 
     IEnumerator SyncVisualPositions()
