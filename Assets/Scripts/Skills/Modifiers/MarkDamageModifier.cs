@@ -1,3 +1,4 @@
+using System.Linq;
 using UnityEngine;
 
 [CreateAssetMenu(fileName = "MarkDamageModifier", menuName = "Scriptable Objects/SkillSO/Modifiers/MarkDamageModifier")]
@@ -7,14 +8,10 @@ public class MarkDamageModifier : SkillModifiersSO
     public float damage;
     public override void Prepare(SkillData data)
     {
-        foreach(StatusEffectData f in data.ctx.Target[0].status_effects)
-        {
-            if (f is not MarkEffect) continue;
-            foreach (var effects in data.effects)
-            {
-                if (effects is not DamageTarget d) continue;
-                d.dmg += damage;
-            }
-        }
+        bool hasMarkedTarget = data.ctx != null && data.ctx.Target != null &&
+            data.ctx.Target.Any(target => target != null && target.status_effects.Any(status => status is MarkEffect));
+        if (!hasMarkedTarget) return;
+        foreach (SkillEffectSO effect in data.effects)
+            if (effect is DamageTarget damageEffect) damageEffect.dmg += damage;
     }
 }

@@ -1,6 +1,5 @@
 using System.Collections.Generic;
 using System.Linq;
-using Unity.Jobs;
 using UnityEngine;
 
 [System.Serializable]
@@ -9,22 +8,21 @@ public class SkillData
     public SkillSO original_skill { get; private set; }
     public int acc_base = 100;
     public int crit_mod = 0;
-
     public List<SkillEffectSO> effects = new List<SkillEffectSO>();
-
     public BattleContext ctx { get; private set; }
     public List<BattleChar> targets = new List<BattleChar>();
-    
-    public SkillData(SkillSO skill, BattleContext ctx)
+
+    public SkillData(SkillSO skill, BattleContext context)
     {
-        this.ctx = ctx;
-        original_skill = ScriptableObject.Instantiate(skill);
+        original_skill = skill;
+        ctx = context;
         SetSkill();
         SetTargets();
     }
 
     public void SetSkill()
     {
+        if (original_skill == null) return;
         acc_base = original_skill.acc_base;
         crit_mod = original_skill.crit_mod;
         SetEffects();
@@ -32,48 +30,57 @@ public class SkillData
 
     public void SetTargets()
     {
-        if (original_skill == null) return;
         targets.Clear();
-
-        if(original_skill.self) { targets.Add(ctx.Self); return; }
-        if (original_skill.affect_enemy)
-        { 
-            foreach(var n in ctx.Enemies)
-            {
-                if (targets.Contains(n) || !original_skill.pos.Contains(n.GetSelfPos())) continue;
-                targets.Add(n);
-            }
-            return; }
-        foreach (var n in ctx.Party)
+        if (original_skill == null || ctx == null) return;
+        if (original_skill.self)
         {
-            if (targets.Contains(n) || !original_skill.pos.Contains(n.GetSelfPos())) continue;
-            targets.Add(n);
+            if (ctx.Self != null && ctx.Self.CheckAlive()) targets.Add(ctx.Self);
+            return;
+        }
+
+        List<BattleChar> candidates = original_skill.affect_enemy ? ctx.Enemies : ctx.Party;
+        if (candidates == null || original_skill.pos == null) return;
+        foreach (BattleChar candidate in candidates)
+        {
+            if (candidate == null || candidate is BattleObjects || !candidate.CheckAlive()) continue;
+            if (original_skill.pos.Contains(candidate.GetSelfPos()) && !targets.Contains(candidate))
+                targets.Add(candidate);
         }
     }
 
     public void SetEffects()
     {
-        effects.Clear();
-        foreach (var effect in original_skill.effects)
-        {
-            effects.Add(ScriptableObject.Instantiate(effect));
-        }
+        ReleaseEffects();
+        if (original_skill == null || original_skill.effects == null) return;
+        foreach (SkillEffectSO effect in original_skill.effects)
+            if (effect != null) effects.Add(Object.Instantiate(effect));
     }
 
     public void Prepare()
     {
+        if (original_skill == null) return;
         SetSkill();
-        foreach(SkillModifiersSO skillModifiersSO in original_skill.modifiers)
-        {
-            skillModifiersSO.Prepare(this);
-        }
+        if (original_skill.modifiers == null) return;
+        foreach (SkillModifiersSO modifier in original_skill.modifiers)
+            if (modifier != null) modifier.Prepare(this);
     }
 
     public void Execute(BattleChar user, BattleResult result)
     {
-        foreach(var effect in effects)
-        {
-            effect.Execute(user, result);
-        }
+        foreach (SkillEffectSO effect in effects.ToArray())
+            if (effect != null) effect.Execute(user, result);
+    }
+
+    public void Dispose()
+    {
+        ReleaseEffects();
+        targets.Clear();
+    }
+
+    private void ReleaseEffects()
+    {
+        foreach (SkillEffectSO effect in effects)
+            if (effect != null) Object.Destroy(effect);
+        effects.Clear();
     }
 }

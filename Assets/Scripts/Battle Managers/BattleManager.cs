@@ -1,9 +1,8 @@
+using System;
 using System.Linq;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using NUnit.Framework.Constraints;
-using NUnit.Framework.Interfaces;
 public enum TurnStep
 {
     ChooseSkill,
@@ -33,6 +32,7 @@ public class BattleManager : MonoBehaviour
 
     public int turn { get; private set; } = 1;
     [SerializeField] int initiative_index = 0;
+    bool battleEnded;
     private void Awake()
     {
         
@@ -56,25 +56,74 @@ public class BattleManager : MonoBehaviour
 
     public void StartBattle(List<PJData> pjs, List<EnemyData> enemies)
     {
+        if (pjs == null || enemies == null || pjs.Count == 0 || enemies.Count == 0)
+        {
+            Debug.LogError("Battle requires at least one player and one enemy.", this);
+            return;
+        }
+        if (pjs.Count > pj_slot.Length || enemies.Count > enemy_slot.Length)
+        {
+            Debug.LogError($"Battle formation supports at most {pj_slot.Length} characters per side.", this);
+            return;
+        }
+        if (hud == null || hud.lifeManager == null || pj_prefab == null || enemy_prefab == null || tomb_prefab == null)
+        {
+            Debug.LogError("BattleManager has missing HUD or prefab references.", this);
+            return;
+        }
+
+        Array.Clear(pj_slot, 0, pj_slot.Length);
+        Array.Clear(enemy_slot, 0, enemy_slot.Length);
+        initiative.Clear();
         initiative_index = 0;
+        turn = 1;
+        battleEnded = false;
         SpawnCharacters(pjs, enemies);
-        hud.SetCharacters(pj_slot[0], enemy_slot[0]);   
+
+        BattleChar firstPlayer = initiative.OfType<PjController>().FirstOrDefault();
+        BattleChar firstEnemy = initiative.OfType<EnemyController>().FirstOrDefault();
+        if (firstPlayer == null || firstEnemy == null)
+        {
+            Debug.LogError("Battle could not initialize both teams. Check character prefabs and data.", this);
+            battleEnded = true;
+            return;
+        }
+        hud.SetCharacters(firstPlayer, firstEnemy);
         hud.lifeManager.SpawnBars(initiative);
         StartCoroutine(TurnOrder());
     }
-    
+
     public void EndBattle()
     {
+        if (battleEnded) return;
+        battleEnded = true;
+        Debug.Log("Battle finished.", this);
+    }
 
+    bool TryFinishBattle()
+    {
+        bool hasPlayers = initiative.Any(character => character is PjController && character.CheckAlive());
+        bool hasEnemies = initiative.Any(character => character is EnemyController && character.CheckAlive());
+        if (hasPlayers && hasEnemies) return false;
+        Debug.Log(!hasPlayers && !hasEnemies ? "Battle ended in a draw." :
+            hasPlayers ? "Player team won." : "Enemy team won.", this);
+        EndBattle();
+        return true;
     }
 
     IEnumerator TurnOrder()
     {
-        while (true)
+        while (!battleEnded)
         {
+            yield return StartCoroutine(CheckCharactersAlive());
+            if (TryFinishBattle()) yield break;
+            if (initiative.Count == 0) { EndBattle(); yield break; }
+            if (initiative_index < 0 || initiative_index >= initiative.Count) initiative_index = 0;
             StartTurn();
+            if (current == null) { EndBattle(); yield break; }
             yield return new WaitForSeconds(.5f);
             yield return StartCoroutine(current.OnGoingTurn());
+            if (battleEnded) yield break;
             EndTurn();
             yield return StartCoroutine(SyncVisualPositions());
         }
@@ -82,7 +131,7 @@ public class BattleManager : MonoBehaviour
 
     void StartTurn()
     {
-        CheckCharactersAlive();
+        if (initiative.Count == 0) { current = null; return; }
         current = initiative[initiative_index];
         hud.OnStartTurn(current);
         current.SetRound();
@@ -124,26 +173,21 @@ public class BattleManager : MonoBehaviour
         SetAllPosition();
     }
 
-    public void CheckCharactersAlive()
+    IEnumerator CheckCharactersAlive()
     {
-        List<BattleChar> all_chars = new List<BattleChar>();
-        List<BattleChar> death_chars = new List<BattleChar>();
-        for(int i = 0; i < 4; i++)
-        {
-            if (pj_slot[i] != null) all_chars.Add(pj_slot[i]);
-            if (enemy_slot[i] != null) all_chars.Add(enemy_slot[i]);
-        }
+        List<BattleChar> deadCharacters = initiative
+            .Where(character => character != null && character is not BattleObjects && !character.CheckAlive())
+            .ToList();
+        foreach (BattleChar character in deadCharacters)
+            yield return StartCoroutine(CharacterDeath(character));
 
-        foreach(BattleChar ch in all_chars)
-        {
-            if (ch.CheckAlive()) continue;
-            StartCoroutine(CharacterDeath(ch));
-        }
+        if (initiative.Count == 0) initiative_index = 0;
+        else initiative_index = Mathf.Clamp(initiative_index, 0, initiative.Count - 1);
     }
 
     public void RefreshHUD()
     {
-        hud.RefreshHUD();
+        if (hud != null) hud.RefreshHUD();
     }
 
     void SetCharacterSpriteRender()
@@ -167,24 +211,15 @@ public class BattleManager : MonoBehaviour
 
     public void PlaceCharacters(BattleChar character)
     {
-        if (character is EnemyController)
+        if (character == null) return;
+        BattleChar[] slots = character is EnemyController ? enemy_slot : pj_slot;
+        for (int i = 0; i < slots.Length; i++)
         {
-            for (int i = 0; i < enemy_slot.Length; i++)
-            {
-                if (CheckOccupyPos(enemy_slot, i)) continue;
-
-                enemy_slot[i] = character;
-                break;
-            }
+            if (slots[i] != null) continue;
+            slots[i] = character;
             return;
         }
-        for (int i = 0; i < pj_slot.Length; i++)
-        {
-            if (CheckOccupyPos(pj_slot, i)) continue;
-
-            pj_slot[i] = character;
-            break;
-        }
+        Debug.LogError($"No free formation slot for {character.name}.", this);
     }
 
     public bool CheckOccupyPos(BattleChar[] list, int pos)
@@ -199,42 +234,20 @@ public class BattleManager : MonoBehaviour
 
     void SetContext()
     {
-        List<BattleChar> off = new List<BattleChar>();
-        for(int i = 0; i < pj_slot.Length; i++)
-        {
-            if (pj_slot[i] != null)
-            {
-                if (off.Contains(pj_slot[i])) continue;
-                pj_slot[i].CreateContext(pj_slot.Where(b => b != null).ToList(), enemy_slot.Where(b => b != null).ToList(), i);
-                off.Add(pj_slot[i]);
-            }
-        }
+        List<BattleChar> playerFormation = pj_slot.ToList();
+        List<BattleChar> enemyFormation = enemy_slot.ToList();
+        for (int i = 0; i < pj_slot.Length; i++)
+            if (pj_slot[i] != null) pj_slot[i].CreateContext(playerFormation, enemyFormation, i);
         for (int i = 0; i < enemy_slot.Length; i++)
-        {
-            if (enemy_slot[i] != null)
-            {
-                if (off.Contains(enemy_slot[i])) continue;
-                enemy_slot[i].CreateContext(enemy_slot.Where(b => b != null).ToList(), pj_slot.Where(b => b != null).ToList(), i);
-                off.Add(pj_slot[i]);
-            }
-        }
+            if (enemy_slot[i] != null) enemy_slot[i].CreateContext(enemyFormation, playerFormation, i);
     }
 
     void SetAllPosition()
     {
-        List<BattleChar> off = new List<BattleChar>();
         for (int i = 0; i < pj_slot.Length; i++)
-        {
-            if (off.Contains(pj_slot[i])) continue;
-            if(pj_slot[i] != null) { pj_slot[i].transform.position = GetWorldPos(i, pj_slot[i]); }
-            off.Add(pj_slot[i]);
-        }
-        for(int i = 0; i < enemy_slot.Length; i++)
-        {
-            if (off.Contains(enemy_slot[i])) continue;
-            if (enemy_slot[i] != null) { enemy_slot[i].transform.position = GetWorldPos(i, enemy_slot[i]); }
-            off.Add(enemy_slot[i]);
-        }
+            if (pj_slot[i] != null) pj_slot[i].transform.position = GetWorldPos(i, pj_slot[i]);
+        for (int i = 0; i < enemy_slot.Length; i++)
+            if (enemy_slot[i] != null) enemy_slot[i].transform.position = GetWorldPos(i, enemy_slot[i]);
     }
 
     Vector3 GetWorldPos(int i, BattleChar c)
@@ -314,30 +327,30 @@ public class BattleManager : MonoBehaviour
     }
 
 
-    public void SwapPosition(BattleChar c, int pos)
+    public void SwapPosition(BattleChar character, int targetPosition)
     {
-        if (c == null ) { return;}
-        Debug.Log($"{c.name} se moveu");
-        if(c is PjController)
-        {
-            List<BattleChar> pj = pj_slot.Where(x => x != c).ToList();
-            pj.Insert(pos, c);
-            pj_slot = pj.ToArray();
-        }
-
-        if(c is EnemyController)
-        {
-            List<BattleChar> n = enemy_slot.Where(x => x != c).ToList();
-            n.Insert(pos, c);
-            enemy_slot = n.ToArray();
-        }
+        if (character == null) return;
+        BattleChar[] slots = character is PjController ? pj_slot :
+            character is EnemyController ? enemy_slot : null;
+        if (slots == null || targetPosition < 0 || targetPosition >= slots.Length) return;
+        int currentPosition = Array.IndexOf(slots, character);
+        if (currentPosition < 0 || currentPosition == targetPosition) return;
+        BattleChar displaced = slots[targetPosition];
+        slots[targetPosition] = character;
+        slots[currentPosition] = displaced;
         SetCharacterSpriteRender();
         SetContext();
+        SetAllPosition();
+        RefreshHUD();
     }
 
     public void InitiativeRemove(BattleChar b)
     {
-        if (initiative.Contains(b)) { initiative.Remove(b); }
+        int removedIndex = initiative.IndexOf(b);
+        if (removedIndex < 0) return;
+        initiative.RemoveAt(removedIndex);
+        if (removedIndex < initiative_index) initiative_index--;
+        if (initiative.Count == 0 || initiative_index >= initiative.Count) initiative_index = 0;
     }
 
     public void SlotRemove(BattleChar b)
@@ -388,7 +401,6 @@ public class BattleManager : MonoBehaviour
     {
         GameObject tomb = Instantiate(tomb_prefab);
         BattleTomb battleTomb = tomb.GetComponent<BattleTomb>();
-        hud.lifeManager.IndividualSpawn(battleTomb);
         if (b is EnemyController)
         {
             enemy_slot[b.GetSelfPos()] = battleTomb;

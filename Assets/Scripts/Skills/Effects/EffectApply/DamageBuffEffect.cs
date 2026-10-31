@@ -8,7 +8,7 @@ public class DamageBuffEffect : ApplyStatusEffect
     {
         if (self)
         {
-            DamageModifierEffect mod = new DamageModifierEffect(user, user, sfSO, stacks, value, false);
+            DamageModifierEffect mod = new DamageModifierEffect(user, user, sfSO, stacks, value, resist);
             user.GiveStatus(mod);
             return;
         }
@@ -16,7 +16,7 @@ public class DamageBuffEffect : ApplyStatusEffect
         foreach (BattleChar target in result.hit)
         {
 
-            DamageModifierEffect mod = new DamageModifierEffect(user, target, sfSO, stacks, value, false);
+            DamageModifierEffect mod = new DamageModifierEffect(user, target, sfSO, stacks, value, resist);
             user.GiveStatus(mod);
         }
     }

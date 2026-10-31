@@ -35,21 +35,20 @@ public class LifeBarManager : MonoBehaviour
         }
     }
 
-    public void IndividualDelete(BattleChar c)
+    public void IndividualDelete(BattleChar character)
     {
-        foreach(LifeBar l in lifeBars)
+        for (int i = lifeBars.Count - 1; i >= 0; i--)
         {
-            if(l.character == c)
-            {
-                lifeBars.Remove(l);
-                Destroy(l.gameObject);
-                break;
-            }
+            LifeBar bar = lifeBars[i];
+            if (bar == null || bar.character != character) continue;
+            lifeBars.RemoveAt(i);
+            Destroy(bar.gameObject);
         }
     }
 
     public void IndividualSpawn(BattleChar c)
     {
+        if (c == null || life_bar == null) return;
         GameObject bar = Instantiate(life_bar, transform);
         bar.transform.SetParent(this.gameObject.transform);
         LifeBar life = bar.GetComponent<LifeBar>();

@@ -5,15 +5,7 @@ public class LifeBar : MonoBehaviour
     public BattleChar character { get; private set; }
     [SerializeField] LifeBarFill fill;
     [SerializeField] BackLifeBar backFill;
-    void Start()
-    {
-        
-    }
-
-    // Update is called once per frame
-    void Update()
-    {
-    }
+    Coroutine backFillRoutine;
 
     public void SetCharacter(BattleChar character)
     {
@@ -25,17 +17,28 @@ public class LifeBar : MonoBehaviour
 
     public void UpdateBars()
     {
-        fill.UpdateBar(character);
-        StartCoroutine(backFill.UpdateBar(character));
+        if (character == null) return;
+        if (fill != null) fill.UpdateBar(character);
+        if (backFillRoutine != null) StopCoroutine(backFillRoutine);
+        if (backFill != null) backFillRoutine = StartCoroutine(backFill.UpdateBar(character));
     }
 
     public void SetPos()
     {
-        transform.position = character.transform.position + new Vector3(0, -.25f);
+        if (character != null) transform.position = character.transform.position + new Vector3(0, -.25f);
     }
 
     public void SetSize()
     {
         transform.localScale = Vector2.one;
+    }
+
+    private void OnDisable()
+    {
+        if (backFillRoutine != null)
+        {
+            StopCoroutine(backFillRoutine);
+            backFillRoutine = null;
+        }
     }
 }

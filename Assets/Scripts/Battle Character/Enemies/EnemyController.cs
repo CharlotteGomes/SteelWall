@@ -9,44 +9,47 @@ public class EnemyController : BattleChar, IPointerEnterHandler
     [SerializeField] protected EnemyBehaviourSO behaviourSO;
     [SerializeField] protected int behaviour_index = 0;
     [SerializeField] int original_behaviour = 0;
-    void Start()
-    {
-    }
-    void Update()
-    {
-    }
 
-    #region Init
     public override void InitStats()
     {
         EnemyData data = battle_char as EnemyData;
+        if (data == null)
+        {
+            Debug.LogError($"Enemy data is missing on {name}.", this);
+            return;
+        }
         behaviourSO = data.behaviour;
         base.InitStats();
-        life_current = life_max;
-        SetFavoritePos(behaviourSO.behaviour);
     }
+
+    public override void CreateContext(List<BattleChar> allies, List<BattleChar> enemies, int pos)
+    {
+        base.CreateContext(allies, enemies, pos);
+        if (behaviourSO != null && behaviourSO.behaviour != null)
+            SetFavoritePos(behaviourSO.behaviour);
+    }
+
     public override void SetFavoritePos(List<SkillSO> so_list)
     {
         base.SetFavoritePos(so_list);
-        
-        foreach(FavoritePos fp in favorite_pos)
+        if (ctx == null) return;
+
+        foreach (FavoritePos favorite in favorite_pos)
         {
-            foreach(SkillSO s in fp.skills)
+            foreach (SkillSO skill in favorite.skills)
             {
-                List<BattleChar> b = new();
-                b = s.affect_enemy ? ctx.Enemies : ctx.Party; 
-                for(int i = 0; i < s.pos.Length; i++)
+                if (skill == null || skill.pos == null) continue;
+                List<BattleChar> candidates = skill.affect_enemy ? ctx.Enemies : ctx.Party;
+                if (candidates == null) continue;
+                foreach (BattleChar candidate in candidates)
                 {
-                    if (i >= b.Count) continue;
-                    fp.AddTarget(b[i]);
+                    if (candidate == null || candidate is BattleObjects || !candidate.CheckAlive()) continue;
+                    if (skill.pos.Contains(candidate.GetSelfPos())) favorite.AddTarget(candidate);
                 }
             }
-            fp.SetValue();
+            favorite.SetValue();
         }
     }
-    #endregion
-
-    #region Turn
 
     public override IEnumerator OnGoingTurn()
     {
@@ -55,31 +58,39 @@ public class EnemyController : BattleChar, IPointerEnterHandler
             switch (step)
             {
                 case TurnStep.ChooseSkill:
-                    StartCoroutine(ChoosingSkill());
+                    yield return StartCoroutine(ChoosingSkill());
                     break;
-
                 case TurnStep.ChooseTarget:
                     yield return StartCoroutine(ChoosingTarget());
                     break;
-
                 case TurnStep.ChooseSwapTarget:
                     ChooseSwapTarget();
                     yield return null;
                     break;
-
                 case TurnStep.ExecutingSkill:
                     yield return StartCoroutine(StartSkill());
                     step = TurnStep.Finish;
                     break;
+                default:
+                    step = TurnStep.Finish;
+                    break;
             }
         }
-        OnEndMyTurn?.Invoke();
+        EndRound();
     }
 
-    IEnumerator ChoosingSkill()
+    private IEnumerator ChoosingSkill()
     {
+        if (behaviourSO == null || behaviourSO.behaviour == null || behaviourSO.behaviour.Count == 0)
+        {
+            step = TurnStep.Finish;
+            yield break;
+        }
+        if (behaviour_index < 0 || behaviour_index >= behaviourSO.behaviour.Count)
+            behaviour_index = 0;
+
         SetSkill(behaviourSO.behaviour[behaviour_index]);
-        if(!CanUseSkill(skill_current))
+        if (skill_current == null || !CanUseSkill(skill_current))
         {
             BehaviourUpdate();
             yield break;
@@ -87,86 +98,75 @@ public class EnemyController : BattleChar, IPointerEnterHandler
         yield return StartCoroutine(ConfirmSkill());
     }
 
-    IEnumerator ConfirmSkill()
+    private IEnumerator ConfirmSkill()
     {
-        if(skill_current == null) { BehaviourUpdate(); yield break; }
+        if (skill_current == null)
+        {
+            BehaviourUpdate();
+            yield break;
+        }
+
+        skill_current_data?.Dispose();
         skill_current_data = new SkillData(skill_current, ctx);
-        if(skill_current_data.targets.Count <= 0) { BehaviourUpdate(); yield break; }
+        if (skill_current_data.targets.Count == 0)
+        {
+            skill_current_data.Dispose();
+            skill_current_data = null;
+            BehaviourUpdate();
+            yield break;
+        }
+
         OnSkillConfirm?.Invoke(skill_current_data);
         SetStep(TurnStep.ChooseTarget);
+        yield return null;
     }
 
-    IEnumerator ChoosingTarget()
+    private IEnumerator ChoosingTarget()
     {
+        if (skill_current_data == null || skill_current_data.targets.Count == 0)
+        {
+            BehaviourUpdate();
+            yield break;
+        }
         int random = Random.Range(0, skill_current_data.targets.Count);
         SelectTarget(random);
-        if(ctx.Target.Count <= 0) { BehaviourUpdate(); yield break; }
+        if (ctx == null || ctx.Target.Count == 0)
+        {
+            BehaviourUpdate();
+            yield break;
+        }
         OnBattleCharSelect?.Invoke(ctx.Target.ToArray());
         yield return StartCoroutine(ConfirmTarget());
     }
 
-    IEnumerator ConfirmTarget()
+    private IEnumerator ConfirmTarget()
     {
         yield return new WaitForSeconds(0.75f);
         SetStep(TurnStep.ExecutingSkill);
     }
 
-    /*
-    protected void ChoosingSkill()
+    public override void ChooseSwapTarget()
     {
-        skill_current = behaviourSO.behaviour[behaviour_index]; 
-        
-        Debug.Log("Choosing skill");
-        BehaviourUpdate();
-    }
-
-    protected IEnumerator ChooseTarget()
-    {
-        skill_current_data = new SkillData(skill_current, ctx);
-        if (skill_current_data == null || skill_current_data.targets.Count == 0) { BehaviourUpdate(); yield break; }  
-        int random = Random.Range(0, skill_current_data.targets.Count);
-        SelectTarget(random);
-        yield return StartCoroutine(ConfirmTarget());
-    }
-
-    public IEnumerator ConfirmTarget()
-    {
-        Debug.Log("Entrou no confirm");
-        if (skill_current == null) yield break;
-        if (ctx.Target.Count == 0) { Debug.Log("Sem alvos"); yield break; }
-        yield return StartCoroutine(ConfirmSkill());
-    }
-
-    public IEnumerator ConfirmSkill()
-    {
-        if (skill_current == null) { yield break; }
-        Debug.Log("Confirmou a skill");
-        OnSkillConfirm?.Invoke(skill_current_data);
-        yield return new WaitForSeconds(.75f);
-        step = TurnStep.ExecutingSkill;
-    }*/
-
-    public override void ChooseSwapTarget() 
-    {
-        List<FavoritePos> mostvalue = favorite_pos.OrderByDescending(a => a.value).ToList();
-        int mostvaluepos = 0;
-
-        for (int i = 0; i < mostvalue.Count; i++) 
+        if (favorite_pos.Count == 0 || battle_manager == null || ctx == null)
         {
-            if (favorite_pos[i] == mostvalue[0]) mostvaluepos = i;   
+            step = TurnStep.Finish;
+            return;
         }
-
-        int dir = mostvaluepos - ctx.SelfPosition;
-        int intent = ctx.SelfPosition + dir;
-        Debug.Log($"{name} intend: {intent}");
-        battle_manager.SwapPosition(this, intent);
+        FavoritePos best = favorite_pos.OrderByDescending(position => position.value).First();
+        int targetPosition = favorite_pos.IndexOf(best);
+        if (targetPosition >= 0 && targetPosition < ctx.Party.Count && targetPosition != ctx.SelfPosition)
+            battle_manager.SwapPosition(this, targetPosition);
         step = TurnStep.Finish;
     }
 
-    void BehaviourUpdate()
+    private void BehaviourUpdate()
     {
-        behaviour_index++;
-        if (behaviour_index > behaviourSO.behaviour.Count - 1) { behaviour_index = 0; }
+        if (behaviourSO == null || behaviourSO.behaviour == null || behaviourSO.behaviour.Count == 0)
+        {
+            step = TurnStep.Finish;
+            return;
+        }
+        behaviour_index = (behaviour_index + 1) % behaviourSO.behaviour.Count;
         if (behaviour_index == original_behaviour)
         {
             SetFavoritePos(behaviourSO.behaviour);
@@ -175,14 +175,15 @@ public class EnemyController : BattleChar, IPointerEnterHandler
         }
         step = TurnStep.ChooseSkill;
     }
-    #endregion
-
-    #region info 
-    #endregion
 
     public override void SetRound()
     {
         base.SetRound();
+        if (behaviourSO == null || behaviourSO.behaviour == null || behaviourSO.behaviour.Count == 0)
+        {
+            step = TurnStep.Finish;
+            return;
+        }
         BehaviourUpdate();
         original_behaviour = behaviour_index;
         step = TurnStep.ChooseSkill;
@@ -190,6 +191,7 @@ public class EnemyController : BattleChar, IPointerEnterHandler
 
     public void OnPointerEnter(PointerEventData eventData)
     {
-        battle_manager.hud.SetCharacter(this);
+        if (battle_manager != null && battle_manager.hud != null)
+            battle_manager.hud.SetCharacter(this);
     }
 }

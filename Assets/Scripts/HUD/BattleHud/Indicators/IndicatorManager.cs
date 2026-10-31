@@ -1,152 +1,151 @@
 using UnityEngine;
 using System.Collections.Generic;
-using JetBrains.Annotations;
-using System.Linq;
-using Unity.Collections.LowLevel.Unsafe;
+
 public class IndicatorManager : MonoBehaviour
 {
     [SerializeField] GameObject prefab;
     [SerializeField] List<Indicator> indicators = new List<Indicator>();
-    [SerializeField] Indicator turn_indicator = null;
+    [SerializeField] Indicator turn_indicator;
     [SerializeField] Sprite ind_turn, ind_atk, ind_move, ind_ally, smk_atk, smk_move, smk_ally;
     [SerializeField] BattleChar test;
-    void Start()
-    {
-        
-    }
 
-    // Update is called once per frame
     void Update()
     {
-        if (Input.GetKeyDown(KeyCode.G))
-        {
-            SetTurnIndicator(test);
-        }
+        if (Input.GetKeyDown(KeyCode.G) && test != null) SetTurnIndicator(test);
     }
 
-    public void SetTurnIndicator(BattleChar c) 
+    public void SetTurnIndicator(BattleChar character)
     {
-        GameObject inst = Instantiate(prefab, this.transform);
-        Indicator ind = inst.GetComponent<Indicator>();
-        turn_indicator = ind;
-        ind.SetChar(c);
-        ind.SetSprites(ind_turn, null);
-        StartCoroutine(ind.StartIndAnimation(c));
+        if (character == null || prefab == null) return;
+        DeleteTurnIndicator();
+        GameObject instance = Instantiate(prefab, transform);
+        turn_indicator = instance.GetComponent<Indicator>();
+        if (turn_indicator == null) { Destroy(instance); return; }
+        turn_indicator.SetChar(character);
+        turn_indicator.SetSprites(ind_turn, null);
+        StartCoroutine(turn_indicator.StartIndAnimation(character));
     }
 
     public void SetTurnIndicatorDefault()
     {
+        if (turn_indicator == null) return;
         turn_indicator.SetSprites(ind_turn, null);
         turn_indicator.Select(true);
     }
 
     public void SetTargetIndicators(SkillData data)
     {
-        foreach(var c in data.targets)
+        DeleteAllIndicators();
+        if (data == null || data.original_skill == null || prefab == null) return;
+        foreach (BattleChar character in data.targets)
         {
-            Sprite ind_spr = data.original_skill.affect_enemy ? ind_atk : ind_ally;
-            Sprite smk_spr = data.original_skill.affect_enemy ? smk_atk : smk_ally;
-            if(turn_indicator != null && turn_indicator.character == c) { turn_indicator.SetSprites(ind_spr, smk_spr); turn_indicator.Select(false); continue; }
-            GameObject inst = Instantiate(prefab, this.transform);
-            Indicator ind = inst.GetComponent<Indicator>();
-            ind.SetChar(c);
-            ind.SetSprites(ind_spr, smk_spr);
-            ind.Select(false);
-            indicators.Add(ind);
-        }
-    }
-    public void SelectIndicators(BattleChar[] c)
-    {
-        for (int i = 0; i < c.Length; i++)
-        {
-            if (turn_indicator.character == c[i]) { turn_indicator.Select(true); }
-            else turn_indicator.Select(false);
-                for (int j = 0; j < indicators.Count; j++)
-                {
-                    if (indicators[j].character == c[i]) { indicators[j].Select(true); continue; }
-                    indicators[j].Select(false);
-                }
-        }
-    }
-
-    public void SetMoveIndicators(BattleContext ctx) 
-    {
-        SetTurnIndicatorDefault();
-        for(int i = -ctx.Self.GetStat(StatType.MOVE); i <= ctx.Self.GetStat(StatType.MOVE); i++)
-        {
-            
-            int pos = i + ctx.SelfPosition;
-            Debug.Log($"{i} {pos}");
-            if (pos < 0 || pos >= ctx.Party.Count) continue;
-            if (ctx.Party[pos] == null || ctx.Party[pos] == ctx.Self) continue;
-            GameObject inst = Instantiate(prefab, this.transform);
-            Indicator ind = inst.GetComponent<Indicator>();
-            ind.SetChar(ctx.Party[pos]);
-            ind.SetSprites(ind_move, smk_move);
-            indicators.Add(ind);
-        }
-    }
-
-    public void SelectMoveIndicators(BattleChar c)
-    {
-        foreach(Indicator indicator in indicators)
-        {
-            if (indicator.character == c)
+            if (character == null) continue;
+            Sprite indicatorSprite = data.original_skill.affect_enemy ? ind_atk : ind_ally;
+            Sprite smokeSprite = data.original_skill.affect_enemy ? smk_atk : smk_ally;
+            if (turn_indicator != null && turn_indicator.character == character)
             {
-                indicator.Select(true);
+                turn_indicator.SetSprites(indicatorSprite, smokeSprite);
+                turn_indicator.Select(false);
                 continue;
             }
+            GameObject instance = Instantiate(prefab, transform);
+            Indicator indicator = instance.GetComponent<Indicator>();
+            if (indicator == null) { Destroy(instance); continue; }
+            indicator.SetChar(character);
+            indicator.SetSprites(indicatorSprite, smokeSprite);
             indicator.Select(false);
+            indicators.Add(indicator);
         }
+    }
+
+    public void SelectIndicators(BattleChar[] selectedCharacters)
+    {
+        HashSet<BattleChar> selected = new HashSet<BattleChar>();
+        if (selectedCharacters != null)
+            foreach (BattleChar character in selectedCharacters)
+                if (character != null) selected.Add(character);
+
+        if (turn_indicator != null)
+            turn_indicator.Select(selected.Contains(turn_indicator.character));
+        foreach (Indicator indicator in indicators)
+            if (indicator != null) indicator.Select(selected.Contains(indicator.character));
+    }
+
+    public void SetMoveIndicators(BattleContext context)
+    {
+        SetTurnIndicatorDefault();
+        if (context == null || context.Self == null || context.Party == null || prefab == null) return;
+        int moveRange = context.Self.GetStat(StatType.MOVE);
+        for (int offset = -moveRange; offset <= moveRange; offset++)
+        {
+            int position = offset + context.SelfPosition;
+            if (position < 0 || position >= context.Party.Count) continue;
+            BattleChar target = context.Party[position];
+            if (target == null || target == context.Self || target is BattleObjects) continue;
+            GameObject instance = Instantiate(prefab, transform);
+            Indicator indicator = instance.GetComponent<Indicator>();
+            if (indicator == null) { Destroy(instance); continue; }
+            indicator.SetChar(target);
+            indicator.SetSprites(ind_move, smk_move);
+            indicators.Add(indicator);
+        }
+    }
+
+    public void SelectMoveIndicators(BattleChar character)
+    {
+        foreach (Indicator indicator in indicators)
+            if (indicator != null) indicator.Select(indicator.character == character);
     }
 
     public void DeleteAllIndicators()
     {
-        foreach(Indicator ind in indicators)
-        {
-            Destroy(ind.gameObject);
-        }
+        foreach (Indicator indicator in indicators)
+            if (indicator != null) Destroy(indicator.gameObject);
         indicators.Clear();
     }
 
     public void DeleteTurnIndicator()
     {
+        if (turn_indicator == null) return;
         Destroy(turn_indicator.gameObject);
         turn_indicator = null;
     }
-    
-    public void SubscribeEvents(BattleChar c)
+
+    public void SubscribeEvents(BattleChar character)
     {
-        c.OnStartMyTurn += SetTurnIndicator;
-        c.OnSkillConfirm += SetTargetIndicators;
-        c.OnSkillCancel += SetTurnIndicatorDefault;
-        c.OnSkillCancel += DeleteAllIndicators;
-        c.OnMoveCancel += DeleteAllIndicators;
-        c.OnBattleCharSelect += SelectIndicators;
-        c.OnMoveConfirm += SetMoveIndicators;
-        c.OnSwapTargetSelect += SelectMoveIndicators;
-        c.OnEndMyTurn += DeleteAllIndicators;
-        c.OnEndMyTurn += DeleteTurnIndicator;
-        c.OnDeath += UnsubscribeEvents;
+        if (character == null) return;
+        character.OnStartMyTurn += SetTurnIndicator;
+        character.OnSkillConfirm += SetTargetIndicators;
+        character.OnSkillCancel += SetTurnIndicatorDefault;
+        character.OnSkillCancel += DeleteAllIndicators;
+        character.OnMoveCancel += DeleteAllIndicators;
+        character.OnBattleCharSelect += SelectIndicators;
+        character.OnMoveConfirm += SetMoveIndicators;
+        character.OnSwapTargetSelect += SelectMoveIndicators;
+        character.OnEndMyTurn += DeleteAllIndicators;
+        character.OnEndMyTurn += DeleteTurnIndicator;
+        character.OnDeath += UnsubscribeEvents;
     }
 
-    public void UnsubscribeEvents(BattleChar c)
+    public void UnsubscribeEvents(BattleChar character)
     {
-        c.OnStartMyTurn -= SetTurnIndicator;
-        c.OnSkillConfirm -= SetTargetIndicators;
-        c.OnSkillCancel -= SetTurnIndicatorDefault;
-        c.OnSkillCancel -= DeleteAllIndicators;
-        c.OnMoveCancel -= DeleteAllIndicators;
-        c.OnBattleCharSelect -= SelectIndicators;
-        c.OnMoveConfirm -= SetMoveIndicators;
-        c.OnSwapTargetSelect -= SelectMoveIndicators;
-        c.OnEndMyTurn -= DeleteAllIndicators;
-        c.OnEndMyTurn -= DeleteTurnIndicator;
-        c.OnDeath -= UnsubscribeEvents;
+        if (character == null) return;
+        character.OnStartMyTurn -= SetTurnIndicator;
+        character.OnSkillConfirm -= SetTargetIndicators;
+        character.OnSkillCancel -= SetTurnIndicatorDefault;
+        character.OnSkillCancel -= DeleteAllIndicators;
+        character.OnMoveCancel -= DeleteAllIndicators;
+        character.OnBattleCharSelect -= SelectIndicators;
+        character.OnMoveConfirm -= SetMoveIndicators;
+        character.OnSwapTargetSelect -= SelectMoveIndicators;
+        character.OnEndMyTurn -= DeleteAllIndicators;
+        character.OnEndMyTurn -= DeleteTurnIndicator;
+        character.OnDeath -= UnsubscribeEvents;
     }
 
-    public void OnDestroy()
+    private void OnDestroy()
     {
-        
+        DeleteAllIndicators();
+        DeleteTurnIndicator();
     }
 }

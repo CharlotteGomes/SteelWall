@@ -2,10 +2,8 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
-using UnityEditor;
 using UnityEngine;
 using UnityEngine.EventSystems;
-using UnityEngine.Rendering;
 
 
 
@@ -95,6 +93,7 @@ public abstract class BattleChar : MonoBehaviour, IPointerClickHandler
         move = battle_char.move_range;
         sprite_renderer.sprite = spriteSO.idle;
 
+        Resistences.Clear();
         Resistences.Add(new StatusResistence(ResistenceType.STUN, battle_char.stun));
         Resistences.Add(new StatusResistence(ResistenceType.DEBUFF, battle_char.debuff));
         Resistences.Add(new StatusResistence(ResistenceType.BLEED, battle_char.bleed));
@@ -113,9 +112,12 @@ public abstract class BattleChar : MonoBehaviour, IPointerClickHandler
 
         foreach (SkillSO so in so_list)
         {
+            if (so == null || so.use_pos == null) continue;
             for(int i = 0; i < so.use_pos.Length; i++)
             {
-                favorite_pos[so.use_pos[i]].AddSkill(so);
+                int position = so.use_pos[i];
+                if (position < 0 || position >= favorite_pos.Count) continue;
+                favorite_pos[position].AddSkill(so);
             }
         }
     }
@@ -129,7 +131,7 @@ public abstract class BattleChar : MonoBehaviour, IPointerClickHandler
     {
         battle_manager = battle;
     }
-    public void CreateContext(List<BattleChar> allies, List<BattleChar> enemies, int pos)
+    public virtual void CreateContext(List<BattleChar> allies, List<BattleChar> enemies, int pos)
     {
         if (ctx == null) ctx = new BattleContext();
         ctx.Self = this;
@@ -143,9 +145,9 @@ public abstract class BattleChar : MonoBehaviour, IPointerClickHandler
     #region Generic
     public void TakeDamage(DamageInfo info)
     {
-        Debug.Log($"dano pré defesa: {info.damage}");
+        Debug.Log($"dano prÃ© defesa: {info.damage}");
         if(!info.ignore_prot) ReduceDamage(info);
-        Debug.Log($"dano pós defese: {info.damage}");
+        Debug.Log($"dano pÃ³s defese: {info.damage}");
         OnDamageTaken(info);
         if(info.damage>= 0)
         {
@@ -278,7 +280,7 @@ public abstract class BattleChar : MonoBehaviour, IPointerClickHandler
     #region Turn Events
     public void OnStartTurn()
     {
-        foreach(StatusEffectData status in StatusEffect)
+        foreach(StatusEffectData status in StatusEffect.ToList())
         {
             status.OnStartTurn();
         }
@@ -322,7 +324,7 @@ public abstract class BattleChar : MonoBehaviour, IPointerClickHandler
 
     public void OnHealGiven(HealInfo info)
     {
-        foreach(StatusEffectData status in StatusEffect)
+        foreach(StatusEffectData status in StatusEffect.ToList())
         {
             status.OnHealGiven(info);
         }
@@ -330,7 +332,7 @@ public abstract class BattleChar : MonoBehaviour, IPointerClickHandler
     }
     public void OnHealReceived(HealInfo info) 
     {
-        foreach(StatusEffectData status in StatusEffect)
+        foreach(StatusEffectData status in StatusEffect.ToList())
         {
             status.OnHealReceived(info);
         }
@@ -338,7 +340,7 @@ public abstract class BattleChar : MonoBehaviour, IPointerClickHandler
     }
     public void OnReceiveStatus(StatusEffectData status)
     {
-        foreach(StatusEffectData s in StatusEffect)
+        foreach(StatusEffectData s in StatusEffect.ToList())
         {
             s.OnReceiveStatus(status);
         }
@@ -347,7 +349,7 @@ public abstract class BattleChar : MonoBehaviour, IPointerClickHandler
 
     public void OnGiveStatus(StatusEffectData status)
     {
-        foreach(StatusEffectData s in StatusEffect)
+        foreach(StatusEffectData s in StatusEffect.ToList())
         {
             s.OnGiveStatus(status);
         }
@@ -356,7 +358,7 @@ public abstract class BattleChar : MonoBehaviour, IPointerClickHandler
 
     public void OnStatusRemoved(StatusEffectData status)
     {
-        foreach(StatusEffectData s in StatusEffect)
+        foreach(StatusEffectData s in StatusEffect.ToList())
         {
             s.OnStatusRemoved(status);
         }
@@ -364,7 +366,7 @@ public abstract class BattleChar : MonoBehaviour, IPointerClickHandler
     }
 
     public void OnCharacterDeath() {
-        foreach(StatusEffectData status in StatusEffect)
+        foreach(StatusEffectData status in StatusEffect.ToList())
         {
             status.OnCharacterDeath();
         }
@@ -398,6 +400,8 @@ public abstract class BattleChar : MonoBehaviour, IPointerClickHandler
     {
         if (result.skill_fail) yield break ;
         skill_current_data.Execute(this, result);
+        skill_current_data.Dispose();
+        skill_current_data = null;
         yield return null;
     }
 
@@ -411,15 +415,17 @@ public abstract class BattleChar : MonoBehaviour, IPointerClickHandler
         result.crit = roll <= GetStat(StatType.CRIT) + skill_current_data.crit_mod && skill_current_data.original_skill.can_crit;
         Debug.Log($"{result.acc_roll} {result.acc_base}");
 
+        result.hit.Clear();
+        result.dodge.Clear();
         foreach (BattleChar n in ctx.Target)
         {
-            int hitChance = result.acc_base - n.dodge;
-
+            if (n == null || !n.CheckAlive()) continue;
+            int hitChance = result.acc_base - n.GetStat(StatType.DODGE);
             if (result.acc_roll > hitChance && skill_current_data.original_skill.can_dodge)
             {
                 Debug.Log($"{n.name} desviou");
                 result.dodge.Add(n);
-                return;            
+                continue;
             }
             Debug.Log($"{n.name} tomou a skill");
             result.hit.Add(n);
@@ -470,8 +476,9 @@ public abstract class BattleChar : MonoBehaviour, IPointerClickHandler
 
     public void SetTarget(BattleChar c)
     {
-        if (skill_current_data != null && skill_current_data.targets.Contains(c))
-            ctx.Target.Clear();
+        if (c == null || skill_current_data == null || ctx == null) return;
+        if (!skill_current_data.targets.Contains(c)) return;
+        ctx.Target.Clear();
         ctx.Target.Add(c);
     }
     
@@ -494,6 +501,12 @@ public abstract class BattleChar : MonoBehaviour, IPointerClickHandler
         return ctx.SelfPosition;
     }
 
+    private int GetResistance(ResistenceType type)
+    {
+        StatusResistence resistance = Resistences.Find(item => item.resist == type);
+        return resistance != null ? resistance.value : 0;
+    }
+
     public int GetBaseStat(StatType stat)
     {
         return stat switch
@@ -508,12 +521,12 @@ public abstract class BattleChar : MonoBehaviour, IPointerClickHandler
             StatType.DODGE => dodge,
             StatType.CRIT => crit,
             StatType.MOVE => move,
-            StatType.R_STUN => Resistences[0].value,
-            StatType.R_DEBUFF => Resistences[1].value,
-            StatType.R_BLEED => Resistences[2].value,
-            StatType.R_POISON => Resistences[3].value,
-            StatType.R_MOVE => Resistences[4].value,
-            StatType.R_SANITY => Resistences[5].value,
+            StatType.R_STUN => GetResistance(ResistenceType.STUN),
+            StatType.R_DEBUFF => GetResistance(ResistenceType.DEBUFF),
+            StatType.R_BLEED => GetResistance(ResistenceType.BLEED),
+            StatType.R_POISON => GetResistance(ResistenceType.POISON),
+            StatType.R_MOVE => GetResistance(ResistenceType.MOVE),
+            StatType.R_SANITY => GetResistance(ResistenceType.SANITY),
             StatType.NOONE => 0,
             _ => 0
         };

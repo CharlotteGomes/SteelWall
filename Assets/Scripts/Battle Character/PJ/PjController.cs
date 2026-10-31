@@ -1,10 +1,7 @@
-using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.ComponentModel;
 using System.Linq;
 using UnityEngine;
-using UnityEngine.InputSystem.HID;
 public class PjController : BattleChar
 {
 
@@ -101,15 +98,24 @@ public class PjController : BattleChar
 
     public void ConfirmSkill()
     {
-        if (skill_current == null)
+        if (skill_current == null || skill_current.use_pos == null || ctx == null)
             return;
 
         for (int i = 0; i < skill_current.use_pos.Length; i++)
         {
             if (ctx.SelfPosition == skill_current.use_pos[i])
             {
-                step = TurnStep.ChooseTarget;
+                skill_current_data?.Dispose();
                 skill_current_data = new SkillData(skill_current, ctx);
+                if (skill_current_data.targets.Count == 0)
+                {
+                    skill_current_data.Dispose();
+                    skill_current_data = null;
+                    ctx.Target.Clear();
+                    step = TurnStep.ChooseSkill;
+                    return;
+                }
+                step = TurnStep.ChooseTarget;
                 intent_index = 0;
                 OnSkillConfirm?.Invoke(skill_current_data);
                 SelectTarget(intent_index);
@@ -121,7 +127,15 @@ public class PjController : BattleChar
     protected void ChoosingTarget()
     {
         InputManager.GetInputs();
-        if(InputManager.esc || InputManager.back) { step = TurnStep.ChooseSkill; ctx.Target.Clear(); skill_current_data = null; OnSkillCancel?.Invoke(); return; }
+        if (InputManager.esc || InputManager.back)
+        {
+            step = TurnStep.ChooseSkill;
+            ctx.Target.Clear();
+            skill_current_data?.Dispose();
+            skill_current_data = null;
+            OnSkillCancel?.Invoke();
+            return;
+        }
         if (InputManager.hud_horizontal != 0)
         {
             if (skill_current.affect_enemy) {SelectTarget(intent_index + InputManager.hud_horizontal); return;}
@@ -139,7 +153,7 @@ public class PjController : BattleChar
     }
     public void ConfirmTarget() 
     {
-        if (skill_current == null) return;
+        if (skill_current == null || skill_current_data == null || ctx == null) return;
         if(ctx.Target.Count == 0) return;
         step = TurnStep.ExecutingSkill;
     }
@@ -173,9 +187,9 @@ public class PjController : BattleChar
         if (InputManager.esc || InputManager.back) { OnMoveCancel?.Invoke(); step = TurnStep.MoveAction; return; }
         if (InputManager.hud_horizontal != 0)
         {
-            int new_intent = Mathf.Abs(InputManager.hud_horizontal - intent_index) - ctx.SelfPosition > move  ? intent_index : intent_index - InputManager.hud_horizontal ;
+            int new_intent = intent_index - InputManager.hud_horizontal;
+            if (Mathf.Abs(new_intent - ctx.SelfPosition) > GetStat(StatType.MOVE)) return;
             int dir = (int)Mathf.Sign(new_intent - intent_index);
-            Debug.Log($"{new_intent} {dir}");
             SelectSwapTarget(new_intent, dir);
         }
 
@@ -183,20 +197,20 @@ public class PjController : BattleChar
     }
     void SelectSwapTarget(int i, int dir)
     {
-        if (i < 0 || i >= ctx.Party.Count) return;
+        if (ctx == null || ctx.Party == null || i < 0 || i >= ctx.Party.Count) return;
         if (i == ctx.SelfPosition)
         {
             if (i + dir >= 0 && i + dir < ctx.Party.Count)
             {
                 intent_index = i + dir;
                 Debug.Log("Passou direto");
-                OnSwapTargetSelect.Invoke(ctx.Party[intent_index]);
+                OnSwapTargetSelect?.Invoke(ctx.Party[intent_index]);
                 return;
             }
             return;
         }
         intent_index = i;
-        OnSwapTargetSelect.Invoke(ctx.Party[intent_index]);
+        OnSwapTargetSelect?.Invoke(ctx.Party[intent_index]);
     } 
 
     public void SkipTurn()

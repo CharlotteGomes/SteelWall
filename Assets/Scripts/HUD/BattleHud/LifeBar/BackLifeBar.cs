@@ -1,40 +1,37 @@
 using System.Collections;
 using UnityEngine;
 using UnityEngine.UI;
+
 public class BackLifeBar : MonoBehaviour
 {
     Image image;
-    void Awake()
-    {
-        image= GetComponent<Image>();
-    }
 
-    
-    void Update()
-    {
-
-    }
+    private void Awake() { image = GetComponent<Image>(); }
+    private void OnEnable() { if (image == null) image = GetComponent<Image>(); }
 
     public IEnumerator UpdateBar(BattleChar character)
     {
+        if (image == null || character == null) yield break;
         yield return new WaitForSeconds(0.5f);
-        float t = 0;
-        float duration = 2f;
+        if (character == null) yield break;
 
-        float x = image.fillAmount;
-        float target = (float)character.GetStat(StatType.LIFE_CURRENT) / (float)character.GetStat(StatType.LIFE_MAX);
-        while (t < duration - .1f)
+        float maxLife = character.GetStat(StatType.LIFE_MAX);
+        float target = maxLife > 0
+            ? Mathf.Clamp01((float)character.GetStat(StatType.LIFE_CURRENT) / maxLife)
+            : 0f;
+        float start = image.fillAmount;
+        const float duration = 2f;
+        float elapsed = 0f;
+
+        while (elapsed < duration)
         {
-            t += Time.deltaTime / duration;
+            if (character == null) yield break;
+            elapsed += Time.deltaTime;
+            float t = Mathf.Clamp01(elapsed / duration);
             float curve = 1f - Mathf.Pow(1f - t, 3f);
-            image.fillAmount = Mathf.Lerp(x, target, curve);
+            image.fillAmount = Mathf.Lerp(start, target, curve);
             yield return null;
         }
         image.fillAmount = target;
-    }
-
-    private void OnEnable()
-    {
-        image = GetComponent<Image>();
     }
 }

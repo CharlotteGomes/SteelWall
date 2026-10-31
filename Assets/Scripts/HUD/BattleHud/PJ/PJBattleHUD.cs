@@ -93,6 +93,6 @@ public class PJBattleHUD : StatsPanel
         base.UnsubscriveEvents(character);
         character.OnSkillSelect -= SelectSkill;
         character.OnMoveActionSelect -= SelectMoveButton;
-        character.OnSkipSelect -= SelectMoveButton;
+        character.OnSkipSelect -= SelectSkipButton;
     }
 }
