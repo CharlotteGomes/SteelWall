@@ -1,10 +1,13 @@
+using System;
 using System.Collections.Generic;
 using UnityEngine;
 
-[System.Serializable]
+[Serializable]
 public class SkillData
 {
-    private readonly List<BattleChar> selectedTargets = new List<BattleChar>();
+    // Unity can restore serializable classes without running their constructors.
+    // Keep runtime-only selection state rebuildable instead of relying on a field initializer.
+    [NonSerialized] private List<BattleChar> selectedTargets;
 
     public SkillSO original_skill { get; private set; }
     public int acc_base = 100;
@@ -12,18 +15,34 @@ public class SkillData
     public List<SkillEffectSO> effects = new List<SkillEffectSO>();
     public BattleContext ctx { get; private set; }
     public List<BattleChar> targets = new List<BattleChar>();
-    public IReadOnlyList<BattleChar> selected_targets => selectedTargets.AsReadOnly();
+    public IReadOnlyList<BattleChar> selected_targets
+    {
+        get
+        {
+            EnsureCollections();
+            return selectedTargets.AsReadOnly();
+        }
+    }
 
     public SkillData(SkillSO skill, BattleContext context)
     {
+        EnsureCollections();
         original_skill = skill;
         ctx = context;
         SetSkill();
         SetTargets();
     }
 
+    private void EnsureCollections()
+    {
+        if (selectedTargets == null) selectedTargets = new List<BattleChar>();
+        if (effects == null) effects = new List<SkillEffectSO>();
+        if (targets == null) targets = new List<BattleChar>();
+    }
+
     public void SetSkill()
     {
+        EnsureCollections();
         if (original_skill == null) return;
         acc_base = original_skill.acc_base;
         crit_mod = original_skill.crit_mod;
@@ -32,18 +51,20 @@ public class SkillData
 
     private void SetEffects()
     {
+        EnsureCollections();
         ReleaseEffects();
         if (original_skill == null || original_skill.effects == null) return;
 
         foreach (SkillEffectSO effect in original_skill.effects)
         {
             if (effect != null)
-                effects.Add(Object.Instantiate(effect));
+                effects.Add(UnityEngine.Object.Instantiate(effect));
         }
     }
 
     public void SetTargets()
     {
+        EnsureCollections();
         ClearSelectedTargets();
         targets.Clear();
         targets.AddRange(TargetResolver.Resolve(original_skill, ctx));
@@ -55,6 +76,7 @@ public class SkillData
     /// </summary>
     public void SetSelectedTargets(IEnumerable<BattleChar> selection)
     {
+        EnsureCollections();
         selectedTargets.Clear();
         if (selection != null)
         {
@@ -73,6 +95,7 @@ public class SkillData
 
     public bool SelectTarget(int index)
     {
+        EnsureCollections();
         if (index < 0 || index >= targets.Count) return false;
         SetSelectedTargets(new[] { targets[index] });
         return selectedTargets.Count == 1;
@@ -80,17 +103,20 @@ public class SkillData
 
     public void SelectAllTargets()
     {
+        EnsureCollections();
         SetSelectedTargets(targets);
     }
 
     public void ClearSelectedTargets()
     {
+        EnsureCollections();
         selectedTargets.Clear();
         SyncContextTargets();
     }
 
     private void SyncContextTargets()
     {
+        EnsureCollections();
         if (ctx == null) return;
         if (ctx.Target == null) ctx.Target = new List<BattleChar>();
         ctx.Target.Clear();
@@ -99,6 +125,7 @@ public class SkillData
 
     public void Prepare()
     {
+        EnsureCollections();
         if (original_skill == null) return;
         SyncContextTargets();
         SetSkill();
@@ -109,11 +136,13 @@ public class SkillData
 
     public void Execute(BattleChar user, BattleResult result)
     {
+        EnsureCollections();
         new SkillExecution(this).Execute(user, result);
     }
 
     public void Dispose()
     {
+        EnsureCollections();
         ClearSelectedTargets();
         ReleaseEffects();
         targets.Clear();
@@ -121,8 +150,9 @@ public class SkillData
 
     private void ReleaseEffects()
     {
+        EnsureCollections();
         foreach (SkillEffectSO effect in effects)
-            if (effect != null) Object.Destroy(effect);
+            if (effect != null) UnityEngine.Object.Destroy(effect);
         effects.Clear();
     }
 }
