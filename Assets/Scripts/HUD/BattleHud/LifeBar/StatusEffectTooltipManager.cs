@@ -101,7 +101,7 @@ public class StatusEffectTooltipManager : MonoBehaviour
 
         tooltipTitle.text = string.IsNullOrWhiteSpace(title) ? "Efeito de status" : title;
         tooltipBody.text = details.Count > 0
-            ? description + "\\n\\n" + string.Join("\\n", details)
+            ? description + "\n\n" + string.Join("\n", details)
             : description;
 
         if (canvasRect != null)
@@ -153,13 +153,25 @@ public class StatusEffectTooltipManager : MonoBehaviour
         GameObject go = new GameObject(objectName, typeof(RectTransform), typeof(TextMeshProUGUI));
         go.transform.SetParent(parent, false);
         TextMeshProUGUI text = go.GetComponent<TextMeshProUGUI>();
-        text.font = TMP_Settings.defaultFontAsset;
+        text.font = ResolveFont();
         text.fontSize = size;
         text.fontStyle = style;
         text.color = Color.white;
         text.raycastTarget = false;
         text.enableWordWrapping = true;
         return text;
+    }
+
+    private static TMP_FontAsset ResolveFont()
+    {
+        TMP_FontAsset font = TMP_Settings.defaultFontAsset;
+        if (font != null) return font;
+
+        font = Resources.Load<TMP_FontAsset>("Fonts & Materials/LiberationSans SDF");
+        if (font != null) return font;
+
+        TMP_FontAsset[] loadedFonts = Resources.FindObjectsOfTypeAll<TMP_FontAsset>();
+        return loadedFonts != null && loadedFonts.Length > 0 ? loadedFonts[0] : null;
     }
 
     private void OnDisable()
