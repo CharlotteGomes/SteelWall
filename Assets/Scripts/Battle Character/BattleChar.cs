@@ -62,6 +62,12 @@ public abstract class BattleChar : MonoBehaviour, IPointerClickHandler
             StatusEffect = new List<StatusEffectData>();
     }
 
+    private List<StatusEffectData> GetStatusEffectSnapshot()
+    {
+        EnsureStatusEffectCollection();
+        return StatusEffect.ToList();
+    }
+
     [SerializeField] protected List<StatsModifierSO> StatsModifier = new();
 
     public BattleContext Context => ctx;
@@ -285,7 +291,7 @@ public abstract class BattleChar : MonoBehaviour, IPointerClickHandler
         // Ensure temporary stat modifiers and other status-owned resources are released
         // before the combatant is destroyed.
         EnsureStatusEffectCollection();
-        foreach (StatusEffectData status in StatusEffect.ToList())
+        foreach (StatusEffectData status in GetStatusEffectSnapshot())
             if (status != null) StatusRemove(status);
 
         OnDeath?.Invoke(this);
@@ -321,73 +327,73 @@ public abstract class BattleChar : MonoBehaviour, IPointerClickHandler
     #region Turn Events
     public void OnStartTurn()
     {
-        foreach(StatusEffectData status in StatusEffect.ToList()) status?.OnStartTurn();
+        foreach(StatusEffectData status in GetStatusEffectSnapshot()) status?.OnStartTurn();
         CheckStatusEffect();
     }
 
     public void OnEndTurn()
     {
-        foreach (StatusEffectData status in StatusEffect.ToList()) status?.OnEndTurn();
+        foreach (StatusEffectData status in GetStatusEffectSnapshot()) status?.OnEndTurn();
         CheckStatusEffect();
     }
 
     public void OnRoundEnd()
     {
-        foreach (StatusEffectData status in StatusEffect.ToList()) status?.OnRoundEnd();
+        foreach (StatusEffectData status in GetStatusEffectSnapshot()) status?.OnRoundEnd();
         CheckStatusEffect();
     }
 
     public void OnUseSkill(BattleResult result)
     {
-        foreach (StatusEffectData status in StatusEffect.ToList()) status?.OnUseSkill(result);
+        foreach (StatusEffectData status in GetStatusEffectSnapshot()) status?.OnUseSkill(result);
         CheckStatusEffect();
     }
 
     public void OnDamageDealt(DamageInfo info)
     {
-        foreach (StatusEffectData status in StatusEffect.ToList()) status?.OnDamageDealt(info);
+        foreach (StatusEffectData status in GetStatusEffectSnapshot()) status?.OnDamageDealt(info);
         CheckStatusEffect();
     }
 
     public void OnDamageTaken(DamageInfo info)
     {
-        foreach (StatusEffectData status in StatusEffect.ToList()) status?.OnDamageTaken(info);
+        foreach (StatusEffectData status in GetStatusEffectSnapshot()) status?.OnDamageTaken(info);
         CheckStatusEffect();
     }
 
     public void OnHealGiven(HealInfo info)
     {
-        foreach(StatusEffectData status in StatusEffect.ToList()) status?.OnHealGiven(info);
+        foreach(StatusEffectData status in GetStatusEffectSnapshot()) status?.OnHealGiven(info);
         CheckStatusEffect();
     }
 
     public void OnHealReceived(HealInfo info)
     {
-        foreach(StatusEffectData status in StatusEffect.ToList()) status?.OnHealReceived(info);
+        foreach(StatusEffectData status in GetStatusEffectSnapshot()) status?.OnHealReceived(info);
         CheckStatusEffect();
     }
 
     public void OnReceiveStatus(StatusEffectData status)
     {
-        foreach(StatusEffectData s in StatusEffect.ToList()) s?.OnReceiveStatus(status);
+        foreach(StatusEffectData s in GetStatusEffectSnapshot()) s?.OnReceiveStatus(status);
         CheckStatusEffect();
     }
 
     public void OnGiveStatus(StatusEffectData status)
     {
-        foreach(StatusEffectData s in StatusEffect.ToList()) s?.OnGiveStatus(status);
+        foreach(StatusEffectData s in GetStatusEffectSnapshot()) s?.OnGiveStatus(status);
         CheckStatusEffect();
     }
 
     public void OnStatusRemoved(StatusEffectData status)
     {
-        foreach(StatusEffectData s in StatusEffect.ToList()) s?.OnStatusRemoved(status);
+        foreach(StatusEffectData s in GetStatusEffectSnapshot()) s?.OnStatusRemoved(status);
         CheckStatusEffect();
     }
 
     public void OnCharacterDeath()
     {
-        foreach(StatusEffectData status in StatusEffect.ToList()) status?.OnCharacterDeath();
+        foreach(StatusEffectData status in GetStatusEffectSnapshot()) status?.OnCharacterDeath();
         CheckStatusEffect();
     }
 
@@ -396,7 +402,7 @@ public abstract class BattleChar : MonoBehaviour, IPointerClickHandler
         EnsureStatusEffectCollection();
         StatusEffect.RemoveAll(status => status == null);
 
-        foreach (StatusEffectData status in StatusEffect.ToList())
+        foreach (StatusEffectData status in GetStatusEffectSnapshot())
         {
             if (status == null)
             {
