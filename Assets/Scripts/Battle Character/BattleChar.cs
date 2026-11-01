@@ -229,7 +229,11 @@ public abstract class BattleChar : MonoBehaviour, IPointerClickHandler
             {
                 int resistanceChance = Mathf.Clamp(resistance.value, 0, 100);
                 int roll = UnityEngine.Random.Range(0, 100);
-                if (roll < resistanceChance) return;
+                if (roll < resistanceChance)
+                {
+                    data.OnDiscarded();
+                    return;
+                }
             }
         }
 
