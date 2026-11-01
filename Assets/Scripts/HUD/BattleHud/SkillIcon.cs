@@ -1,40 +1,47 @@
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
+
 public class SkillIcon : MonoBehaviour, IPointerClickHandler
 {
-    Image image;
-    [SerializeField] PJBattleHUD panel;
+    [SerializeField] private PJBattleHUD panel;
+
+    private Image image;
     public SkillSO so { get; private set; }
-    public bool select = false;
-    void Start()
-    {
-        image = GetComponent<Image>();
-    }
 
-    // Update is called once per frame
-    void Update()
+    private void Awake()
     {
-        
-    }
-
-    public void OnPointerClick(PointerEventData eventData)
-    {
-        panel.SetSkill(so);
-    }
-
-    public void UpdateSkillSO(SkillSO skSO)
-    {
-        so = skSO;
-    }
-
-    public void UpdateSprite()
-    {
-        image.sprite = so.icon; 
+        CacheReferences();
     }
 
     private void OnEnable()
     {
-        image = GetComponent<Image>();
+        CacheReferences();
+    }
+
+    private void CacheReferences()
+    {
+        if (image == null)
+            image = GetComponent<Image>();
+    }
+
+    public void OnPointerClick(PointerEventData eventData)
+    {
+        if (so == null || panel == null) return;
+        panel.SetSkill(so);
+    }
+
+    public void UpdateSkillSO(SkillSO skill)
+    {
+        so = skill;
+    }
+
+    public void UpdateSprite()
+    {
+        if (image == null) CacheReferences();
+        if (image == null) return;
+
+        image.sprite = so != null ? so.icon : null;
+        image.enabled = so != null && so.icon != null;
     }
 }
