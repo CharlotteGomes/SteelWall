@@ -83,15 +83,24 @@ public class StatusEffectTooltipManager : MonoBehaviour
         activeSource = source;
         string title = status.sfSO != null && !string.IsNullOrWhiteSpace(status.sfSO.effectName)
             ? status.sfSO.effectName : status.effectName;
-        string description = status.sfSO != null ? status.sfSO.description : null;
+        string description = status.GetRuntimeDescription();
+        if (string.IsNullOrWhiteSpace(description) && status.sfSO != null)
+            description = status.sfSO.description;
         if (string.IsNullOrWhiteSpace(description))
-            description = GetFallbackDescription(status);
+            description = "Efeito ativo durante o combate.";
 
-        string duration = status.remainingDuration < 0 ? "Indefinida" : status.remainingDuration.ToString();
+        System.Collections.Generic.List<string> details = new System.Collections.Generic.List<string>();
+        if (status.stacks > 1)
+            details.Add("Acúmulos: " + status.stacks);
+        if (status.remainingDuration > 0)
+            details.Add("Duração restante: " + status.remainingDuration + (status.remainingDuration == 1 ? " turno" : " turnos"));
+        if (status.source != null && status.source != status.owner)
+            details.Add("Origem: " + status.source.name);
+
         tooltipTitle.text = string.IsNullOrWhiteSpace(title) ? "Efeito de status" : title;
-        tooltipBody.text = description + "\n\n" +
-            "Acúmulos: " + status.stacks + "   Potência: " + status.potency +
-            "\nDuração restante: " + duration;
+        tooltipBody.text = details.Count > 0
+            ? description + "\n\n" + string.Join("\n", details)
+            : description;
 
         if (canvasRect != null)
         {
@@ -130,25 +139,6 @@ public class StatusEffectTooltipManager : MonoBehaviour
         if (tooltip != null) tooltip.gameObject.SetActive(false);
     }
 
-    private static string GetFallbackDescription(StatusEffectData status)
-    {
-        if (status is BleedEffect)
-            return "Causa dano direto no início do turno do personagem.";
-        if (status is PoisonEffect)
-            return "Causa dano no final do turno do personagem.";
-        if (status is HealPerTurnEffect)
-            return "Recupera vida no início do turno do personagem.";
-        if (status is StatModifierEffect)
-            return "Altera um ou mais atributos enquanto estiver ativo.";
-        if (status is DamageModifierEffect)
-            return "Modifica o dano causado pelo personagem.";
-        if (status is Penitence)
-            return "Efeito acumulável que aplica modificadores de atributos.";
-        if (status is MarkEffect)
-            return "Marca de status ativa neste personagem.";
-        return "Efeito de status ativo durante o combate.";
-    }
-
     private static RectTransform CreateRect(string objectName, RectTransform parent)
     {
         GameObject go = new GameObject(objectName, typeof(RectTransform));
@@ -161,13 +151,25 @@ public class StatusEffectTooltipManager : MonoBehaviour
         GameObject go = new GameObject(objectName, typeof(RectTransform), typeof(TextMeshProUGUI));
         go.transform.SetParent(parent, false);
         TextMeshProUGUI text = go.GetComponent<TextMeshProUGUI>();
-        text.font = TMP_Settings.defaultFontAsset;
+        text.font = ResolveFont();
         text.fontSize = size;
         text.fontStyle = style;
         text.color = Color.white;
         text.raycastTarget = false;
         text.enableWordWrapping = true;
         return text;
+    }
+
+    private static TMP_FontAsset ResolveFont()
+    {
+        TMP_FontAsset font = TMP_Settings.defaultFontAsset;
+        if (font != null) return font;
+
+        font = Resources.Load<TMP_FontAsset>("Fonts & Materials/LiberationSans SDF");
+        if (font != null) return font;
+
+        TMP_FontAsset[] loadedFonts = Resources.FindObjectsOfTypeAll<TMP_FontAsset>();
+        return loadedFonts != null && loadedFonts.Length > 0 ? loadedFonts[0] : null;
     }
 
     private void OnDisable()

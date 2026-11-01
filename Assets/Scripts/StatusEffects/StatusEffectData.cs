@@ -19,6 +19,12 @@ public class StatusEffectData
     public bool HasFiniteDuration => remainingDuration >= 0;
     public bool IsExpired => stacks <= 0 || remainingDuration == 0;
 
+    /// <summary>Short, runtime-accurate explanation shown by the combat HUD.</summary>
+    public virtual string GetRuntimeDescription()
+    {
+        return sfSO != null ? sfSO.description : string.Empty;
+    }
+
     public StatusEffectData(
         BattleChar source,
         BattleChar owner,
@@ -40,6 +46,12 @@ public class StatusEffectData
 
     public virtual void OnApply() { }
     public virtual void OnRemove() { }
+
+    /// <summary>
+    /// Releases resources owned by an application that was merged into an existing
+    /// status and therefore never became an active instance on the character.
+    /// </summary>
+    public virtual void OnDiscarded() { }
     public virtual void OnStartTurn() { }
     public virtual void OnEndTurn() { }
     public virtual void OnRoundEnd() { }
@@ -62,8 +74,8 @@ public class StatusEffectData
     public virtual void OnStackPile(StatusEffectData status)
     {
         if (status == null) return;
-        stacks += status.stacks;
-        potency += status.potency;
+        stacks = Mathf.Max(0, stacks + status.stacks);
+        potency = Mathf.Max(0, potency + status.potency);
         if (status.remainingDuration >= 0)
             remainingDuration = remainingDuration < 0
                 ? status.remainingDuration

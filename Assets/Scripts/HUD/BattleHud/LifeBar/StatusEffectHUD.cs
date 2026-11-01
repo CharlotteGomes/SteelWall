@@ -23,9 +23,11 @@ public class StatusEffectHUD : MonoBehaviour
 
     public void Initialize(BattleChar owner, StatusEffectTooltipManager sharedTooltipManager)
     {
+        UnsubscribeFromCharacter();
         character = owner;
         tooltipManager = sharedTooltipManager;
         EnsureVisuals();
+        SubscribeToCharacter();
         Refresh(true);
     }
 
@@ -34,15 +36,36 @@ public class StatusEffectHUD : MonoBehaviour
         Initialize(owner, tooltipManager);
     }
 
-    private void Update()
+    private void SubscribeToCharacter()
+    {
+        if (character == null) return;
+        character.StatusEffectsChanged -= HandleStatusEffectsChanged;
+        character.StatusEffectsChanged += HandleStatusEffectsChanged;
+    }
+
+    private void UnsubscribeFromCharacter()
     {
         if (character != null)
+            character.StatusEffectsChanged -= HandleStatusEffectsChanged;
+    }
+
+    private void HandleStatusEffectsChanged(BattleChar changedCharacter)
+    {
+        if (changedCharacter == character)
             Refresh(false);
+    }
+
+    private void OnEnable()
+    {
+        SubscribeToCharacter();
+        if (character != null) Refresh(true);
     }
 
     public void SetCharacter(BattleChar owner)
     {
+        UnsubscribeFromCharacter();
         character = owner;
+        SubscribeToCharacter();
         Refresh(true);
     }
 
@@ -156,6 +179,15 @@ public class StatusEffectHUD : MonoBehaviour
         scrollRect.verticalNormalizedPosition = 1f;
     }
 
+    private static string BuildCompactValues(StatusEffectData status)
+    {
+        if (status == null) return string.Empty;
+        System.Collections.Generic.List<string> values = new System.Collections.Generic.List<string>();
+        if (status.stacks > 1) values.Add("x" + status.stacks);
+        if (status.remainingDuration > 0) values.Add(status.remainingDuration + "t");
+        return string.Join(" ", values);
+    }
+
     private void HideTooltip()
     {
         if (tooltipManager != null)
@@ -171,6 +203,7 @@ public class StatusEffectHUD : MonoBehaviour
 
     private void OnDisable()
     {
+        UnsubscribeFromCharacter();
         HideTooltip();
     }
 

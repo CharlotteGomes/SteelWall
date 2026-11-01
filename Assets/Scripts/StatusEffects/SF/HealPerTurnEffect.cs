@@ -10,6 +10,13 @@ public class HealPerTurnEffect : StatusEffectData
     {
     }
 
+    public override string GetRuntimeDescription()
+    {
+        return potency > 0
+            ? $"Recupera {potency} de vida no início do turno do personagem."
+            : "Recupera vida no início do turno do personagem.";
+    }
+
     public override void OnStartTurn()
     {
         if (owner == null || !owner.CheckAlive()) return;

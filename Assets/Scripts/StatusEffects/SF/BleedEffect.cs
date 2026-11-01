@@ -10,6 +10,13 @@ public class BleedEffect : StatusEffectData
     {
     }
 
+    public override string GetRuntimeDescription()
+    {
+        return potency > 0
+            ? $"Causa {potency} de dano no início do turno do personagem."
+            : "Causa dano no início do turno do personagem.";
+    }
+
     public override void OnStartTurn()
     {
         if (owner == null || !owner.CheckAlive()) return;

@@ -1,6 +1,4 @@
-using System.Xml.Linq;
 using UnityEngine;
-using static UnityEngine.Rendering.DebugUI;
 
 [CreateAssetMenu(fileName = "Move", menuName = "Scriptable Objects/SkillSO/Effects/Status Effect/HealPerTurn")]
 public class HealPerTurnEffectSO : ApplyStatusEffect
@@ -9,7 +7,8 @@ public class HealPerTurnEffectSO : ApplyStatusEffect
     {
         if (self)
         {
-            HealPerTurnEffect heal = new HealPerTurnEffect(user, user, stacks, sfSO, resist);
+            HealPerTurnEffect heal = new HealPerTurnEffect(
+                user, user, stacks, sfSO, resist, RuntimeDuration, RuntimePotency);
             user.GiveStatus(heal);
             return;
         }
@@ -17,7 +16,8 @@ public class HealPerTurnEffectSO : ApplyStatusEffect
         foreach (BattleChar target in result.hit)
         {
 
-            HealPerTurnEffect heal = new HealPerTurnEffect(user, target, stacks, sfSO, resist);
+            HealPerTurnEffect heal = new HealPerTurnEffect(
+                user, target, stacks, sfSO, resist, RuntimeDuration, RuntimePotency);
             user.GiveStatus(heal);
         }
     }

@@ -47,7 +47,26 @@ public abstract class BattleChar : MonoBehaviour, IPointerClickHandler
 
     [SerializeField] protected List<StatusEffectData> StatusEffect = new();
 
-    public IReadOnlyList<StatusEffectData> status_effects => StatusEffect.AsReadOnly();
+    public IReadOnlyList<StatusEffectData> status_effects
+    {
+        get
+        {
+            EnsureStatusEffectCollection();
+            return StatusEffect.AsReadOnly();
+        }
+    }
+
+    private void EnsureStatusEffectCollection()
+    {
+        if (StatusEffect == null)
+            StatusEffect = new List<StatusEffectData>();
+    }
+
+    private List<StatusEffectData> GetStatusEffectSnapshot()
+    {
+        EnsureStatusEffectCollection();
+        return StatusEffect.ToList();
+    }
 
     [SerializeField] protected List<StatsModifierSO> StatsModifier = new();
 
@@ -75,6 +94,9 @@ public abstract class BattleChar : MonoBehaviour, IPointerClickHandler
     public Action OnSkipSelect;
 
     public Action OnEndMyTurn;
+
+    /// <summary>Raised whenever this character's active status list or runtime values change.</summary>
+    public event Action<BattleChar> StatusEffectsChanged;
 
     public Action<BattleChar> OnDeath;
 
@@ -181,7 +203,13 @@ public abstract class BattleChar : MonoBehaviour, IPointerClickHandler
 
     public void GiveStatus(StatusEffectData data)
     {
-        if (data == null || data.owner == null) return;
+        if (data == null) return;
+        if (data.owner == null)
+        {
+            data.OnDiscarded();
+            return;
+        }
+
         OnGiveStatus(data);
         data.owner.ReceiveStatus(data);
     }
@@ -189,23 +217,36 @@ public abstract class BattleChar : MonoBehaviour, IPointerClickHandler
     public void ReceiveStatus(StatusEffectData data)
     {
         if (data == null) return;
+        EnsureStatusEffectCollection();
+
+        if (data.owner != this || (data.sfSO == null && string.IsNullOrWhiteSpace(data.effectName)))
+        {
+            data.OnDiscarded();
+            return;
+        }
+
         Debug.Log(data.effectName);
         OnReceiveStatus(data);
 
-        if (data.resistiable && data.sfSO != null)
+        if (data.resistiable && data.sfSO != null && Resistences != null)
         {
-            StatusResistence resistance = Resistences.Find(st => st.resist == data.sfSO.type);
+            StatusResistence resistance = Resistences.Find(st => st != null && st.resist == data.sfSO.type);
             if (resistance != null)
             {
-                int roll = UnityEngine.Random.Range(0, 101);
-                if (roll < resistance.value) return;
+                int resistanceChance = Mathf.Clamp(resistance.value, 0, 100);
+                int roll = UnityEngine.Random.Range(0, 100);
+                if (roll < resistanceChance)
+                {
+                    data.OnDiscarded();
+                    return;
+                }
             }
         }
 
-        if (data.remainingDuration == 0) return;
-        if (data.stacks <= 0)
+        // A zero-duration or zero-stack application is not a live status.
+        if (data.remainingDuration == 0 || data.stacks <= 0)
         {
-            data.OnApply();
+            data.OnDiscarded();
             return;
         }
 
@@ -217,21 +258,27 @@ public abstract class BattleChar : MonoBehaviour, IPointerClickHandler
         if (existing != null)
         {
             existing.OnStackPile(data);
+            // The incoming runtime object was never registered. Release any transient
+            // resources it created (for example cloned stat-modifier ScriptableObjects).
+            data.OnDiscarded();
+            CheckStatusEffect();
             return;
         }
 
         StatusEffect.Add(data);
         data.OnApply();
+        CheckStatusEffect();
     }
 
     public void StatusRemove(StatusEffectData status)
     {
         if (status == null) return;
-        if (StatusEffect.Contains(status))
-        {
-            StatusEffect.Remove(status);
-            status.OnRemove();
-        }
+        EnsureStatusEffectCollection();
+        bool removed = StatusEffect.Remove(status);
+        if (!removed) return;
+
+        status.OnRemove();
+        StatusEffectsChanged?.Invoke(this);
         OnStatusRemoved(status);
     }
 
@@ -240,24 +287,35 @@ public abstract class BattleChar : MonoBehaviour, IPointerClickHandler
     public void CharacterDeath()
     {
         OnCharacterDeath();
+
+        // Ensure temporary stat modifiers and other status-owned resources are released
+        // before the combatant is destroyed.
+        EnsureStatusEffectCollection();
+        foreach (StatusEffectData status in GetStatusEffectSnapshot())
+            if (status != null) StatusRemove(status);
+
         OnDeath?.Invoke(this);
         Destroy(gameObject);
     }
 
     public void ReceiveStatsModifier(StatsModifierSO modifier)
     {
-        if (modifier != null) StatsModifier.Add(modifier);
+        if (modifier == null) return;
+        if (StatsModifier == null) StatsModifier = new List<StatsModifierSO>();
+        if (!StatsModifier.Contains(modifier)) StatsModifier.Add(modifier);
     }
 
     public void RemoveStatsModifier(StatsModifierSO modifier)
     {
-        if (StatsModifier.Contains(modifier)) StatsModifier.Remove(modifier);
+        if (modifier != null && StatsModifier != null)
+            StatsModifier.Remove(modifier);
     }
 
     public int GetStatsModifier(StatType t)
     {
-        List<StatsModifierSO> flat = StatsModifier.FindAll(x => x.flat && x.statType == t);
-        List<StatsModifierSO> percent = StatsModifier.FindAll(x => !x.flat && x.statType == t);
+        if (StatsModifier == null) return 0;
+        List<StatsModifierSO> flat = StatsModifier.FindAll(x => x != null && x.flat && x.statType == t);
+        List<StatsModifierSO> percent = StatsModifier.FindAll(x => x != null && !x.flat && x.statType == t);
         int value = 0;
         foreach (StatsModifierSO modifier in flat) value += modifier.value;
         foreach(StatsModifierSO modifier in percent)
@@ -269,80 +327,94 @@ public abstract class BattleChar : MonoBehaviour, IPointerClickHandler
     #region Turn Events
     public void OnStartTurn()
     {
-        foreach(StatusEffectData status in StatusEffect.ToList()) status?.OnStartTurn();
+        foreach(StatusEffectData status in GetStatusEffectSnapshot()) status?.OnStartTurn();
         CheckStatusEffect();
     }
 
     public void OnEndTurn()
     {
-        foreach (StatusEffectData status in StatusEffect.ToList()) status?.OnEndTurn();
+        foreach (StatusEffectData status in GetStatusEffectSnapshot()) status?.OnEndTurn();
         CheckStatusEffect();
     }
 
     public void OnRoundEnd()
     {
-        foreach (StatusEffectData status in StatusEffect.ToList()) status?.OnRoundEnd();
+        foreach (StatusEffectData status in GetStatusEffectSnapshot()) status?.OnRoundEnd();
         CheckStatusEffect();
     }
 
     public void OnUseSkill(BattleResult result)
     {
-        foreach (StatusEffectData status in StatusEffect.ToList()) status?.OnUseSkill(result);
+        foreach (StatusEffectData status in GetStatusEffectSnapshot()) status?.OnUseSkill(result);
         CheckStatusEffect();
     }
 
     public void OnDamageDealt(DamageInfo info)
     {
-        foreach (StatusEffectData status in StatusEffect.ToList()) status?.OnDamageDealt(info);
+        foreach (StatusEffectData status in GetStatusEffectSnapshot()) status?.OnDamageDealt(info);
         CheckStatusEffect();
     }
 
     public void OnDamageTaken(DamageInfo info)
     {
-        foreach (StatusEffectData status in StatusEffect.ToList()) status?.OnDamageTaken(info);
+        foreach (StatusEffectData status in GetStatusEffectSnapshot()) status?.OnDamageTaken(info);
         CheckStatusEffect();
     }
 
     public void OnHealGiven(HealInfo info)
     {
-        foreach(StatusEffectData status in StatusEffect.ToList()) status?.OnHealGiven(info);
+        foreach(StatusEffectData status in GetStatusEffectSnapshot()) status?.OnHealGiven(info);
         CheckStatusEffect();
     }
 
     public void OnHealReceived(HealInfo info)
     {
-        foreach(StatusEffectData status in StatusEffect.ToList()) status?.OnHealReceived(info);
+        foreach(StatusEffectData status in GetStatusEffectSnapshot()) status?.OnHealReceived(info);
         CheckStatusEffect();
     }
 
     public void OnReceiveStatus(StatusEffectData status)
     {
-        foreach(StatusEffectData s in StatusEffect.ToList()) s?.OnReceiveStatus(status);
+        foreach(StatusEffectData s in GetStatusEffectSnapshot()) s?.OnReceiveStatus(status);
         CheckStatusEffect();
     }
 
     public void OnGiveStatus(StatusEffectData status)
     {
-        foreach(StatusEffectData s in StatusEffect.ToList()) s?.OnGiveStatus(status);
+        foreach(StatusEffectData s in GetStatusEffectSnapshot()) s?.OnGiveStatus(status);
         CheckStatusEffect();
     }
 
     public void OnStatusRemoved(StatusEffectData status)
     {
-        foreach(StatusEffectData s in StatusEffect.ToList()) s?.OnStatusRemoved(status);
+        foreach(StatusEffectData s in GetStatusEffectSnapshot()) s?.OnStatusRemoved(status);
         CheckStatusEffect();
     }
 
     public void OnCharacterDeath()
     {
-        foreach(StatusEffectData status in StatusEffect.ToList()) status?.OnCharacterDeath();
+        foreach(StatusEffectData status in GetStatusEffectSnapshot()) status?.OnCharacterDeath();
         CheckStatusEffect();
     }
 
     public void CheckStatusEffect()
     {
-        foreach (StatusEffectData status in StatusEffect.ToList())
-            if (status == null || status.IsExpired) StatusRemove(status);
+        EnsureStatusEffectCollection();
+        StatusEffect.RemoveAll(status => status == null);
+
+        foreach (StatusEffectData status in GetStatusEffectSnapshot())
+        {
+            if (status == null)
+            {
+                StatusEffect.Remove(status);
+                continue;
+            }
+
+            if (status.IsExpired)
+                StatusRemove(status);
+        }
+
+        StatusEffectsChanged?.Invoke(this);
     }
     #endregion
 
@@ -453,7 +525,8 @@ public abstract class BattleChar : MonoBehaviour, IPointerClickHandler
 
     private int GetResistance(ResistenceType type)
     {
-        StatusResistence resistance = Resistences.Find(item => item.resist == type);
+        if (Resistences == null) return 0;
+        StatusResistence resistance = Resistences.Find(item => item != null && item.resist == type);
         return resistance != null ? resistance.value : 0;
     }
 

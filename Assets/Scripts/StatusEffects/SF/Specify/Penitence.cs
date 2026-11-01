@@ -20,11 +20,35 @@ public class Penitence : StatusEffectData
         modifiers = temp.ToArray();
     }
 
+    public override string GetRuntimeDescription()
+    {
+        if (modifiers == null || modifiers.Length == 0)
+            return "Aplica modificadores de atributos enquanto estiver ativo.";
+
+        List<string> lines = new List<string>();
+        foreach (StatsModifierSO modifier in modifiers)
+        {
+            if (modifier == null || modifier.value == 0) continue;
+            string sign = modifier.value > 0 ? "+" : string.Empty;
+            string unit = modifier.flat ? string.Empty : "%";
+            lines.Add(modifier.statType + ": " + sign + modifier.value + unit);
+        }
+
+        return lines.Count > 0
+            ? "Modifica os atributos do personagem:\n" + string.Join("\n", lines)
+            : "Aplica modificadores de atributos enquanto estiver ativo.";
+    }
+
     public override void OnApply()
     {
         if (owner == null || modifiers == null) return;
-        foreach (var modifier in modifiers)
-            owner.ReceiveStatsModifier(modifier);
+        for (int i = 0; i < modifiers.Length; i++)
+        {
+            if (modifiers[i] == null) continue;
+            if (original_value != null && i < original_value.Length && original_value[i] != null)
+                modifiers[i].value = original_value[i].value * Mathf.Max(1, stacks);
+            owner.ReceiveStatsModifier(modifiers[i]);
+        }
     }
 
     public override void OnRoundEnd()
@@ -34,9 +58,9 @@ public class Penitence : StatusEffectData
 
     public override void OnStackPile(StatusEffectData status)
     {
-        if (status == null || stacks >= 3) return;
+        if (status == null) return;
         int previousStacks = stacks;
-        int addedStacks = Mathf.Min(status.stacks, 3 - previousStacks);
+        int addedStacks = Mathf.Min(status.stacks, Mathf.Max(0, 3 - previousStacks));
         base.OnStackPile(status);
         stacks = previousStacks + addedStacks;
 
@@ -54,10 +78,19 @@ public class Penitence : StatusEffectData
                 if (modifier != null) owner.RemoveStatsModifier(modifier);
         }
 
-        if (modifiers != null)
-        {
-            foreach (var modifier in modifiers)
-                if (modifier != null) Object.Destroy(modifier);
-        }
+        ReleaseModifiers();
+    }
+
+    public override void OnDiscarded()
+    {
+        ReleaseModifiers();
+    }
+
+    private void ReleaseModifiers()
+    {
+        if (modifiers == null) return;
+        foreach (var modifier in modifiers)
+            if (modifier != null) Object.Destroy(modifier);
+        modifiers = System.Array.Empty<StatsModifierSO>();
     }
 }
