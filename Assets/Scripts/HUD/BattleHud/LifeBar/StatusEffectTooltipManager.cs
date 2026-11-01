@@ -13,47 +13,61 @@ public class StatusEffectTooltipManager : MonoBehaviour
     private Canvas rootCanvas;
     private TextMeshProUGUI tooltipTitle;
     private TextMeshProUGUI tooltipBody;
+    private Image tooltipBackground;
     private StatusEffectIconView activeSource;
 
-    public void Initialize(Canvas canvas)
+    public void Initialize(Canvas canvas, Sprite backgroundSprite = null)
     {
         if (canvas != null)
             rootCanvas = canvas.rootCanvas;
 
-        if (tooltip != null) return;
+        if (tooltip == null)
+        {
+            canvasRect = rootCanvas != null
+                ? rootCanvas.transform as RectTransform
+                : transform as RectTransform;
 
-        canvasRect = rootCanvas != null
-            ? rootCanvas.transform as RectTransform
-            : transform as RectTransform;
+            RectTransform tooltipParent = canvasRect != null ? canvasRect : transform as RectTransform;
+            tooltip = CreateRect("StatusEffectTooltip", tooltipParent);
+            tooltip.anchorMin = Vector2.zero;
+            tooltip.anchorMax = Vector2.zero;
+            tooltip.pivot = Vector2.zero;
+            tooltip.sizeDelta = new Vector2(250f, 108f);
 
-        RectTransform tooltipParent = canvasRect != null ? canvasRect : transform as RectTransform;
-        tooltip = CreateRect("StatusEffectTooltip", tooltipParent);
-        tooltip.anchorMin = Vector2.zero;
-        tooltip.anchorMax = Vector2.zero;
-        tooltip.pivot = Vector2.zero;
-        tooltip.sizeDelta = new Vector2(250f, 108f);
+            tooltipBackground = tooltip.gameObject.AddComponent<Image>();
+            tooltipBackground.raycastTarget = false;
 
-        Image background = tooltip.gameObject.AddComponent<Image>();
-        background.color = new Color(0.055f, 0.065f, 0.085f, 0.98f);
-        background.raycastTarget = false;
+            tooltipTitle = CreateText("Title", tooltip, 14, FontStyles.Bold);
+            tooltipTitle.rectTransform.anchorMin = new Vector2(0f, 1f);
+            tooltipTitle.rectTransform.anchorMax = new Vector2(1f, 1f);
+            tooltipTitle.rectTransform.pivot = new Vector2(0.5f, 1f);
+            tooltipTitle.rectTransform.anchoredPosition = new Vector2(0f, -5f);
+            tooltipTitle.rectTransform.sizeDelta = new Vector2(-12f, 22f);
+            tooltipTitle.alignment = TextAlignmentOptions.Center;
 
-        tooltipTitle = CreateText("Title", tooltip, 14, FontStyles.Bold);
-        tooltipTitle.rectTransform.anchorMin = new Vector2(0f, 1f);
-        tooltipTitle.rectTransform.anchorMax = new Vector2(1f, 1f);
-        tooltipTitle.rectTransform.pivot = new Vector2(0.5f, 1f);
-        tooltipTitle.rectTransform.anchoredPosition = new Vector2(0f, -5f);
-        tooltipTitle.rectTransform.sizeDelta = new Vector2(-12f, 22f);
-        tooltipTitle.alignment = TextAlignmentOptions.Center;
+            tooltipBody = CreateText("Details", tooltip, 11, FontStyles.Normal);
+            tooltipBody.rectTransform.anchorMin = Vector2.zero;
+            tooltipBody.rectTransform.anchorMax = Vector2.one;
+            tooltipBody.rectTransform.offsetMin = new Vector2(8f, 7f);
+            tooltipBody.rectTransform.offsetMax = new Vector2(-8f, -30f);
+            tooltipBody.alignment = TextAlignmentOptions.TopLeft;
+            tooltipBody.enableWordWrapping = true;
 
-        tooltipBody = CreateText("Details", tooltip, 11, FontStyles.Normal);
-        tooltipBody.rectTransform.anchorMin = Vector2.zero;
-        tooltipBody.rectTransform.anchorMax = Vector2.one;
-        tooltipBody.rectTransform.offsetMin = new Vector2(8f, 7f);
-        tooltipBody.rectTransform.offsetMax = new Vector2(-8f, -30f);
-        tooltipBody.alignment = TextAlignmentOptions.TopLeft;
-        tooltipBody.enableWordWrapping = true;
+            tooltip.gameObject.SetActive(false);
+        }
 
-        tooltip.gameObject.SetActive(false);
+        SetBackgroundSprite(backgroundSprite);
+    }
+
+    private void SetBackgroundSprite(Sprite sprite)
+    {
+        if (tooltipBackground == null) return;
+
+        tooltipBackground.sprite = sprite;
+        tooltipBackground.type = sprite != null ? Image.Type.Sliced : Image.Type.Simple;
+        tooltipBackground.color = sprite != null
+            ? Color.white
+            : new Color(0.055f, 0.065f, 0.085f, 0.98f);
     }
 
     public void ShowTooltip(StatusEffectIconView source, StatusEffectData status, Vector2 pointerScreenPosition)
