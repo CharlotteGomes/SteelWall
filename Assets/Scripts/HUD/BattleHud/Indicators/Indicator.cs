@@ -53,6 +53,7 @@ public class Indicator : MonoBehaviour
     public void SetPosition()
     {
         if (character == null) return;
+        CacheReferences();
 
         RectTransform parentRect = transform.parent as RectTransform;
         if (parentCanvas == null || rectTransform == null || parentRect == null)
