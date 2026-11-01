@@ -7,15 +7,11 @@ public class BleedApplyEffectSO : ApplyStatusEffect
     {
         if (self)
         {
-            BleedEffect bleed = new BleedEffect(user, user, stacks, sfSO, resist);
-            user.GiveStatus(bleed);
+            user.GiveStatus(new BleedEffect(user, user, stacks, sfSO, resist, RuntimeDuration, RuntimePotency));
             return;
         }
 
         foreach (BattleChar target in result.hit)
-        {
-            BleedEffect bleed = new BleedEffect(user, target, stacks, sfSO, resist);
-            user.GiveStatus(bleed);
-        }
+            user.GiveStatus(new BleedEffect(user, target, stacks, sfSO, resist, RuntimeDuration, RuntimePotency));
     }
 }
