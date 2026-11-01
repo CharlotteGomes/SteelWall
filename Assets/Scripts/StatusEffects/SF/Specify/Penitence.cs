@@ -1,46 +1,57 @@
 using UnityEngine;
 using System.Collections.Generic;
+
 public class Penitence : StatusEffectData
 {
     public StatsModifierSO[] original_value;
-    public StatsModifierSO[] modifiers; 
-    public Penitence(BattleChar source, BattleChar owner, int stacks, StatusEffectSO so, StatsModifierSO[] mods, bool resist = false) : base(source, owner, stacks, so, resist)
+    public StatsModifierSO[] modifiers;
+
+    public Penitence(BattleChar source, BattleChar owner, int stacks, StatusEffectSO so,
+        StatsModifierSO[] mods, bool resist = false, int duration = -1, int potency = -1)
+        : base(source, owner, stacks, so, resist, duration, potency)
     {
         original_value = mods;
         List<StatsModifierSO> temp = new List<StatsModifierSO>();
-        foreach(var m in mods)
+        if (mods != null)
         {
-            temp.Add(ScriptableObject.Instantiate(m));
+            foreach (var modifier in mods)
+                if (modifier != null) temp.Add(ScriptableObject.Instantiate(modifier));
         }
         modifiers = temp.ToArray();
     }
 
     public override void OnApply()
     {
-        foreach(var modifier in modifiers)
-        {
+        if (owner == null || modifiers == null) return;
+        foreach (var modifier in modifiers)
             owner.ReceiveStatsModifier(modifier);
-        }
     }
 
     public override void OnStackPile(StatusEffectData status)
     {
-        if (stacks >= 3) return;
-
+        if (status == null || stacks >= 3) return;
+        int previousStacks = stacks;
         base.OnStackPile(status);
-        if (status is not Penitence p) return;
-        for (int i = 0; i < modifiers.Length; i++) 
-        {
-            modifiers[i].value += original_value[i].value;
-        }
+        int addedStacks = Mathf.Min(status.stacks, 3 - previousStacks);
+        if (status is not Penitence || addedStacks <= 0 || modifiers == null || original_value == null) return;
+
+        for (int i = 0; i < modifiers.Length && i < original_value.Length; i++)
+            if (modifiers[i] != null && original_value[i] != null)
+                modifiers[i].value += original_value[i].value * addedStacks;
     }
 
     public override void OnRemove()
     {
-        foreach (var m in modifiers)
+        if (owner != null && modifiers != null)
         {
-            owner.RemoveStatsModifier(m);
+            foreach (var modifier in modifiers)
+                if (modifier != null) owner.RemoveStatsModifier(modifier);
         }
-        
+
+        if (modifiers != null)
+        {
+            foreach (var modifier in modifiers)
+                if (modifier != null) Object.Destroy(modifier);
+        }
     }
 }
