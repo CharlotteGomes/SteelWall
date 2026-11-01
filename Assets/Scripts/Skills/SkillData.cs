@@ -88,6 +88,7 @@ public class SkillData
     public void Prepare()
     {
         if (original_skill == null) return;
+        SyncContextTargets();
         SetSkill();
         if (original_skill.modifiers == null) return;
         foreach (SkillModifiersSO modifier in original_skill.modifiers)
