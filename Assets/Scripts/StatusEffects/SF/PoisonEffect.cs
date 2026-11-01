@@ -14,6 +14,14 @@ public class PoisonEffect : StatusEffectData
         this.tier = tier;
     }
 
+    public override string GetRuntimeDescription()
+    {
+        int damage = potency * tier;
+        return damage > 0
+            ? $"Causa {damage} de dano no final do turno do personagem."
+            : "Causa dano no final do turno do personagem.";
+    }
+
     public override void OnEndTurn()
     {
         if (owner == null || !owner.CheckAlive()) return;
