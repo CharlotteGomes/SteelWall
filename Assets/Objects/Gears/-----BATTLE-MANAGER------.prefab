@@ -10,6 +10,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1466863388649912772}
   - component: {fileID: 2168740237297369963}
+  - component: {fileID: 6041790000000000001}
   m_Layer: 0
   m_Name: -----BATTLE-MANAGER------
   m_TagString: Untagged
@@ -70,3 +71,23 @@ MonoBehaviour:
   - {fileID: 0}
   test: []
   initiative_index: 0
+--- !u!114 &6041790000000000001
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8917519997379622332}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 604179e80cd372b7e6180dfa52033475, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::BattlePresentationController
+  attackTrigger: ""
+  hitTrigger: Hit
+  dodgeTrigger: Dodge
+  completeTrigger: ActionEnd
+  battleCamera: {fileID: 0}
+  impulse: 0.08
+  impulseDuration: 0.12
+  criticalMultiplier: 1.5
