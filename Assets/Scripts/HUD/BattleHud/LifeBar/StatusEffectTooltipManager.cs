@@ -14,10 +14,14 @@ public class StatusEffectTooltipManager : MonoBehaviour
     private TextMeshProUGUI tooltipTitle;
     private TextMeshProUGUI tooltipBody;
     private Image tooltipBackground;
+    private Sprite configuredBackground;
     private StatusEffectIconView activeSource;
 
     public void Initialize(Canvas canvas, Sprite backgroundSprite = null)
     {
+        if (backgroundSprite != null)
+            configuredBackground = backgroundSprite;
+
         if (canvas != null)
             rootCanvas = canvas.rootCanvas;
 
@@ -56,7 +60,7 @@ public class StatusEffectTooltipManager : MonoBehaviour
             tooltip.gameObject.SetActive(false);
         }
 
-        SetBackgroundSprite(backgroundSprite);
+        SetBackgroundSprite(configuredBackground);
     }
 
     private void SetBackgroundSprite(Sprite sprite)
@@ -73,7 +77,7 @@ public class StatusEffectTooltipManager : MonoBehaviour
     public void ShowTooltip(StatusEffectIconView source, StatusEffectData status, Vector2 pointerScreenPosition)
     {
         if (source == null || status == null) return;
-        if (tooltip == null) Initialize(rootCanvas);
+        if (tooltip == null) Initialize(rootCanvas, configuredBackground);
 
         activeSource = source;
         string title = status.sfSO != null && !string.IsNullOrWhiteSpace(status.sfSO.effectName)
