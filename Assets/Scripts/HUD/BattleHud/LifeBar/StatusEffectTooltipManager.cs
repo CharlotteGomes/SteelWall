@@ -36,26 +36,27 @@ public class StatusEffectTooltipManager : MonoBehaviour
             tooltip.anchorMin = Vector2.zero;
             tooltip.anchorMax = Vector2.zero;
             tooltip.pivot = Vector2.zero;
-            tooltip.sizeDelta = new Vector2(250f, 108f);
+            tooltip.sizeDelta = new Vector2(340f, 164f);
 
             tooltipBackground = tooltip.gameObject.AddComponent<Image>();
             tooltipBackground.raycastTarget = false;
 
-            tooltipTitle = CreateText("Title", tooltip, 14, FontStyles.Bold);
+            tooltipTitle = CreateText("Title", tooltip, 18, FontStyles.Bold);
             tooltipTitle.rectTransform.anchorMin = new Vector2(0f, 1f);
             tooltipTitle.rectTransform.anchorMax = new Vector2(1f, 1f);
             tooltipTitle.rectTransform.pivot = new Vector2(0.5f, 1f);
-            tooltipTitle.rectTransform.anchoredPosition = new Vector2(0f, -5f);
-            tooltipTitle.rectTransform.sizeDelta = new Vector2(-12f, 22f);
+            tooltipTitle.rectTransform.anchoredPosition = new Vector2(0f, -9f);
+            tooltipTitle.rectTransform.sizeDelta = new Vector2(-20f, 30f);
             tooltipTitle.alignment = TextAlignmentOptions.Center;
 
-            tooltipBody = CreateText("Details", tooltip, 11, FontStyles.Normal);
+            tooltipBody = CreateText("Details", tooltip, 14, FontStyles.Normal);
             tooltipBody.rectTransform.anchorMin = Vector2.zero;
             tooltipBody.rectTransform.anchorMax = Vector2.one;
-            tooltipBody.rectTransform.offsetMin = new Vector2(8f, 7f);
-            tooltipBody.rectTransform.offsetMax = new Vector2(-8f, -30f);
+            tooltipBody.rectTransform.offsetMin = new Vector2(14f, 12f);
+            tooltipBody.rectTransform.offsetMax = new Vector2(-14f, -46f);
             tooltipBody.alignment = TextAlignmentOptions.TopLeft;
             tooltipBody.enableWordWrapping = true;
+            tooltipBody.lineSpacing = 2f;
 
             tooltip.gameObject.SetActive(false);
         }
@@ -88,7 +89,7 @@ public class StatusEffectTooltipManager : MonoBehaviour
 
         string duration = status.remainingDuration < 0 ? "Indefinida" : status.remainingDuration.ToString();
         tooltipTitle.text = string.IsNullOrWhiteSpace(title) ? "Efeito de status" : title;
-        tooltipBody.text = description + "\n" +
+        tooltipBody.text = description + "\n\n" +
             "Acúmulos: " + status.stacks + "   Potência: " + status.potency +
             "\nDuração restante: " + duration;
 
@@ -99,7 +100,7 @@ public class StatusEffectTooltipManager : MonoBehaviour
             if (RectTransformUtility.ScreenPointToLocalPointInRectangle(
                 canvasRect, pointerScreenPosition, eventCamera, out Vector2 localPoint))
             {
-                Vector2 position = localPoint - canvasRect.rect.min + new Vector2(16f, 16f);
+                Vector2 position = localPoint - canvasRect.rect.min + new Vector2(18f, 18f);
                 position.x = Mathf.Clamp(position.x, 0f, Mathf.Max(0f, canvasRect.rect.width - tooltip.sizeDelta.x));
                 position.y = Mathf.Clamp(position.y, 0f, Mathf.Max(0f, canvasRect.rect.height - tooltip.sizeDelta.y));
                 tooltip.anchoredPosition = position;
