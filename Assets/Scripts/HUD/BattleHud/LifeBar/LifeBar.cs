@@ -73,7 +73,7 @@ public class LifeBar : MonoBehaviour
         RectTransform parentRect = transform.parent as RectTransform;
         if (parentCanvas == null || rectTransform == null || parentRect == null)
         {
-            transform.position = character.transform.position + new Vector3(0f, -0.25f, 0f);
+            transform.position = character.transform.position + new Vector3(0f, 0.25f, 0f);
             return;
         }
 
@@ -81,7 +81,7 @@ public class LifeBar : MonoBehaviour
             ? null
             : (canvasCamera != null ? canvasCamera : parentCanvas.worldCamera);
 
-        Vector3 worldPosition = character.transform.position + new Vector3(0f, -0.25f, 0f);
+        Vector3 worldPosition = character.transform.position + new Vector3(0f, 0.25f, 0f);
         Vector2 screenPosition = RectTransformUtility.WorldToScreenPoint(eventCamera, worldPosition);
 
         if (RectTransformUtility.ScreenPointToLocalPointInRectangle(
