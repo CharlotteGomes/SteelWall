@@ -7,4 +7,9 @@ public class MarkEffect : StatusEffectData
         : base(source, owner, stacks, so, resist, duration, potency)
     {
     }
+
+    public override void OnRoundEnd()
+    {
+        TickDuration();
+    }
 }
