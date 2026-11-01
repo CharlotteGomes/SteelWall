@@ -3,6 +3,7 @@ using System.Linq;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Serialization;
 public enum TurnStep
 {
     ChooseSkill,
@@ -22,7 +23,8 @@ public class BattleManager : MonoBehaviour
     [SerializeField] List<BattleChar> initiative = new List<BattleChar>();
     [SerializeField] GameObject pj_prefab, enemy_prefab, tomb_prefab;
 
-    [SerializeField] List<BattleCharSO> pjs, enemy;
+    [FormerlySerializedAs("pjs")]
+    [SerializeField] List<BattleCharSO> PlayerTest, enemy;
 
     [SerializeField] BattleChar[] pj_slot = new BattleChar[4];
     [SerializeField] BattleChar[] enemy_slot = new BattleChar[4];
@@ -40,7 +42,7 @@ public class BattleManager : MonoBehaviour
 
     void Start()
     {
-        if (pjs == null || enemy == null)
+        if (PlayerTest == null || enemy == null)
         {
             Debug.LogError("BattleManager character data lists are not assigned.", this);
             return;
@@ -48,7 +50,7 @@ public class BattleManager : MonoBehaviour
 
         List<PJData> pjs_data = new();
         List<EnemyData> enemy_data = new();
-        foreach (BattleCharSO player in pjs)
+        foreach (BattleCharSO player in PlayerTest)
         {
             if (player is not PJSO playerData)
             {
