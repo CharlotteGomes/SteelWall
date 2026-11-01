@@ -19,6 +19,12 @@ public class StatusEffectData
     public bool HasFiniteDuration => remainingDuration >= 0;
     public bool IsExpired => stacks <= 0 || remainingDuration == 0;
 
+    /// <summary>Short, runtime-accurate explanation shown by the combat HUD.</summary>
+    public virtual string GetRuntimeDescription()
+    {
+        return sfSO != null ? sfSO.description : string.Empty;
+    }
+
     public StatusEffectData(
         BattleChar source,
         BattleChar owner,
@@ -62,8 +68,9 @@ public class StatusEffectData
     public virtual void OnStackPile(StatusEffectData status)
     {
         if (status == null) return;
-        stacks += status.stacks;
-        potency += status.potency;
+        if (status == null) return;
+        stacks = Mathf.Max(0, stacks + status.stacks);
+        potency = Mathf.Max(0, potency + status.potency);
         if (status.remainingDuration >= 0)
             remainingDuration = remainingDuration < 0
                 ? status.remainingDuration
