@@ -1,12 +1,15 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.TextCore.Text;
+using TMPro;
 public class PJBattleHUD : StatsPanel
 {
     [SerializeField] List<SkillIcon> skillIcon = new List<SkillIcon>();
     [SerializeField] SwapButton swapButton;
     [SerializeField] SkipButton skipButton;
     [SerializeField] ButtonSelect buttonSelect;
+    [Header("Optional skill details")]
+    [SerializeField] TMP_Text skillDescriptionText;
 
     void Start()
     {
@@ -21,11 +24,15 @@ public class PJBattleHUD : StatsPanel
     {
         base.UpdateChildren();
         if (character is not PjController pj) return;
-        for (int i = 0; i < pj.read_skills.Count; i++)
+        int visibleSkillCount = Mathf.Min(pj.read_skills.Count, skillIcon.Count);
+        for (int i = 0; i < visibleSkillCount; i++)
         {
+            if (skillIcon[i] == null || pj.read_skills[i] == null) continue;
             skillIcon[i].UpdateSkillSO(pj.read_skills[i]);
             skillIcon[i].UpdateSprite();
         }
+        for (int i = visibleSkillCount; i < skillIcon.Count; i++)
+            if (skillIcon[i] != null) skillIcon[i].UpdateSkillSO(null);
     }
 
     public void SetSkill(SkillSO so)
@@ -35,10 +42,13 @@ public class PJBattleHUD : StatsPanel
         pj.SetSkill(so);
         pj.ConfirmSkill();
         SelectSkill(so);
+        RefreshSkillDescription();
     }
 
     public void SelectSkill(SkillSO so)
     {
+        if (skillDescriptionText != null)
+            skillDescriptionText.text = SkillDescriptionBuilder.Build(so, character);
         if (character is not PjController pj) return;
         for(int i = 0; i < pj.read_skills.Count; i++)
         {
@@ -48,6 +58,31 @@ public class PJBattleHUD : StatsPanel
                 continue;
             }
         }
+    }
+
+    private void HandleSkillConfirmed(SkillData skillData)
+    {
+        if (skillDescriptionText != null)
+            skillDescriptionText.text = SkillDescriptionBuilder.Build(skillData, character);
+    }
+
+    private void HandleTargetsChanged(BattleChar[] targets)
+    {
+        if (character is PjController pj && pj.skill_current_data != null && skillDescriptionText != null)
+            skillDescriptionText.text = SkillDescriptionBuilder.Build(pj.skill_current_data, character);
+    }
+
+    private void RefreshSkillDescription()
+    {
+        if (character is PjController pj && pj.skill_current_data != null)
+            HandleSkillConfirmed(pj.skill_current_data);
+        else if (character is PjController player && player.skill_read != null)
+            SelectSkill(player.skill_read);
+    }
+
+    private void ClearSkillDescription()
+    {
+        if (skillDescriptionText != null) skillDescriptionText.text = string.Empty;
     }
 
     public void SetMoveAction()
@@ -86,6 +121,9 @@ public class PJBattleHUD : StatsPanel
         character.OnSkillSelect += SelectSkill;
         character.OnMoveActionSelect += SelectMoveButton;
         character.OnSkipSelect += SelectSkipButton;
+        character.OnSkillConfirm += HandleSkillConfirmed;
+        character.OnBattleCharSelect += HandleTargetsChanged;
+        character.OnSkillCancel += ClearSkillDescription;
     }
 
     public override void UnsubscriveEvents(BattleChar character)
@@ -94,5 +132,8 @@ public class PJBattleHUD : StatsPanel
         character.OnSkillSelect -= SelectSkill;
         character.OnMoveActionSelect -= SelectMoveButton;
         character.OnSkipSelect -= SelectSkipButton;
+        character.OnSkillConfirm -= HandleSkillConfirmed;
+        character.OnBattleCharSelect -= HandleTargetsChanged;
+        character.OnSkillCancel -= ClearSkillDescription;
     }
 }
