@@ -3,6 +3,14 @@ using UnityEngine;
 public class DamageModifierEffect : StatusEffectData
 {
     private readonly int value;
+    public int Value => value;
+
+    public override string GetRuntimeDescription()
+    {
+        if (value == 0) return "Modifica o dano causado pelo personagem.";
+        string operation = value > 0 ? "+" : string.Empty;
+        return $"Modifica o dano causado em {operation}{value}%.";
+    }
 
     public DamageModifierEffect(BattleChar source, BattleChar owner, StatusEffectSO so, int stacks,
         int value, bool resist, int duration = -1)
