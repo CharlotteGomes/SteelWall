@@ -23,6 +23,7 @@ public class StatusEffectData
     public virtual void OnRemove() { }
     public virtual void OnStartTurn() { }
     public virtual void OnEndTurn() { }
+    public virtual void OnRoundEnd() { }
     public virtual void OnUseSkill(BattleResult result) { }
     public virtual void OnDamageDealt(DamageInfo info) { }
     public virtual void OnDamageTaken(DamageInfo info) { }

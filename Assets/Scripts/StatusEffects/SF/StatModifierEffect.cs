@@ -13,7 +13,7 @@ public class StatModifierEffect : StatusEffectData
         owner.ReceiveStatsModifier(modifier);
     }
 
-    public override void OnEndTurn()
+    public override void OnRoundEnd()
     {
         stacks--;
     }

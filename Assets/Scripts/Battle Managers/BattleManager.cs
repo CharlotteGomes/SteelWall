@@ -168,11 +168,19 @@ public class BattleManager : MonoBehaviour
             current.OnEndTurn();
             hud.UnsubscribeEvents(current);
         }
+
         initiative_index++;
-        if (initiative_index > initiative.Count - 1) { initiative_index = 0; turn++; }
-        
-        RefreshHUD(); 
-        
+        if (initiative_index >= initiative.Count)
+        {
+            initiative_index = 0;
+            turn++;
+
+            // A round is complete only after every remaining combatant has acted.
+            foreach (BattleChar character in initiative.ToList())
+                if (character != null && character.CheckAlive()) character.OnRoundEnd();
+        }
+
+        RefreshHUD();
     }
 
     void SpawnCharacters(List<PJData> pjs, List<EnemyData> enemies)

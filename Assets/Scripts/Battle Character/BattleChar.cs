@@ -388,12 +388,15 @@ public abstract class BattleChar : MonoBehaviour, IPointerClickHandler
     public virtual IEnumerator StartSkill()
     {
         BattleResult result = new BattleResult();
+        BattleCombatEvents.RaiseSkillStarted(this, skill_current);
         yield return StartCoroutine(OnGoingSkill(result));
     }
 
-    public virtual IEnumerator OnGoingSkill(BattleResult result) 
+    public virtual IEnumerator OnGoingSkill(BattleResult result)
     {
         ResolveSkill(result);
+        foreach (TargetResolution targetResult in result.target_results)
+            BattleCombatEvents.RaiseTargetResolved(this, skill_current, targetResult);
         yield return StartCoroutine(FinishingSkill(result));
     }
 
@@ -402,6 +405,7 @@ public abstract class BattleChar : MonoBehaviour, IPointerClickHandler
         if (!result.skill_fail && skill_current_data != null)
             skill_current_data.Execute(this, result);
 
+        BattleCombatEvents.RaiseSkillCompleted(this, skill_current, result);
         skill_current_data?.Dispose();
         skill_current_data = null;
         yield return null;
@@ -409,28 +413,34 @@ public abstract class BattleChar : MonoBehaviour, IPointerClickHandler
 
     public void ResolveSkill(BattleResult result)
     {
-        int roll = UnityEngine.Random.Range(0, 101);
-        result.acc_base = skill_current_data.acc_base + GetStat(StatType.ACCURACY);
-        result.acc_roll = roll;
-        OnUseSkill(result);
-        result.skill_fail = result.acc_roll <= result.acc_base || !skill_current.can_miss ? false : true;
-        result.crit = roll <= GetStat(StatType.CRIT) + skill_current_data.crit_mod && skill_current_data.original_skill.can_crit;
-        Debug.Log($"{result.acc_roll} {result.acc_base}");
-
         result.hit.Clear();
         result.dodge.Clear();
-        foreach (BattleChar n in ctx.Target)
+        result.target_results.Clear();
+        result.crit = false;
+        result.skill_fail = true;
+
+        if (skill_current == null || skill_current_data == null || ctx == null) return;
+
+        result.acc_base = skill_current_data.acc_base + GetStat(StatType.ACCURACY);
+        result.acc_roll = UnityEngine.Random.Range(0, 101);
+        OnUseSkill(result);
+        result.skill_fail = skill_current.can_miss && result.acc_roll > Mathf.Clamp(result.acc_base, 0, 100);
+        if (result.skill_fail) return;
+
+        foreach (BattleChar target in ctx.Target.ToList())
         {
-            if (n == null || !n.CheckAlive()) continue;
-            int hitChance = result.acc_base - n.GetStat(StatType.DODGE);
-            if (result.acc_roll > hitChance && skill_current_data.original_skill.can_dodge)
-            {
-                Debug.Log($"{n.name} desviou");
-                result.dodge.Add(n);
-                continue;
-            }
-            Debug.Log($"{n.name} tomou a skill");
-            result.hit.Add(n);
+            if (target == null || !target.CheckAlive()) continue;
+
+            int hitChance = Mathf.Clamp(result.acc_base - target.GetStat(StatType.DODGE), 0, 100);
+            int hitRoll = UnityEngine.Random.Range(0, 101);
+            bool dodged = skill_current.can_dodge && hitRoll > hitChance;
+            int criticalChance = Mathf.Clamp(GetStat(StatType.CRIT) + skill_current_data.crit_mod, 0, 100);
+            int criticalRoll = dodged || !skill_current.can_crit
+                ? 101
+                : UnityEngine.Random.Range(0, 101);
+            bool critical = !dodged && skill_current.can_crit && criticalRoll <= criticalChance;
+
+            result.AddTargetResult(new TargetResolution(target, dodged, critical, hitRoll, hitChance, criticalRoll));
         }
     }
 

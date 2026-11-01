@@ -24,7 +24,7 @@ public class PJData : BattleCharData
     public PJData(PJSO so) : base(so)
     {
         
-        this.all_skills = so.skills;
-        this.skill_equipped = so.skills;
+        this.all_skills = so.skills != null ? new List<SkillSO>(so.skills) : new List<SkillSO>();
+        this.skill_equipped = new List<SkillSO>(this.all_skills);
     }
 }
