@@ -92,10 +92,17 @@ public class StatusEffectIconView : MonoBehaviour, IPointerEnterHandler, IPointe
         values.color = Color.white;
         values.outlineWidth = 0.18f;
         values.outlineColor = Color.black;
-        values.text = status == null ? string.Empty :
-            status.stacks + " | " + (status.remainingDuration < 0
-                ? "∞" : status.remainingDuration.ToString());
+        values.text = BuildCompactValues(status);
         values.raycastTarget = false;
+    }
+
+    private static string BuildCompactValues(StatusEffectData data)
+    {
+        if (data == null) return string.Empty;
+        System.Collections.Generic.List<string> parts = new System.Collections.Generic.List<string>();
+        if (data.stacks > 1) parts.Add("x" + data.stacks);
+        if (data.remainingDuration > 0) parts.Add(data.remainingDuration.ToString());
+        return string.Join(" ", parts);
     }
 
     private static string GetAbbreviation(StatusEffectData data)
