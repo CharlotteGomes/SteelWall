@@ -11,7 +11,7 @@ public class StatModifierEffect : StatusEffectData
     public override string GetRuntimeDescription()
     {
         if (runtimeModifier == null || runtimeModifier.value == 0)
-            return "Altera os atributos do personagem enquanto estiver ativo.";
+            return "Nenhuma alteração de atributo está ativa.";
 
         string operation = runtimeModifier.value > 0 ? "+" : string.Empty;
         string unit = runtimeModifier.flat ? string.Empty : "%";
