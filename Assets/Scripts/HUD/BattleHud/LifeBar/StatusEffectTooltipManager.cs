@@ -83,15 +83,26 @@ public class StatusEffectTooltipManager : MonoBehaviour
         activeSource = source;
         string title = status.sfSO != null && !string.IsNullOrWhiteSpace(status.sfSO.effectName)
             ? status.sfSO.effectName : status.effectName;
-        string description = status.sfSO != null ? status.sfSO.description : null;
+        string description = status.GetRuntimeDescription();
+        if (string.IsNullOrWhiteSpace(description) && status.sfSO != null)
+            description = status.sfSO.description;
         if (string.IsNullOrWhiteSpace(description))
-            description = GetFallbackDescription(status);
+            description = "Efeito ativo durante o combate.";
 
-        string duration = status.remainingDuration < 0 ? "Indefinida" : status.remainingDuration.ToString();
+        System.Collections.Generic.List<string> details = new System.Collections.Generic.List<string>();
+        if (status.stacks > 1)
+            details.Add("Acúmulos: " + status.stacks);
+        if (status.potency > 0 && !(status is BleedEffect) && !(status is PoisonEffect) && !(status is HealPerTurnEffect))
+            details.Add("Potência: " + status.potency);
+        if (status.remainingDuration > 0)
+            details.Add("Duração restante: " + status.remainingDuration + (status.remainingDuration == 1 ? " turno" : " turnos"));
+        if (status.source != null && status.source != status.owner)
+            details.Add("Origem: " + status.source.name);
+
         tooltipTitle.text = string.IsNullOrWhiteSpace(title) ? "Efeito de status" : title;
-        tooltipBody.text = description + "\n\n" +
-            "Acúmulos: " + status.stacks + "   Potência: " + status.potency +
-            "\nDuração restante: " + duration;
+        tooltipBody.text = details.Count > 0
+            ? description + "\\n\\n" + string.Join("\\n", details)
+            : description;
 
         if (canvasRect != null)
         {
