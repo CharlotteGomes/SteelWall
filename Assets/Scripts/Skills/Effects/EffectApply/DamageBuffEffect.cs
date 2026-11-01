@@ -4,20 +4,16 @@ using UnityEngine;
 public class DamageBuffEffect : ApplyStatusEffect
 {
     public int value;
+
     public override void Execute(BattleChar user, BattleResult result)
     {
         if (self)
         {
-            DamageModifierEffect mod = new DamageModifierEffect(user, user, sfSO, stacks, value, resist);
-            user.GiveStatus(mod);
+            user.GiveStatus(new DamageModifierEffect(user, user, sfSO, stacks, value, resist, RuntimeDuration));
             return;
         }
 
         foreach (BattleChar target in result.hit)
-        {
-
-            DamageModifierEffect mod = new DamageModifierEffect(user, target, sfSO, stacks, value, resist);
-            user.GiveStatus(mod);
-        }
+            user.GiveStatus(new DamageModifierEffect(user, target, sfSO, stacks, value, resist, RuntimeDuration));
     }
 }
