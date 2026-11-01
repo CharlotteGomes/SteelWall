@@ -6,20 +6,19 @@ using UnityEngine.UI;
 /// <summary>Pointer target and compact runtime values for one status icon.</summary>
 public class StatusEffectIconView : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler
 {
-    private StatusEffectHUD owner;
+    private StatusEffectTooltipManager tooltipManager;
     private StatusEffectData status;
 
-    public void Initialize(StatusEffectHUD hud, StatusEffectData data)
+    public void Initialize(StatusEffectTooltipManager sharedTooltipManager, StatusEffectData data)
     {
-        owner = hud;
+        tooltipManager = sharedTooltipManager;
         status = data;
 
         Image background = GetComponent<Image>();
         if (background == null)
             background = gameObject.AddComponent<Image>();
 
-        // An Image without a sprite does not generate a UI mesh and may not be
-        // considered by GraphicRaycaster, even when raycastTarget is enabled.
+        // A sprite-backed Image generates a raycastable UI mesh.
         Sprite raycastSprite = Resources.GetBuiltinResource<Sprite>("UI/Skin/UISprite.psd");
         if (raycastSprite != null)
             background.sprite = raycastSprite;
@@ -36,7 +35,7 @@ public class StatusEffectIconView : MonoBehaviour, IPointerEnterHandler, IPointe
         iconRect.offsetMax = Vector2.zero;
 
         Image icon = iconObject.GetComponent<Image>();
-        icon.sprite = status.sfSO != null ? status.sfSO.icon : null;
+        icon.sprite = status != null && status.sfSO != null ? status.sfSO.icon : null;
         icon.color = icon.sprite != null ? Color.white : new Color(0.72f, 0.76f, 0.82f, 1f);
         icon.preserveAspect = true;
         icon.raycastTarget = false;
@@ -55,7 +54,8 @@ public class StatusEffectIconView : MonoBehaviour, IPointerEnterHandler, IPointe
             initials.fontSize = 10;
             initials.alignment = TextAlignmentOptions.Center;
             initials.color = new Color(0.08f, 0.09f, 0.12f, 1f);
-            string name = status.sfSO != null ? status.sfSO.effectName : status.effectName;
+            string name = status != null && status.sfSO != null ? status.sfSO.effectName :
+                (status != null ? status.effectName : null);
             initials.text = string.IsNullOrEmpty(name) ? "?" : name.Substring(0, 1).ToUpperInvariant();
             initials.raycastTarget = false;
         }
@@ -74,17 +74,26 @@ public class StatusEffectIconView : MonoBehaviour, IPointerEnterHandler, IPointe
         values.fontStyle = FontStyles.Bold;
         values.alignment = TextAlignmentOptions.Center;
         values.color = Color.white;
-        values.text = status.stacks + " | " + (status.remainingDuration < 0 ? "∞" : status.remainingDuration.ToString());
+        values.text = status == null ? string.Empty :
+            status.stacks + " | " + (status.remainingDuration < 0 ? "∞" : status.remainingDuration.ToString());
         values.raycastTarget = false;
     }
 
     public void OnPointerEnter(PointerEventData eventData)
     {
-        if (owner != null) owner.ShowTooltip(status, eventData.position);
+        if (tooltipManager != null && status != null)
+            tooltipManager.ShowTooltip(this, status, eventData.position);
     }
 
     public void OnPointerExit(PointerEventData eventData)
     {
-        if (owner != null) owner.HideTooltip();
+        if (tooltipManager != null)
+            tooltipManager.HideTooltip(this);
+    }
+
+    private void OnDestroy()
+    {
+        if (tooltipManager != null)
+            tooltipManager.HideTooltip(this);
     }
 }
