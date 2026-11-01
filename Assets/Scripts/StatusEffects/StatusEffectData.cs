@@ -68,7 +68,6 @@ public class StatusEffectData
     public virtual void OnStackPile(StatusEffectData status)
     {
         if (status == null) return;
-        if (status == null) return;
         stacks = Mathf.Max(0, stacks + status.stacks);
         potency = Mathf.Max(0, potency + status.potency);
         if (status.remainingDuration >= 0)
