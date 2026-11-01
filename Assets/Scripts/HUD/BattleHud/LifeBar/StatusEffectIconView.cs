@@ -15,6 +15,15 @@ public class StatusEffectIconView : MonoBehaviour, IPointerEnterHandler, IPointe
         status = data;
 
         Image background = GetComponent<Image>();
+        if (background == null)
+            background = gameObject.AddComponent<Image>();
+
+        // An Image without a sprite does not generate a UI mesh and may not be
+        // considered by GraphicRaycaster, even when raycastTarget is enabled.
+        Sprite raycastSprite = Resources.GetBuiltinResource<Sprite>("UI/Skin/UISprite.psd");
+        if (raycastSprite != null)
+            background.sprite = raycastSprite;
+        background.type = Image.Type.Simple;
         background.color = new Color(0.12f, 0.14f, 0.18f, 0.96f);
         background.raycastTarget = true;
 
