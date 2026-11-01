@@ -437,7 +437,7 @@ public abstract class BattleChar : MonoBehaviour, IPointerClickHandler
         result.skill_fail = skill_current.can_miss && result.acc_roll > Mathf.Clamp(result.acc_base, 0, 100);
         if (result.skill_fail) return;
 
-        foreach (BattleChar target in ctx.Target.ToList())
+        foreach (BattleChar target in skill_current_data.selected_targets)
         {
             if (target == null || !target.CheckAlive()) continue;
 
@@ -465,17 +465,14 @@ public abstract class BattleChar : MonoBehaviour, IPointerClickHandler
 
     public virtual void SelectTarget(int index)
     {
-        if (skill_current_data == null) { return; }
+        if (skill_current_data == null || skill_current == null || ctx == null) return;
         if (index < 0 || index >= skill_current_data.targets.Count) return;
-        ctx.Target.Clear();
-        if (!skill_current.chose)
-        {
-            ctx.Target = skill_current_data.targets.ToList();
-            skill_current_data.Prepare();
-            return;
-        }
 
-        ctx.Target.Add(skill_current_data.targets[index]);
+        if (!skill_current.chose)
+            skill_current_data.SelectAllTargets();
+        else if (!skill_current_data.SelectTarget(index))
+            return;
+
         skill_current_data.Prepare();
     }
     public virtual void ChooseSwapTarget() { }
@@ -500,8 +497,7 @@ public abstract class BattleChar : MonoBehaviour, IPointerClickHandler
     {
         if (c == null || skill_current_data == null || ctx == null) return;
         if (!skill_current_data.targets.Contains(c)) return;
-        ctx.Target.Clear();
-        ctx.Target.Add(c);
+        skill_current_data.SetSelectedTargets(new[] { c });
     }
     
     public bool CanUseSkill(SkillSO so)
@@ -568,7 +564,8 @@ public abstract class BattleChar : MonoBehaviour, IPointerClickHandler
     #region Round
     public virtual void SetRound()
     {
-        if (ctx.Target.Count >= 1) ctx.Target.Clear();
+        skill_current_data?.ClearSelectedTargets();
+        if (ctx != null && ctx.Target != null) ctx.Target.Clear();
         OnStartTurn();
         OnStartMyTurn?.Invoke(this);
     }
