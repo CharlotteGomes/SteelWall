@@ -50,13 +50,11 @@ public class PJBattleHUD : StatsPanel
         if (skillDescriptionText != null)
             skillDescriptionText.text = SkillDescriptionBuilder.Build(so, character);
         if (character is not PjController pj) return;
-        for(int i = 0; i < pj.read_skills.Count; i++)
+        int count = Mathf.Min(pj.read_skills.Count, skillIcon.Count);
+        for (int i = 0; i < count; i++)
         {
-            if (pj.read_skills[i] == so)
-            {
+            if (pj.read_skills[i] == so && skillIcon[i] != null)
                 SetButtonSelect<SkillIcon>(skillIcon[i]);
-                continue;
-            }
         }
     }
 
@@ -69,7 +67,7 @@ public class PJBattleHUD : StatsPanel
     private void HandleTargetsChanged(BattleChar[] targets)
     {
         if (character is PjController pj && pj.CurrentSkillData != null && skillDescriptionText != null)
-            skillDescriptionText.text = SkillDescriptionBuilder.Build(pj.skill_current_data, character);
+            skillDescriptionText.text = SkillDescriptionBuilder.Build(pj.CurrentSkillData, character);
     }
 
     private void RefreshSkillDescription()
