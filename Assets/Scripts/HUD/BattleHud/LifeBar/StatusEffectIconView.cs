@@ -62,7 +62,7 @@ public class StatusEffectIconView : MonoBehaviour, IPointerEnterHandler, IPointe
             fallbackRect.offsetMax = Vector2.zero;
 
             TextMeshProUGUI fallback = fallbackObject.GetComponent<TextMeshProUGUI>();
-            fallback.font = TMP_Settings.defaultFontAsset;
+            fallback.font = ResolveFont();
             fallback.fontSize = 13;
             fallback.fontStyle = FontStyles.Bold;
             fallback.alignment = TextAlignmentOptions.Center;
@@ -85,7 +85,7 @@ public class StatusEffectIconView : MonoBehaviour, IPointerEnterHandler, IPointe
         valueRect.offsetMax = Vector2.zero;
 
         TextMeshProUGUI values = valueObject.GetComponent<TextMeshProUGUI>();
-        values.font = TMP_Settings.defaultFontAsset;
+        values.font = ResolveFont();
         values.fontSize = 8;
         values.fontStyle = FontStyles.Bold;
         values.alignment = TextAlignmentOptions.Center;
@@ -141,6 +141,18 @@ public class StatusEffectIconView : MonoBehaviour, IPointerEnterHandler, IPointe
             return new Color(0.38f, 0.25f, 0.58f, 1f);
 
         return new Color(0.16f, 0.29f, 0.48f, 1f);
+    }
+
+    private static TMP_FontAsset ResolveFont()
+    {
+        TMP_FontAsset font = TMP_Settings.defaultFontAsset;
+        if (font != null) return font;
+
+        font = Resources.Load<TMP_FontAsset>("Fonts & Materials/LiberationSans SDF");
+        if (font != null) return font;
+
+        TMP_FontAsset[] loadedFonts = Resources.FindObjectsOfTypeAll<TMP_FontAsset>();
+        return loadedFonts != null && loadedFonts.Length > 0 ? loadedFonts[0] : null;
     }
 
     public void OnPointerEnter(PointerEventData eventData)
