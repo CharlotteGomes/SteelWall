@@ -4,12 +4,14 @@ using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 
-/// <summary>Displays the runtime status effects owned by the character above this life bar.</summary>
+/// <summary>Displays runtime status effects and pointer-positioned descriptions for one character.</summary>
 public class StatusEffectHUD : MonoBehaviour
 {
     private BattleChar character;
     private RectTransform row;
     private RectTransform tooltip;
+    private RectTransform canvasRect;
+    private Canvas rootCanvas;
     private TextMeshProUGUI tooltipTitle;
     private TextMeshProUGUI tooltipBody;
     private readonly List<StatusEffectIconView> icons = new List<StatusEffectIconView>();
@@ -37,52 +39,62 @@ public class StatusEffectHUD : MonoBehaviour
 
     private void EnsureVisuals()
     {
-        if (row != null) return;
+        if (row != null && tooltip != null) return;
 
-        row = CreateRect("StatusEffects", transform as RectTransform);
-        row.anchorMin = new Vector2(0.5f, 0.5f);
-        row.anchorMax = new Vector2(0.5f, 0.5f);
-        row.pivot = new Vector2(0.5f, 1f);
-        row.anchoredPosition = new Vector2(0f, -16f);
-        row.sizeDelta = new Vector2(180f, 34f);
-        row.gameObject.SetActive(isVisible);
+        Canvas canvas = GetComponentInParent<Canvas>();
+        rootCanvas = canvas != null ? canvas.rootCanvas : null;
+        canvasRect = rootCanvas != null ? rootCanvas.transform as RectTransform : null;
 
-        HorizontalLayoutGroup layout = row.gameObject.AddComponent<HorizontalLayoutGroup>();
-        layout.childAlignment = TextAnchor.UpperCenter;
-        layout.spacing = 3f;
-        layout.childControlWidth = false;
-        layout.childControlHeight = false;
-        layout.childForceExpandWidth = false;
-        layout.childForceExpandHeight = false;
+        if (row == null)
+        {
+            row = CreateRect("StatusEffects", transform as RectTransform);
+            row.anchorMin = new Vector2(0.5f, 0.5f);
+            row.anchorMax = new Vector2(0.5f, 0.5f);
+            row.pivot = new Vector2(0.5f, 1f);
+            row.anchoredPosition = new Vector2(0f, -16f);
+            row.sizeDelta = new Vector2(180f, 34f);
+            row.gameObject.SetActive(isVisible);
 
-        tooltip = CreateRect("StatusTooltip", transform as RectTransform);
-        tooltip.anchorMin = new Vector2(0.5f, 0.5f);
-        tooltip.anchorMax = new Vector2(0.5f, 0.5f);
-        tooltip.pivot = new Vector2(0.5f, 0f);
-        tooltip.anchoredPosition = new Vector2(0f, 20f);
-        tooltip.sizeDelta = new Vector2(220f, 92f);
+            HorizontalLayoutGroup layout = row.gameObject.AddComponent<HorizontalLayoutGroup>();
+            layout.childAlignment = TextAnchor.UpperCenter;
+            layout.spacing = 3f;
+            layout.childControlWidth = false;
+            layout.childControlHeight = false;
+            layout.childForceExpandWidth = false;
+            layout.childForceExpandHeight = false;
+        }
 
-        Image background = tooltip.gameObject.AddComponent<Image>();
-        background.color = new Color(0.055f, 0.065f, 0.085f, 0.97f);
-        background.raycastTarget = false;
+        if (tooltip == null)
+        {
+            RectTransform tooltipParent = canvasRect != null ? canvasRect : transform as RectTransform;
+            tooltip = CreateRect("StatusTooltip", tooltipParent);
+            tooltip.anchorMin = Vector2.zero;
+            tooltip.anchorMax = Vector2.zero;
+            tooltip.pivot = Vector2.zero;
+            tooltip.sizeDelta = new Vector2(250f, 108f);
 
-        tooltipTitle = CreateText("Title", tooltip, 14, FontStyles.Bold);
-        tooltipTitle.rectTransform.anchorMin = new Vector2(0f, 1f);
-        tooltipTitle.rectTransform.anchorMax = new Vector2(1f, 1f);
-        tooltipTitle.rectTransform.pivot = new Vector2(0.5f, 1f);
-        tooltipTitle.rectTransform.anchoredPosition = new Vector2(0f, -5f);
-        tooltipTitle.rectTransform.sizeDelta = new Vector2(-12f, 20f);
-        tooltipTitle.alignment = TextAlignmentOptions.Center;
+            Image background = tooltip.gameObject.AddComponent<Image>();
+            background.color = new Color(0.055f, 0.065f, 0.085f, 0.98f);
+            background.raycastTarget = false;
 
-        tooltipBody = CreateText("Details", tooltip, 11, FontStyles.Normal);
-        tooltipBody.rectTransform.anchorMin = new Vector2(0f, 0f);
-        tooltipBody.rectTransform.anchorMax = new Vector2(1f, 1f);
-        tooltipBody.rectTransform.offsetMin = new Vector2(7f, 6f);
-        tooltipBody.rectTransform.offsetMax = new Vector2(-7f, -27f);
-        tooltipBody.alignment = TextAlignmentOptions.TopLeft;
-        tooltipBody.enableWordWrapping = true;
+            tooltipTitle = CreateText("Title", tooltip, 14, FontStyles.Bold);
+            tooltipTitle.rectTransform.anchorMin = new Vector2(0f, 1f);
+            tooltipTitle.rectTransform.anchorMax = new Vector2(1f, 1f);
+            tooltipTitle.rectTransform.pivot = new Vector2(0.5f, 1f);
+            tooltipTitle.rectTransform.anchoredPosition = new Vector2(0f, -5f);
+            tooltipTitle.rectTransform.sizeDelta = new Vector2(-12f, 22f);
+            tooltipTitle.alignment = TextAlignmentOptions.Center;
 
-        tooltip.gameObject.SetActive(false);
+            tooltipBody = CreateText("Details", tooltip, 11, FontStyles.Normal);
+            tooltipBody.rectTransform.anchorMin = Vector2.zero;
+            tooltipBody.rectTransform.anchorMax = Vector2.one;
+            tooltipBody.rectTransform.offsetMin = new Vector2(8f, 7f);
+            tooltipBody.rectTransform.offsetMax = new Vector2(-8f, -30f);
+            tooltipBody.alignment = TextAlignmentOptions.TopLeft;
+            tooltipBody.enableWordWrapping = true;
+
+            tooltip.gameObject.SetActive(false);
+        }
     }
 
     private void Refresh(bool force)
@@ -126,9 +138,9 @@ public class StatusEffectHUD : MonoBehaviour
         }
     }
 
-    public void ShowTooltip(StatusEffectData status)
+    public void ShowTooltip(StatusEffectData status, Vector2 pointerScreenPosition)
     {
-        if (status == null || tooltip == null) return;
+        if (!isVisible || status == null || tooltip == null) return;
 
         string title = status.sfSO != null && !string.IsNullOrWhiteSpace(status.sfSO.effectName)
             ? status.sfSO.effectName : status.effectName;
@@ -141,6 +153,21 @@ public class StatusEffectHUD : MonoBehaviour
         tooltipBody.text = description + "\n" +
             "Acúmulos: " + status.stacks + "   Potência: " + status.potency +
             "\nDuração restante: " + duration;
+
+        if (canvasRect != null)
+        {
+            Camera eventCamera = rootCanvas.renderMode == RenderMode.ScreenSpaceOverlay
+                ? null : rootCanvas.worldCamera;
+            if (RectTransformUtility.ScreenPointToLocalPointInRectangle(
+                canvasRect, pointerScreenPosition, eventCamera, out Vector2 localPoint))
+            {
+                Vector2 position = localPoint - canvasRect.rect.min + new Vector2(16f, 16f);
+                position.x = Mathf.Clamp(position.x, 0f, Mathf.Max(0f, canvasRect.rect.width - tooltip.sizeDelta.x));
+                position.y = Mathf.Clamp(position.y, 0f, Mathf.Max(0f, canvasRect.rect.height - tooltip.sizeDelta.y));
+                tooltip.anchoredPosition = position;
+            }
+        }
+
         tooltip.gameObject.SetActive(true);
         tooltip.SetAsLastSibling();
     }
