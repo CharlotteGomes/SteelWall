@@ -195,9 +195,9 @@ public abstract class BattleChar : MonoBehaviour, IPointerClickHandler
         Debug.Log(data.effectName);
         OnReceiveStatus(data);
 
-        if (data.resistiable && data.sfSO != null)
+        if (data.resistiable && data.sfSO != null && Resistences != null)
         {
-            StatusResistence resistance = Resistences.Find(st => st.resist == data.sfSO.type);
+            StatusResistence resistance = Resistences.Find(st => st != null && st.resist == data.sfSO.type);
             if (resistance != null)
             {
                 int resistanceChance = Mathf.Clamp(resistance.value, 0, 100);
@@ -206,10 +206,10 @@ public abstract class BattleChar : MonoBehaviour, IPointerClickHandler
             }
         }
 
-        if (data.remainingDuration == 0) return;
-        if (data.stacks <= 0)
+        // A zero-duration or zero-stack application is not a live status.
+        if (data.remainingDuration == 0 || data.stacks <= 0)
         {
-            data.OnApply();
+            data.OnDiscarded();
             return;
         }
 
@@ -221,6 +221,9 @@ public abstract class BattleChar : MonoBehaviour, IPointerClickHandler
         if (existing != null)
         {
             existing.OnStackPile(data);
+            // The incoming runtime object was never registered. Release any transient
+            // resources it created (for example cloned stat-modifier ScriptableObjects).
+            data.OnDiscarded();
             CheckStatusEffect();
             return;
         }
@@ -234,10 +237,10 @@ public abstract class BattleChar : MonoBehaviour, IPointerClickHandler
     {
         if (status == null) return;
         bool removed = StatusEffect.Remove(status);
-        if (removed)
-            status.OnRemove();
-        if (removed)
-            StatusEffectsChanged?.Invoke(this);
+        if (!removed) return;
+
+        status.OnRemove();
+        StatusEffectsChanged?.Invoke(this);
         OnStatusRemoved(status);
     }
 
@@ -347,8 +350,21 @@ public abstract class BattleChar : MonoBehaviour, IPointerClickHandler
 
     public void CheckStatusEffect()
     {
+        if (StatusEffect == null)
+            StatusEffect = new List<StatusEffectData>();
+
         foreach (StatusEffectData status in StatusEffect.ToList())
-            if (status == null || status.IsExpired) StatusRemove(status);
+        {
+            if (status == null)
+            {
+                StatusEffect.Remove(status);
+                continue;
+            }
+
+            if (status.IsExpired)
+                StatusRemove(status);
+        }
+
         StatusEffectsChanged?.Invoke(this);
     }
     #endregion
