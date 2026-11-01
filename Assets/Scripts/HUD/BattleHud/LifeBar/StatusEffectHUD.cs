@@ -165,7 +165,7 @@ public class StatusEffectHUD : MonoBehaviour
         text.fontStyle = style;
         text.color = Color.white;
         text.raycastTarget = false;
-        text.textWrappingMode = TextWrappingModes.Normal;
+        text.enableWordWrapping = true;
         return text;
     }
 }
