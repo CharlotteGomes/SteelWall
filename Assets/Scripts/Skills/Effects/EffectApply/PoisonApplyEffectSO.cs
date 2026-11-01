@@ -1,4 +1,3 @@
-using System.ComponentModel;
 using UnityEngine;
 
 [CreateAssetMenu(fileName = "PoisonEffect", menuName = "Scriptable Objects/SkillSO/Effects/Status Effect/Poison")]
@@ -10,15 +9,11 @@ public class PoisonApplyEffectSO : ApplyStatusEffect
     {
         if (self)
         {
-            PoisonEffect poison = new PoisonEffect(user, user, stacks, sfSO, tier, resist);
-            user.GiveStatus(poison);
+            user.GiveStatus(new PoisonEffect(user, user, stacks, sfSO, tier, resist, RuntimeDuration, RuntimePotency));
             return;
         }
 
-        foreach(BattleChar target in result.hit)
-        {
-            PoisonEffect poison = new PoisonEffect(user, target, stacks, sfSO, tier, resist);
-            user.GiveStatus(poison);        
-        }
+        foreach (BattleChar target in result.hit)
+            user.GiveStatus(new PoisonEffect(user, target, stacks, sfSO, tier, resist, RuntimeDuration, RuntimePotency));
     }
 }
