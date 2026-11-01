@@ -51,6 +51,7 @@ public abstract class BattleChar : MonoBehaviour, IPointerClickHandler
     public IReadOnlyList<StatusEffectData> status_effects => StatusEffect.AsReadOnly();
     
     public BattleContext Context => ctx;
+    public SkillData CurrentSkillData => skill_current_data;
     [SerializeField] protected SkillSO skill_current;
     [SerializeField] protected SkillData skill_current_data;
     [SerializeField] protected TurnStep step;
