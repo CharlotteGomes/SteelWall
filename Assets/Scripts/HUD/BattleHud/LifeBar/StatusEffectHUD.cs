@@ -184,7 +184,7 @@ public class StatusEffectHUD : MonoBehaviour
         if (status == null) return string.Empty;
         System.Collections.Generic.List<string> values = new System.Collections.Generic.List<string>();
         if (status.stacks > 1) values.Add("x" + status.stacks);
-        if (status.remainingDuration > 0) values.Add(status.remainingDuration.ToString());
+        if (status.remainingDuration > 0) values.Add(status.remainingDuration + "t");
         return string.Join(" ", values);
     }
 
