@@ -6,9 +6,16 @@ using UnityEngine.UI;
 /// <summary>Builds and refreshes the status-effect icons for a single character.</summary>
 public class StatusEffectHUD : MonoBehaviour
 {
+    private const int VisibleColumns = 6;
+    private const int VisibleRows = 4;
+    private const float IconSize = 28f;
+    private const float IconSpacing = 3f;
+
     private BattleChar character;
     private StatusEffectTooltipManager tooltipManager;
-    private RectTransform row;
+    private RectTransform viewport;
+    private RectTransform content;
+    private ScrollRect scrollRect;
     private readonly List<StatusEffectIconView> icons = new List<StatusEffectIconView>();
     private string lastSignature = string.Empty;
     private bool isVisible = true;
@@ -40,23 +47,59 @@ public class StatusEffectHUD : MonoBehaviour
 
     private void EnsureVisuals()
     {
-        if (row != null) return;
+        if (viewport != null) return;
 
-        row = CreateRect("StatusEffects", transform as RectTransform);
-        row.anchorMin = new Vector2(0.5f, 0.5f);
-        row.anchorMax = new Vector2(0.5f, 0.5f);
-        row.pivot = new Vector2(0.5f, 1f);
-        row.anchoredPosition = new Vector2(0f, -16f);
-        row.sizeDelta = new Vector2(180f, 34f);
-        row.gameObject.SetActive(isVisible);
+        GameObject viewportObject = new GameObject(
+            "StatusEffectsViewport", typeof(RectTransform), typeof(Image), typeof(Mask), typeof(ScrollRect));
+        viewportObject.transform.SetParent(transform, false);
+        viewport = viewportObject.GetComponent<RectTransform>();
+        viewport.anchorMin = new Vector2(0.5f, 0.5f);
+        viewport.anchorMax = new Vector2(0.5f, 0.5f);
+        viewport.pivot = new Vector2(0.5f, 0f);
+        viewport.anchoredPosition = new Vector2(0f, 13f);
+        viewport.sizeDelta = new Vector2(
+            VisibleColumns * IconSize + (VisibleColumns - 1) * IconSpacing + 4f,
+            VisibleRows * IconSize + (VisibleRows - 1) * IconSpacing + 4f);
 
-        HorizontalLayoutGroup layout = row.gameObject.AddComponent<HorizontalLayoutGroup>();
-        layout.childAlignment = TextAnchor.UpperCenter;
-        layout.spacing = 3f;
-        layout.childControlWidth = false;
-        layout.childControlHeight = false;
-        layout.childForceExpandWidth = false;
-        layout.childForceExpandHeight = false;
+        Image viewportImage = viewportObject.GetComponent<Image>();
+        viewportImage.color = new Color(0f, 0f, 0f, 0f);
+        viewportImage.raycastTarget = true;
+        Mask mask = viewportObject.GetComponent<Mask>();
+        mask.showMaskGraphic = false;
+
+        scrollRect = viewportObject.GetComponent<ScrollRect>();
+        scrollRect.viewport = viewport;
+        scrollRect.horizontal = false;
+        scrollRect.vertical = true;
+        scrollRect.movementType = ScrollRect.MovementType.Clamped;
+        scrollRect.inertia = true;
+        scrollRect.scrollSensitivity = 24f;
+
+        GameObject contentObject = new GameObject("StatusEffectsContent", typeof(RectTransform));
+        contentObject.transform.SetParent(viewport, false);
+        content = contentObject.GetComponent<RectTransform>();
+        content.anchorMin = new Vector2(0f, 1f);
+        content.anchorMax = new Vector2(1f, 1f);
+        content.pivot = new Vector2(0.5f, 1f);
+        content.anchoredPosition = Vector2.zero;
+        content.sizeDelta = Vector2.zero;
+        scrollRect.content = content;
+
+        GridLayoutGroup grid = contentObject.AddComponent<GridLayoutGroup>();
+        grid.cellSize = new Vector2(IconSize, IconSize);
+        grid.spacing = new Vector2(IconSpacing, IconSpacing);
+        grid.startCorner = GridLayoutGroup.Corner.UpperLeft;
+        grid.startAxis = GridLayoutGroup.Axis.Horizontal;
+        grid.childAlignment = TextAnchor.UpperLeft;
+        grid.constraint = GridLayoutGroup.Constraint.FixedColumnCount;
+        grid.constraintCount = VisibleColumns;
+        grid.padding = new RectOffset(2, 2, 2, 2);
+
+        ContentSizeFitter fitter = contentObject.AddComponent<ContentSizeFitter>();
+        fitter.horizontalFit = ContentSizeFitter.FitMode.Unconstrained;
+        fitter.verticalFit = ContentSizeFitter.FitMode.PreferredSize;
+
+        viewport.gameObject.SetActive(isVisible);
     }
 
     private void Refresh(bool force)
@@ -86,18 +129,26 @@ public class StatusEffectHUD : MonoBehaviour
             if (icon != null) Destroy(icon.gameObject);
         icons.Clear();
 
-        if (statuses == null) return;
+        if (statuses == null)
+        {
+            scrollRect.verticalNormalizedPosition = 1f;
+            return;
+        }
+
         foreach (StatusEffectData status in statuses)
         {
             if (status == null || status.IsExpired) continue;
             GameObject item = new GameObject("StatusEffect", typeof(RectTransform), typeof(Image));
-            item.transform.SetParent(row, false);
+            item.transform.SetParent(content, false);
             RectTransform itemRect = item.GetComponent<RectTransform>();
-            itemRect.sizeDelta = new Vector2(30f, 30f);
+            itemRect.sizeDelta = new Vector2(IconSize, IconSize);
             StatusEffectIconView view = item.AddComponent<StatusEffectIconView>();
             view.Initialize(tooltipManager, status);
             icons.Add(view);
         }
+
+        scrollRect.verticalNormalizedPosition = 1f;
+        Canvas.ForceUpdateCanvases();
     }
 
     private void HideTooltip()
@@ -109,15 +160,8 @@ public class StatusEffectHUD : MonoBehaviour
     public void SetVisible(bool visible)
     {
         isVisible = visible;
-        if (row != null) row.gameObject.SetActive(visible);
+        if (viewport != null) viewport.gameObject.SetActive(visible);
         if (!visible) HideTooltip();
-    }
-
-    private static RectTransform CreateRect(string objectName, RectTransform parent)
-    {
-        GameObject go = new GameObject(objectName, typeof(RectTransform));
-        go.transform.SetParent(parent, false);
-        return go.GetComponent<RectTransform>();
     }
 
     private void OnDisable()
