@@ -14,4 +14,5 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::StatusEffectSO
   type: 1
   effectName: Mark
-  icon: {fileID: 0}
+  icon: {fileID: -6989339202161741409, guid: 25f835a8830645e40a5814c6d7c0b142, type: 3}
+  description: 

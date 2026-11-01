@@ -14,4 +14,5 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::StatusEffectSO
   type: 2
   effectName: Bleed
-  icon: {fileID: 0}
+  icon: {fileID: -6773611723979055997, guid: 5939c58c605c5fb48a981d80e7961932, type: 3}
+  description: teste

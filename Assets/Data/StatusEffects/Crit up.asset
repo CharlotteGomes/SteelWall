@@ -14,4 +14,5 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::StatusEffectSO
   type: 1
   effectName: Crit Up
-  icon: {fileID: 0}
+  icon: {fileID: -4757777172361484089, guid: d66d01406e507764294eef161296fbfa, type: 3}
+  description: 
