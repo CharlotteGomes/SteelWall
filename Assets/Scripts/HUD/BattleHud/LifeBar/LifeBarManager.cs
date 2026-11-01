@@ -5,6 +5,8 @@ public class LifeBarManager : MonoBehaviour
 {
     [SerializeField] private GameObject life_bar;
     [SerializeField] private List<LifeBar> lifeBars = new List<LifeBar>();
+    [Header("Status Effect Tooltip")]
+    [SerializeField] private Sprite tooltipBackground;
 
     private StatusEffectTooltipManager tooltipManager;
 
@@ -15,7 +17,7 @@ public class LifeBarManager : MonoBehaviour
             tooltipManager = gameObject.AddComponent<StatusEffectTooltipManager>();
 
         Canvas canvas = GetComponentInParent<Canvas>();
-        tooltipManager.Initialize(canvas != null ? canvas.rootCanvas : null);
+        tooltipManager.Initialize(canvas != null ? canvas.rootCanvas : null, tooltipBackground);
     }
 
     public void UpdateLifeBars()
