@@ -40,6 +40,7 @@ public abstract class BattleCharData
 
         stun = so.stun;
         debuff = so.debuff;
+        bleed = so.bleed;
         poison = so.poison;
         move = so.move;
         sanity = so.sanity;
