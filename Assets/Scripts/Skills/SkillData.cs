@@ -31,21 +31,7 @@ public class SkillData
     public void SetTargets()
     {
         targets.Clear();
-        if (original_skill == null || ctx == null) return;
-        if (original_skill.self)
-        {
-            if (ctx.Self != null && ctx.Self.CheckAlive()) targets.Add(ctx.Self);
-            return;
-        }
-
-        List<BattleChar> candidates = original_skill.affect_enemy ? ctx.Enemies : ctx.Party;
-        if (candidates == null || original_skill.pos == null) return;
-        foreach (BattleChar candidate in candidates)
-        {
-            if (candidate == null || candidate is BattleObjects || !candidate.CheckAlive()) continue;
-            if (original_skill.pos.Contains(candidate.GetSelfPos()) && !targets.Contains(candidate))
-                targets.Add(candidate);
-        }
+        targets.AddRange(TargetResolver.Resolve(original_skill, ctx));
     }
 
     public void SetEffects()
@@ -67,8 +53,7 @@ public class SkillData
 
     public void Execute(BattleChar user, BattleResult result)
     {
-        foreach (SkillEffectSO effect in effects.ToArray())
-            if (effect != null) effect.Execute(user, result);
+        new SkillExecution(this).Execute(user, result);
     }
 
     public void Dispose()
