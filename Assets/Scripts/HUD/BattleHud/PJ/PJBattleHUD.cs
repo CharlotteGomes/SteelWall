@@ -115,7 +115,7 @@ public class PJBattleHUD : StatsPanel
 
         RectTransform rect = target.GetComponent<RectTransform>();
         if (rect != null)
-            StartCoroutine(buttonSelect.LerpTransform(rect));
+            buttonSelect.MoveTo(rect);
     }
 
     public override void SubscriveEvents(BattleChar target)
