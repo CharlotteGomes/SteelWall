@@ -30,8 +30,13 @@ public class LifeBar : MonoBehaviour
 
     public void SetCharacter(BattleChar target)
     {
+        SetCharacter(target, null);
+    }
+
+    public void SetCharacter(BattleChar target, StatusEffectTooltipManager sharedTooltipManager)
+    {
         character = target;
-        if (statusHud != null) statusHud.Initialize(character);
+        if (statusHud != null) statusHud.Initialize(character, sharedTooltipManager);
         UpdateBars();
         SetPos();
         SetSize();
