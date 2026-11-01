@@ -46,6 +46,12 @@ public class StatusEffectData
 
     public virtual void OnApply() { }
     public virtual void OnRemove() { }
+
+    /// <summary>
+    /// Releases resources owned by an application that was merged into an existing
+    /// status and therefore never became an active instance on the character.
+    /// </summary>
+    public virtual void OnDiscarded() { }
     public virtual void OnStartTurn() { }
     public virtual void OnEndTurn() { }
     public virtual void OnRoundEnd() { }
