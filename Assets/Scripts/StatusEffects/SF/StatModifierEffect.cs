@@ -4,6 +4,7 @@ public class StatModifierEffect : StatusEffectData
 {
     private readonly StatsModifierSO sourceModifier;
     private readonly StatsModifierSO runtimeModifier;
+    private bool runtimeModifierReleased;
 
     public StatsModifierSO Modifier => runtimeModifier;
 
@@ -19,10 +20,13 @@ public class StatModifierEffect : StatusEffectData
 
     public StatModifierEffect(BattleChar source, BattleChar owner, int stacks, StatusEffectSO so,
         StatsModifierSO modifier, bool resist, int duration = -1)
-        : base(source, owner, 1, so, resist, duration >= 0 ? duration : stacks, 1)
+        : base(source, owner, Mathf.Max(1, stacks), so, resist,
+            duration >= 0 ? duration : stacks, Mathf.Max(1, stacks))
     {
         sourceModifier = modifier;
         runtimeModifier = modifier != null ? ScriptableObject.Instantiate(modifier) : null;
+        if (runtimeModifier != null)
+            runtimeModifier.value *= Mathf.Max(1, stacks);
     }
 
     public override void OnApply()
@@ -50,7 +54,18 @@ public class StatModifierEffect : StatusEffectData
     {
         if (owner != null && runtimeModifier != null)
             owner.RemoveStatsModifier(runtimeModifier);
-        if (runtimeModifier != null)
-            Object.Destroy(runtimeModifier);
+        ReleaseRuntimeModifier();
+    }
+
+    public override void OnDiscarded()
+    {
+        ReleaseRuntimeModifier();
+    }
+
+    private void ReleaseRuntimeModifier()
+    {
+        if (runtimeModifierReleased || runtimeModifier == null) return;
+        runtimeModifierReleased = true;
+        Object.Destroy(runtimeModifier);
     }
 }
