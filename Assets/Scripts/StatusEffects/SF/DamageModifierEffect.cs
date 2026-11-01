@@ -7,7 +7,7 @@ public class DamageModifierEffect : StatusEffectData
 
     public override string GetRuntimeDescription()
     {
-        if (value == 0) return "Modifica o dano causado pelo personagem.";
+        if (value == 0) return "Não altera o dano causado.";
         string operation = value > 0 ? "+" : string.Empty;
         return $"Modifica o dano causado em {operation}{value}%.";
     }
