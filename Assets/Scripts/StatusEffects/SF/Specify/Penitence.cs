@@ -27,14 +27,20 @@ public class Penitence : StatusEffectData
             owner.ReceiveStatsModifier(modifier);
     }
 
+    public override void OnRoundEnd()
+    {
+        TickDuration();
+    }
+
     public override void OnStackPile(StatusEffectData status)
     {
         if (status == null || stacks >= 3) return;
         int previousStacks = stacks;
-        base.OnStackPile(status);
         int addedStacks = Mathf.Min(status.stacks, 3 - previousStacks);
-        if (status is not Penitence || addedStacks <= 0 || modifiers == null || original_value == null) return;
+        base.OnStackPile(status);
+        stacks = previousStacks + addedStacks;
 
+        if (status is not Penitence || addedStacks <= 0 || modifiers == null || original_value == null) return;
         for (int i = 0; i < modifiers.Length && i < original_value.Length; i++)
             if (modifiers[i] != null && original_value[i] != null)
                 modifiers[i].value += original_value[i].value * addedStacks;
