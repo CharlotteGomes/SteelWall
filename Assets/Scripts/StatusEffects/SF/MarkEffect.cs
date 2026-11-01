@@ -8,6 +8,11 @@ public class MarkEffect : StatusEffectData
     {
     }
 
+    public override string GetRuntimeDescription()
+    {
+        return "Este personagem está marcado e pode ser afetado por habilidades que exploram marcas.";
+    }
+
     public override void OnRoundEnd()
     {
         TickDuration();
