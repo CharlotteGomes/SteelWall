@@ -72,8 +72,8 @@ public class PJBattleHUD : StatsPanel
 
     private void RefreshSkillDescription()
     {
-        if (character is PjController pj && pj.skill_current_data != null)
-            HandleSkillConfirmed(pj.skill_current_data);
+        if (character is PjController pj && pj.CurrentSkillData != null)
+            HandleSkillConfirmed(pj.CurrentSkillData);
         else if (character is PjController player && player.skill_read != null)
             SelectSkill(player.skill_read);
     }
