@@ -76,6 +76,9 @@ public abstract class BattleChar : MonoBehaviour, IPointerClickHandler
 
     public Action OnEndMyTurn;
 
+    /// <summary>Raised whenever this character's active status list or runtime values change.</summary>
+    public event Action<BattleChar> StatusEffectsChanged;
+
     public Action<BattleChar> OnDeath;
 
     #region Init
@@ -188,7 +191,7 @@ public abstract class BattleChar : MonoBehaviour, IPointerClickHandler
 
     public void ReceiveStatus(StatusEffectData data)
     {
-        if (data == null) return;
+        if (data == null || data.owner != this || data.sfSO == null && string.IsNullOrWhiteSpace(data.effectName)) return;
         Debug.Log(data.effectName);
         OnReceiveStatus(data);
 
@@ -197,8 +200,9 @@ public abstract class BattleChar : MonoBehaviour, IPointerClickHandler
             StatusResistence resistance = Resistences.Find(st => st.resist == data.sfSO.type);
             if (resistance != null)
             {
-                int roll = UnityEngine.Random.Range(0, 101);
-                if (roll < resistance.value) return;
+                int resistanceChance = Mathf.Clamp(resistance.value, 0, 100);
+                int roll = UnityEngine.Random.Range(0, 100);
+                if (roll < resistanceChance) return;
             }
         }
 
@@ -217,21 +221,23 @@ public abstract class BattleChar : MonoBehaviour, IPointerClickHandler
         if (existing != null)
         {
             existing.OnStackPile(data);
+            CheckStatusEffect();
             return;
         }
 
         StatusEffect.Add(data);
         data.OnApply();
+        CheckStatusEffect();
     }
 
     public void StatusRemove(StatusEffectData status)
     {
         if (status == null) return;
-        if (StatusEffect.Contains(status))
-        {
-            StatusEffect.Remove(status);
+        bool removed = StatusEffect.Remove(status);
+        if (removed)
             status.OnRemove();
-        }
+        if (removed)
+            StatusEffectsChanged?.Invoke(this);
         OnStatusRemoved(status);
     }
 
@@ -343,6 +349,7 @@ public abstract class BattleChar : MonoBehaviour, IPointerClickHandler
     {
         foreach (StatusEffectData status in StatusEffect.ToList())
             if (status == null || status.IsExpired) StatusRemove(status);
+        StatusEffectsChanged?.Invoke(this);
     }
     #endregion
 
