@@ -30,6 +30,18 @@ public class SkillData
         SetEffects();
     }
 
+    private void SetEffects()
+    {
+        ReleaseEffects();
+        if (original_skill == null || original_skill.effects == null) return;
+
+        foreach (SkillEffectSO effect in original_skill.effects)
+        {
+            if (effect != null)
+                effects.Add(Object.Instantiate(effect));
+        }
+    }
+
     public void SetTargets()
     {
         ClearSelectedTargets();
