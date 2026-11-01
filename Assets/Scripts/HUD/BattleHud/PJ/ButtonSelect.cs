@@ -1,45 +1,77 @@
-using NUnit.Framework.Constraints;
 using System.Collections;
 using UnityEngine;
 
 public class ButtonSelect : MonoBehaviour
 {
-    RectTransform tf;
-    void Start()
-    {
-        tf = GetComponent<RectTransform>();
-    }
+    private RectTransform rectTransform;
+    private Coroutine transition;
 
-    void Update()
+    private void Awake()
     {
-        
+        CacheReferences();
     }
 
     private void OnEnable()
     {
-        tf = GetComponent<RectTransform>();
+        CacheReferences();
     }
-  
-    public IEnumerator LerpTransform(RectTransform _tf)
-    {
-        Canvas.ForceUpdateCanvases();
-        Vector2 StartPos = tf.position;
-        Vector2 EndPos = _tf.position;
-        Vector2 StartScale = tf.sizeDelta;
-        Vector2 EndScale = _tf.sizeDelta + new Vector2(10, 26);
-        float t = 0f;
-        float duration = 0.35f;
 
-        while (t < duration)
+    private void CacheReferences()
+    {
+        if (rectTransform == null)
+            rectTransform = GetComponent<RectTransform>();
+    }
+
+    public void MoveTo(RectTransform target)
+    {
+        if (target == null) return;
+        if (transition != null)
+            StopCoroutine(transition);
+
+        transition = StartCoroutine(LerpTransform(target));
+    }
+
+    public IEnumerator LerpTransform(RectTransform target)
+    {
+        CacheReferences();
+        if (rectTransform == null || target == null) yield break;
+
+        Canvas.ForceUpdateCanvases();
+
+        Vector3 startPosition = rectTransform.position;
+        Vector3 endPosition = target.position;
+        Vector2 startSize = rectTransform.sizeDelta;
+        Vector2 endSize = target.sizeDelta + new Vector2(10f, 26f);
+
+        const float duration = 0.35f;
+        float elapsed = 0f;
+
+        while (elapsed < duration)
         {
-            t += Time.deltaTime / duration; 
-            float curve = 1f - Mathf.Pow(1f - t, 3f);
-            tf.position = Vector2.Lerp(StartPos, EndPos, curve);
-            tf.sizeDelta = Vector2.Lerp(StartScale, EndScale, curve);
+            if (rectTransform == null || target == null) yield break;
+
+            elapsed += Time.deltaTime;
+            float t = Mathf.Clamp01(elapsed / duration);
+            float eased = 1f - Mathf.Pow(1f - t, 3f);
+
+            rectTransform.position = Vector3.Lerp(startPosition, endPosition, eased);
+            rectTransform.sizeDelta = Vector2.Lerp(startSize, endSize, eased);
             yield return null;
         }
-        tf.position = EndPos;
-        tf.sizeDelta = EndScale;
-        yield return null;
+
+        if (rectTransform != null && target != null)
+        {
+            rectTransform.position = target.position;
+            rectTransform.sizeDelta = endSize;
+        }
+
+        transition = null;
+    }
+
+    private void OnDisable()
+    {
+        if (transition == null) return;
+        StopCoroutine(transition);
+        transition = null;
     }
 }
