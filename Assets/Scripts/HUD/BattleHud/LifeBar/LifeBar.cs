@@ -12,10 +12,14 @@ public class LifeBar : MonoBehaviour
     private Canvas parentCanvas;
     private RectTransform rectTransform;
     private Camera canvasCamera;
+    private StatusEffectHUD statusHud;
 
     private void Awake()
     {
         rectTransform = transform as RectTransform;
+        statusHud = GetComponent<StatusEffectHUD>();
+        if (statusHud == null)
+            statusHud = gameObject.AddComponent<StatusEffectHUD>();
         parentCanvas = GetComponentInParent<Canvas>();
         if (parentCanvas != null && parentCanvas.rootCanvas != null)
             parentCanvas = parentCanvas.rootCanvas;
@@ -27,6 +31,7 @@ public class LifeBar : MonoBehaviour
     public void SetCharacter(BattleChar target)
     {
         character = target;
+        if (statusHud != null) statusHud.Initialize(character);
         UpdateBars();
         SetPos();
         SetSize();
