@@ -92,8 +92,6 @@ public class StatusEffectTooltipManager : MonoBehaviour
         System.Collections.Generic.List<string> details = new System.Collections.Generic.List<string>();
         if (status.stacks > 1)
             details.Add("Acúmulos: " + status.stacks);
-        if (status.potency > 0 && !(status is BleedEffect) && !(status is PoisonEffect) && !(status is HealPerTurnEffect))
-            details.Add("Potência: " + status.potency);
         if (status.remainingDuration > 0)
             details.Add("Duração restante: " + status.remainingDuration + (status.remainingDuration == 1 ? " turno" : " turnos"));
         if (status.source != null && status.source != status.owner)
