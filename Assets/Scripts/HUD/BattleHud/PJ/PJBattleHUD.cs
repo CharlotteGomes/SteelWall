@@ -1,7 +1,7 @@
 using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.TextCore.Text;
 using TMPro;
+
 public class PJBattleHUD : StatsPanel
 {
     [SerializeField] List<SkillIcon> skillIcon = new List<SkillIcon>();
@@ -11,50 +11,48 @@ public class PJBattleHUD : StatsPanel
     [Header("Optional skill details")]
     [SerializeField] TMP_Text skillDescriptionText;
 
-    void Start()
-    {
-        
-    }
-
-    void Update()
-    {
-    }
-
     public override void UpdateChildren()
     {
         base.UpdateChildren();
-        if (character is not PjController pj) return;
-        int visibleSkillCount = Mathf.Min(pj.read_skills.Count, skillIcon.Count);
-        for (int i = 0; i < visibleSkillCount; i++)
+        if (character is not PjController player) return;
+
+        int visibleSkillCount = Mathf.Min(player.read_skills.Count, skillIcon.Count);
+        for (int i = 0; i < skillIcon.Count; i++)
         {
-            if (skillIcon[i] == null || pj.read_skills[i] == null) continue;
-            skillIcon[i].UpdateSkillSO(pj.read_skills[i]);
-            skillIcon[i].UpdateSprite();
+            SkillIcon icon = skillIcon[i];
+            if (icon == null) continue;
+
+            SkillSO skill = i < visibleSkillCount ? player.read_skills[i] : null;
+            icon.UpdateSkillSO(skill);
+            icon.UpdateSprite();
         }
-        for (int i = visibleSkillCount; i < skillIcon.Count; i++)
-            if (skillIcon[i] != null) skillIcon[i].UpdateSkillSO(null);
     }
 
-    public void SetSkill(SkillSO so)
+    public void SetSkill(SkillSO skill)
     {
-        if (character is not PjController pj) return;
-        pj.OnSkillCancel?.Invoke();
-        pj.SetSkill(so);
-        pj.ConfirmSkill();
-        SelectSkill(so);
+        if (skill == null || character is not PjController player) return;
+
+        player.OnSkillCancel?.Invoke();
+        player.SetSkill(skill);
+        player.ConfirmSkill();
+        SelectSkill(skill);
         RefreshSkillDescription();
     }
 
-    public void SelectSkill(SkillSO so)
+    public void SelectSkill(SkillSO skill)
     {
         if (skillDescriptionText != null)
-            skillDescriptionText.text = SkillDescriptionBuilder.Build(so, character);
-        if (character is not PjController pj) return;
-        int count = Mathf.Min(pj.read_skills.Count, skillIcon.Count);
+            skillDescriptionText.text = SkillDescriptionBuilder.Build(skill, character);
+
+        if (character is not PjController player || skill == null) return;
+        int count = Mathf.Min(player.read_skills.Count, skillIcon.Count);
         for (int i = 0; i < count; i++)
         {
-            if (pj.read_skills[i] == so && skillIcon[i] != null)
-                SetButtonSelect<SkillIcon>(skillIcon[i]);
+            if (player.read_skills[i] == skill && skillIcon[i] != null)
+            {
+                SetButtonSelect(skillIcon[i]);
+                break;
+            }
         }
     }
 
@@ -66,72 +64,81 @@ public class PJBattleHUD : StatsPanel
 
     private void HandleTargetsChanged(BattleChar[] targets)
     {
-        if (character is PjController pj && pj.CurrentSkillData != null && skillDescriptionText != null)
-            skillDescriptionText.text = SkillDescriptionBuilder.Build(pj.CurrentSkillData, character);
+        if (character is PjController player && player.CurrentSkillData != null && skillDescriptionText != null)
+            skillDescriptionText.text = SkillDescriptionBuilder.Build(player.CurrentSkillData, character);
     }
 
     private void RefreshSkillDescription()
     {
-        if (character is PjController pj && pj.CurrentSkillData != null)
-            HandleSkillConfirmed(pj.CurrentSkillData);
-        else if (character is PjController player && player.skill_read != null)
-            SelectSkill(player.skill_read);
+        if (character is PjController player && player.CurrentSkillData != null)
+            HandleSkillConfirmed(player.CurrentSkillData);
+        else if (character is PjController currentPlayer && currentPlayer.skill_read != null)
+            SelectSkill(currentPlayer.skill_read);
     }
 
     private void ClearSkillDescription()
     {
-        if (skillDescriptionText != null) skillDescriptionText.text = string.Empty;
+        if (skillDescriptionText != null)
+            skillDescriptionText.text = string.Empty;
     }
 
     public void SetMoveAction()
     {
-        if (character is not PjController pj) return;
-        pj.OnMoveCancel?.Invoke();
+        if (character is not PjController player) return;
+        player.OnMoveCancel?.Invoke();
         SelectMoveButton();
-        pj.ConfirmMoveAction();
+        player.ConfirmMoveAction();
     }
 
     public void SelectMoveButton()
     {
-        SetButtonSelect<SwapButton>(swapButton);
+        if (swapButton != null) SetButtonSelect(swapButton);
     }
 
     public void SelectSkipButton()
     {
-        SetButtonSelect<SkipButton>(skipButton);
+        if (skipButton != null) SetButtonSelect(skipButton);
     }
 
     public void DisableButtonSelect()
     {
-        buttonSelect.gameObject.SetActive(false);
+        if (buttonSelect != null)
+            buttonSelect.gameObject.SetActive(false);
     }
 
     public void SetButtonSelect<T>(T target) where T : MonoBehaviour
     {
-        if(!buttonSelect.gameObject.activeSelf) buttonSelect.gameObject.SetActive(true);
+        if (buttonSelect == null || target == null) return;
+
+        if (!buttonSelect.gameObject.activeSelf)
+            buttonSelect.gameObject.SetActive(true);
+
         RectTransform rect = target.GetComponent<RectTransform>();
-        StartCoroutine(buttonSelect.LerpTransform(rect));
+        if (rect != null)
+            StartCoroutine(buttonSelect.LerpTransform(rect));
     }
 
-    public override void SubscriveEvents(BattleChar character)
+    public override void SubscriveEvents(BattleChar target)
     {
-        base.SubscriveEvents(character);
-        character.OnSkillSelect += SelectSkill;
-        character.OnMoveActionSelect += SelectMoveButton;
-        character.OnSkipSelect += SelectSkipButton;
-        character.OnSkillConfirm += HandleSkillConfirmed;
-        character.OnBattleCharSelect += HandleTargetsChanged;
-        character.OnSkillCancel += ClearSkillDescription;
+        if (!TryBeginSubscription(target)) return;
+
+        target.OnSkillSelect += SelectSkill;
+        target.OnMoveActionSelect += SelectMoveButton;
+        target.OnSkipSelect += SelectSkipButton;
+        target.OnSkillConfirm += HandleSkillConfirmed;
+        target.OnBattleCharSelect += HandleTargetsChanged;
+        target.OnSkillCancel += ClearSkillDescription;
     }
 
-    public override void UnsubscriveEvents(BattleChar character)
+    public override void UnsubscriveEvents(BattleChar target)
     {
-        base.UnsubscriveEvents(character);
-        character.OnSkillSelect -= SelectSkill;
-        character.OnMoveActionSelect -= SelectMoveButton;
-        character.OnSkipSelect -= SelectSkipButton;
-        character.OnSkillConfirm -= HandleSkillConfirmed;
-        character.OnBattleCharSelect -= HandleTargetsChanged;
-        character.OnSkillCancel -= ClearSkillDescription;
+        if (!TryEndSubscription(target)) return;
+
+        target.OnSkillSelect -= SelectSkill;
+        target.OnMoveActionSelect -= SelectMoveButton;
+        target.OnSkipSelect -= SelectSkipButton;
+        target.OnSkillConfirm -= HandleSkillConfirmed;
+        target.OnBattleCharSelect -= HandleTargetsChanged;
+        target.OnSkillCancel -= ClearSkillDescription;
     }
 }
