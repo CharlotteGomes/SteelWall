@@ -71,7 +71,7 @@ public class StatusEffectIconView : MonoBehaviour, IPointerEnterHandler, IPointe
 
     public void OnPointerEnter(PointerEventData eventData)
     {
-        if (owner != null) owner.ShowTooltip(status);
+        if (owner != null) owner.ShowTooltip(status, eventData.position);
     }
 
     public void OnPointerExit(PointerEventData eventData)
