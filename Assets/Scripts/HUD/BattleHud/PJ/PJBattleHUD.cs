@@ -68,7 +68,7 @@ public class PJBattleHUD : StatsPanel
 
     private void HandleTargetsChanged(BattleChar[] targets)
     {
-        if (character is PjController pj && pj.skill_current_data != null && skillDescriptionText != null)
+        if (character is PjController pj && pj.CurrentSkillData != null && skillDescriptionText != null)
             skillDescriptionText.text = SkillDescriptionBuilder.Build(pj.skill_current_data, character);
     }
 
