@@ -5,6 +5,7 @@ public class LifeBarManager : MonoBehaviour
 {
     [SerializeField] private GameObject life_bar;
     [SerializeField] private List<LifeBar> lifeBars = new List<LifeBar>();
+    [SerializeField] private Sprite tooltipBackground;
     [Header("Status Effect Tooltip")]
     [SerializeField] private Sprite tooltipBackground;
 
