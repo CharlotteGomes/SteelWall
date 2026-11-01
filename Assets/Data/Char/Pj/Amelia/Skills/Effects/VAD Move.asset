@@ -14,6 +14,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::MoveEffectSO
   self: 1
   sfSO: {fileID: 11400000, guid: 853c982d45e1fbd4db6f614f6271ab11, type: 2}
-  stacks: 0
+  stacks: 1
   resist: 0
+  duration: 1
+  potency: 1
   dir: 1
