@@ -9,5 +9,6 @@ public abstract class ApplyStatusEffect : SkillEffectSO
     [Min(-1)] public int potency = -1;
 
     protected int RuntimeDuration => duration >= 0 ? duration : stacks;
+    protected int ConfiguredDuration => duration;
     protected int RuntimePotency => potency >= 0 ? potency : stacks;
 }
