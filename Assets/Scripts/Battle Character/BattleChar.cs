@@ -389,7 +389,8 @@ public abstract class BattleChar : MonoBehaviour, IPointerClickHandler
         List<StatusEffectData> s = StatusEffect.ToList();
         foreach (StatusEffectData status in s)
         {
-            if(status.stacks <= 0) {StatusRemove(status); }
+            if (status == null || status.stacks <= 0 || status.HasExpired)
+                StatusRemove(status);
         }
     }
     #endregion
