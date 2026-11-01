@@ -18,12 +18,12 @@ public class StatusEffectIconView : MonoBehaviour, IPointerEnterHandler, IPointe
         if (background == null)
             background = gameObject.AddComponent<Image>();
 
-        // A sprite-backed Image generates a raycastable UI mesh.
-        Sprite raycastSprite = Resources.GetBuiltinResource<Sprite>("UI/Skin/UISprite.psd");
-        if (raycastSprite != null)
-            background.sprite = raycastSprite;
+        // A sprite is not required for Graphic raycasts when the alpha threshold is zero.
+        // Keeping the Image sprite null avoids relying on version-dependent Unity builtin assets.
+        background.sprite = null;
         background.type = Image.Type.Simple;
         background.color = new Color(0.12f, 0.14f, 0.18f, 0.96f);
+        background.alphaHitTestMinimumThreshold = 0f;
         background.raycastTarget = true;
 
         GameObject iconObject = new GameObject("Icon", typeof(RectTransform), typeof(Image));
