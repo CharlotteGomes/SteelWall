@@ -46,10 +46,11 @@ public abstract class BattleChar : MonoBehaviour, IPointerClickHandler
     public CharacterSpriteSO spriteSO { get; private set; }
 
     [SerializeField] protected List<StatusEffectData> StatusEffect = new();
-    [SerializeField] protected List<StatsModifierSO> StatsModifier = new();
-    
+
     public IReadOnlyList<StatusEffectData> status_effects => StatusEffect.AsReadOnly();
-    
+
+    [SerializeField] protected List<StatsModifierSO> StatsModifier = new();
+
     public BattleContext Context => ctx;
     public SkillData CurrentSkillData => skill_current_data;
     [SerializeField] protected SkillSO skill_current;
@@ -107,10 +108,8 @@ public abstract class BattleChar : MonoBehaviour, IPointerClickHandler
     {
         favorite_pos.Clear();
         if (so_list == null) return;
-        for(int ii = 0;  ii < 4; ii++)
-        {
+        for(int ii = 0; ii < 4; ii++)
             favorite_pos.Add(new FavoritePos());
-        }
 
         foreach (SkillSO so in so_list)
         {
@@ -124,15 +123,9 @@ public abstract class BattleChar : MonoBehaviour, IPointerClickHandler
         }
     }
 
-    public void SetBattleChar(BattleCharData battle_char)
-    {
-        this.battle_char = battle_char;
-    }
+    public void SetBattleChar(BattleCharData battle_char) { this.battle_char = battle_char; }
+    public void SetBattleManager(BattleManager battle) { battle_manager = battle; }
 
-    public void SetBattleManager(BattleManager battle)
-    {
-        battle_manager = battle;
-    }
     public virtual void CreateContext(List<BattleChar> allies, List<BattleChar> enemies, int pos)
     {
         if (ctx == null) ctx = new BattleContext();
@@ -141,7 +134,6 @@ public abstract class BattleChar : MonoBehaviour, IPointerClickHandler
         ctx.Enemies = enemies;
         ctx.SelfPosition = pos;
     }
-
     #endregion
 
     #region Generic
@@ -151,19 +143,15 @@ public abstract class BattleChar : MonoBehaviour, IPointerClickHandler
         if(!info.ignore_prot) ReduceDamage(info);
         Debug.Log($"dano pós defese: {info.damage}");
         OnDamageTaken(info);
-        if(info.damage>= 0)
-        {
+        if(info.damage >= 0)
             life_current = (int)Mathf.Clamp(life_current - info.damage, 0, Mathf.Infinity);
-        }
     }
 
     public void DealDamage(DamageInfo info)
     {
-        OnDamageDealt(info);   
+        OnDamageDealt(info);
         if(info.damage >= 0)
-        {
             info.receiver.TakeDamage(info);
-        }
     }
 
     public void ReduceDamage(DamageInfo info)
@@ -181,45 +169,56 @@ public abstract class BattleChar : MonoBehaviour, IPointerClickHandler
         Debug.Log($"ME CURARAM EM {info.heal_amount}");
         OnHealReceived(info);
         if(info.heal_amount >= 0)
-        {
             life_current = (int)Mathf.Clamp(life_current + info.heal_amount, 0, life_max);
-        }
     }
 
     public void DealHeal(HealInfo info)
     {
         OnHealGiven(info);
         if(info.heal_amount >= 0)
-        {
             info.target.ReceiveHeal(info);
-        }
     }
 
     public void GiveStatus(StatusEffectData data)
     {
+        if (data == null || data.owner == null) return;
         OnGiveStatus(data);
         data.owner.ReceiveStatus(data);
     }
 
     public void ReceiveStatus(StatusEffectData data)
     {
+        if (data == null) return;
         Debug.Log(data.effectName);
         OnReceiveStatus(data);
-        if (data.resistiable == true) {
-            foreach (StatusResistence st in Resistences)
-            {
-                if (st.resist == data.sfSO.type)
-                {
-                    int roll = UnityEngine.Random.Range(0, 101);
-                    if (roll < st.value) {return; }
-                }
-            } 
-        }
-        if(data.stacks == 0) { data.OnApply(); return; }
-        foreach (var s in StatusEffect)
+
+        if (data.resistiable && data.sfSO != null)
         {
-            if (data.effectName == s.effectName) { s.OnStackPile(data); return; }
+            StatusResistence resistance = Resistences.Find(st => st.resist == data.sfSO.type);
+            if (resistance != null)
+            {
+                int roll = UnityEngine.Random.Range(0, 101);
+                if (roll < resistance.value) return;
+            }
         }
+
+        if (data.stacks <= 0 || data.remainingDuration == 0)
+        {
+            data.OnApply();
+            return;
+        }
+
+        StatusEffectData existing = StatusEffect.Find(status =>
+            status != null && (
+                (data.sfSO != null && status.sfSO == data.sfSO) ||
+                (data.sfSO == null && status.sfSO == null && status.effectName == data.effectName)));
+
+        if (existing != null)
+        {
+            existing.OnStackPile(data);
+            return;
+        }
+
         StatusEffect.Add(data);
         data.OnApply();
     }
@@ -234,10 +233,7 @@ public abstract class BattleChar : MonoBehaviour, IPointerClickHandler
         OnStatusRemoved(status);
     }
 
-    public bool CheckAlive()
-    {
-        return life_current <= 0 ? false : true;
-    }
+    public bool CheckAlive() { return life_current > 0; }
 
     public void CharacterDeath()
     {
@@ -245,153 +241,106 @@ public abstract class BattleChar : MonoBehaviour, IPointerClickHandler
         OnDeath?.Invoke(this);
         Destroy(gameObject);
     }
+
     public void ReceiveStatsModifier(StatsModifierSO modifier)
     {
-        if(modifier != null)
-        {
-            StatsModifier.Add(modifier);
-        }
+        if (modifier != null) StatsModifier.Add(modifier);
     }
 
     public void RemoveStatsModifier(StatsModifierSO modifier)
     {
-        if (StatsModifier.Contains(modifier))
-        {
-            StatsModifier.Remove(modifier);
-        }
+        if (StatsModifier.Contains(modifier)) StatsModifier.Remove(modifier);
     }
 
     public int GetStatsModifier(StatType t)
     {
-        List<StatsModifierSO> flat = StatsModifier.FindAll(x => x.flat == true && x.statType == t).ToList();
-        List<StatsModifierSO> percent = StatsModifier.FindAll(x => x.flat == false && x.statType == t).ToList();
-
+        List<StatsModifierSO> flat = StatsModifier.FindAll(x => x.flat && x.statType == t);
+        List<StatsModifierSO> percent = StatsModifier.FindAll(x => !x.flat && x.statType == t);
         int value = 0;
-        foreach (StatsModifierSO modifier in flat)
-        {
-            value += modifier.value;
-        }
+        foreach (StatsModifierSO modifier in flat) value += modifier.value;
         foreach(StatsModifierSO modifier in percent)
-        {
             value += (int)(GetBaseStat(modifier.statType) * (modifier.value / 100f));
-        }
-        return value;   
+        return value;
     }
     #endregion
 
     #region Turn Events
     public void OnStartTurn()
     {
-        foreach(StatusEffectData status in StatusEffect.ToList())
-        {
-            status.OnStartTurn();
-        }
+        foreach(StatusEffectData status in StatusEffect.ToList()) status?.OnStartTurn();
         CheckStatusEffect();
     }
 
     public void OnEndTurn()
     {
-        foreach (StatusEffectData status in StatusEffect.ToList())
-        {
-            status.OnEndTurn();
-        }
+        foreach (StatusEffectData status in StatusEffect.ToList()) status?.OnEndTurn();
         CheckStatusEffect();
     }
 
     public void OnRoundEnd()
     {
-        foreach (StatusEffectData status in StatusEffect.ToList())
-        {
-            status.OnRoundEnd();
-        }
+        foreach (StatusEffectData status in StatusEffect.ToList()) status?.OnRoundEnd();
         CheckStatusEffect();
     }
 
     public void OnUseSkill(BattleResult result)
     {
-        foreach (StatusEffectData status in StatusEffect.ToList())
-        {
-            status.OnUseSkill(result);
-        }
+        foreach (StatusEffectData status in StatusEffect.ToList()) status?.OnUseSkill(result);
         CheckStatusEffect();
     }
+
     public void OnDamageDealt(DamageInfo info)
     {
-        foreach (StatusEffectData status in StatusEffect.ToList())
-        {
-            status.OnDamageDealt(info);
-        }
+        foreach (StatusEffectData status in StatusEffect.ToList()) status?.OnDamageDealt(info);
         CheckStatusEffect();
     }
 
     public void OnDamageTaken(DamageInfo info)
     {
-        foreach (StatusEffectData status in StatusEffect.ToList())
-        {
-            status.OnDamageTaken(info);
-        }
+        foreach (StatusEffectData status in StatusEffect.ToList()) status?.OnDamageTaken(info);
         CheckStatusEffect();
     }
 
     public void OnHealGiven(HealInfo info)
     {
-        foreach(StatusEffectData status in StatusEffect.ToList())
-        {
-            status.OnHealGiven(info);
-        }
+        foreach(StatusEffectData status in StatusEffect.ToList()) status?.OnHealGiven(info);
         CheckStatusEffect();
     }
-    public void OnHealReceived(HealInfo info) 
+
+    public void OnHealReceived(HealInfo info)
     {
-        foreach(StatusEffectData status in StatusEffect.ToList())
-        {
-            status.OnHealReceived(info);
-        }
+        foreach(StatusEffectData status in StatusEffect.ToList()) status?.OnHealReceived(info);
         CheckStatusEffect();
     }
+
     public void OnReceiveStatus(StatusEffectData status)
     {
-        foreach(StatusEffectData s in StatusEffect.ToList())
-        {
-            s.OnReceiveStatus(status);
-        }
+        foreach(StatusEffectData s in StatusEffect.ToList()) s?.OnReceiveStatus(status);
         CheckStatusEffect();
     }
 
     public void OnGiveStatus(StatusEffectData status)
     {
-        foreach(StatusEffectData s in StatusEffect.ToList())
-        {
-            s.OnGiveStatus(status);
-        }
-        CheckStatusEffect();
-    }   
-
-    public void OnStatusRemoved(StatusEffectData status)
-    {
-        foreach(StatusEffectData s in StatusEffect.ToList())
-        {
-            s.OnStatusRemoved(status);
-        }
+        foreach(StatusEffectData s in StatusEffect.ToList()) s?.OnGiveStatus(status);
         CheckStatusEffect();
     }
 
-    public void OnCharacterDeath() {
-        foreach(StatusEffectData status in StatusEffect.ToList())
-        {
-            status.OnCharacterDeath();
-        }
+    public void OnStatusRemoved(StatusEffectData status)
+    {
+        foreach(StatusEffectData s in StatusEffect.ToList()) s?.OnStatusRemoved(status);
+        CheckStatusEffect();
+    }
+
+    public void OnCharacterDeath()
+    {
+        foreach(StatusEffectData status in StatusEffect.ToList()) status?.OnCharacterDeath();
         CheckStatusEffect();
     }
 
     public void CheckStatusEffect()
     {
-        List<StatusEffectData> s = StatusEffect.ToList();
-        foreach (StatusEffectData status in s)
-        {
-            if (status != null && (status.stacks <= 0 || status.IsExpired))
-                StatusRemove(status);
-        }
+        foreach (StatusEffectData status in StatusEffect.ToList())
+            if (status == null || status.IsExpired) StatusRemove(status);
     }
     #endregion
 
@@ -446,19 +395,13 @@ public abstract class BattleChar : MonoBehaviour, IPointerClickHandler
             int hitRoll = UnityEngine.Random.Range(0, 101);
             bool dodged = skill_current.can_dodge && hitRoll > hitChance;
             int criticalChance = Mathf.Clamp(GetStat(StatType.CRIT) + skill_current_data.crit_mod, 0, 100);
-            int criticalRoll = dodged || !skill_current.can_crit
-                ? 101
-                : UnityEngine.Random.Range(0, 101);
+            int criticalRoll = dodged || !skill_current.can_crit ? 101 : UnityEngine.Random.Range(0, 101);
             bool critical = !dodged && skill_current.can_crit && criticalRoll <= criticalChance;
-
             result.AddTargetResult(new TargetResolution(target, dodged, critical, hitRoll, hitChance, criticalRoll));
         }
     }
 
-    public void SetSkill(SkillSO so)
-    {
-        skill_current = so;
-    }
+    public void SetSkill(SkillSO so) { skill_current = so; }
     #endregion
 
     #region Turn
@@ -468,31 +411,24 @@ public abstract class BattleChar : MonoBehaviour, IPointerClickHandler
     {
         if (skill_current_data == null || skill_current == null || ctx == null) return;
         if (index < 0 || index >= skill_current_data.targets.Count) return;
-
-        if (!skill_current.chose)
-            skill_current_data.SelectAllTargets();
-        else if (!skill_current_data.SelectTarget(index))
-            return;
-
+        if (!skill_current.chose) skill_current_data.SelectAllTargets();
+        else if (!skill_current_data.SelectTarget(index)) return;
         skill_current_data.Prepare();
     }
+
     public virtual void ChooseSwapTarget() { }
+
     public void ConfirmSwapTarget(int index)
     {
-        if (battle_manager == null) return;
+        if (battle_manager == null || ctx == null || ctx.Party == null) return;
         if (index == ctx.SelfPosition || index < 0 || index >= ctx.Party.Count) return;
         battle_manager.SwapPosition(this, index);
         step = TurnStep.Finish;
     }
-
     #endregion
 
     #region Turn Info
-
-    public void SetStep(TurnStep s)
-    {
-        step = s;
-    }
+    public void SetStep(TurnStep s) { step = s; }
 
     public void SetTarget(BattleChar c)
     {
@@ -500,26 +436,18 @@ public abstract class BattleChar : MonoBehaviour, IPointerClickHandler
         if (!skill_current_data.targets.Contains(c)) return;
         skill_current_data.SetSelectedTargets(new[] { c });
     }
-    
+
     public bool CanUseSkill(SkillSO so)
     {
         if (so == null || so.use_pos == null || ctx == null) return false;
         for (int i = 0; i < so.use_pos.Length; i++)
-        {
             if (ctx.SelfPosition == so.use_pos[i]) return true;
-        }
         return false;
     }
-
     #endregion
 
     #region Status
-    
-
-    public int GetSelfPos()
-    {
-        return ctx.SelfPosition;
-    }
+    public int GetSelfPos() { return ctx != null ? ctx.SelfPosition : -1; }
 
     private int GetResistance(ResistenceType type)
     {
@@ -554,12 +482,8 @@ public abstract class BattleChar : MonoBehaviour, IPointerClickHandler
 
     public int GetStat(StatType stat)
     {
-        int baseValue = GetBaseStat(stat);
-        int modifier = GetStatsModifier(stat);
-
-        return baseValue + modifier;
+        return GetBaseStat(stat) + GetStatsModifier(stat);
     }
-
     #endregion
 
     #region Round
@@ -571,24 +495,16 @@ public abstract class BattleChar : MonoBehaviour, IPointerClickHandler
         OnStartMyTurn?.Invoke(this);
     }
 
-    public virtual void EndRound()
-    {
-        OnEndMyTurn?.Invoke();
-    }
+    public virtual void EndRound() { OnEndMyTurn?.Invoke(); }
 
-    public TurnStep CurrentStep()
-    {
-        return step;
-    }
+    public TurnStep CurrentStep() { return step; }
     #endregion
 
-    public void OnPointerClick(PointerEventData eventData)
-    {
-    }
+    public void OnPointerClick(PointerEventData eventData) { }
 
     protected virtual void Awake()
     {
         sprite_renderer = GetComponent<SpriteRenderer>();
-        tf = GetComponent<Transform>(); 
+        tf = GetComponent<Transform>();
     }
 }
