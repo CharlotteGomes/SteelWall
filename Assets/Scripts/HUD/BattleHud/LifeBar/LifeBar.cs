@@ -1,15 +1,32 @@
 using UnityEngine;
+using UnityEngine.UI;
 
 public class LifeBar : MonoBehaviour
 {
     public BattleChar character { get; private set; }
-    [SerializeField] LifeBarFill fill;
-    [SerializeField] BackLifeBar backFill;
-    Coroutine backFillRoutine;
 
-    public void SetCharacter(BattleChar character)
+    [SerializeField] private LifeBarFill fill;
+    [SerializeField] private BackLifeBar backFill;
+
+    private Coroutine backFillRoutine;
+    private Canvas parentCanvas;
+    private RectTransform rectTransform;
+    private Camera canvasCamera;
+
+    private void Awake()
     {
-        this.character = character;
+        rectTransform = transform as RectTransform;
+        parentCanvas = GetComponentInParent<Canvas>();
+        if (parentCanvas != null && parentCanvas.rootCanvas != null)
+            parentCanvas = parentCanvas.rootCanvas;
+
+        if (parentCanvas != null && parentCanvas.renderMode != RenderMode.ScreenSpaceOverlay)
+            canvasCamera = parentCanvas.worldCamera;
+    }
+
+    public void SetCharacter(BattleChar target)
+    {
+        character = target;
         UpdateBars();
         SetPos();
         SetSize();
@@ -18,27 +35,58 @@ public class LifeBar : MonoBehaviour
     public void UpdateBars()
     {
         if (character == null) return;
-        if (fill != null) fill.UpdateBar(character);
-        if (backFillRoutine != null) StopCoroutine(backFillRoutine);
-        if (backFill != null) backFillRoutine = StartCoroutine(backFill.UpdateBar(character));
+
+        if (fill != null)
+            fill.UpdateBar(character);
+
+        if (backFillRoutine != null)
+            StopCoroutine(backFillRoutine);
+
+        if (backFill != null)
+            backFillRoutine = StartCoroutine(backFill.UpdateBar(character));
     }
 
     public void SetPos()
     {
-        if (character != null) transform.position = character.transform.position + new Vector3(0, -.25f);
+        if (character == null) return;
+
+        RectTransform parentRect = transform.parent as RectTransform;
+        if (parentCanvas == null || rectTransform == null || parentRect == null)
+        {
+            transform.position = character.transform.position + new Vector3(0f, -0.25f, 0f);
+            return;
+        }
+
+        Camera eventCamera = parentCanvas.renderMode == RenderMode.ScreenSpaceOverlay
+            ? null
+            : (canvasCamera != null ? canvasCamera : parentCanvas.worldCamera);
+
+        Vector3 worldPosition = character.transform.position + new Vector3(0f, -0.25f, 0f);
+        Vector2 screenPosition = RectTransformUtility.WorldToScreenPoint(eventCamera, worldPosition);
+
+        if (RectTransformUtility.ScreenPointToLocalPointInRectangle(
+            parentRect, screenPosition, eventCamera, out Vector2 localPosition))
+        {
+            rectTransform.anchoredPosition = localPosition;
+        }
     }
 
     public void SetSize()
     {
-        transform.localScale = Vector2.one;
+        transform.localScale = Vector3.one;
+    }
+
+    public void SetVisible(bool visible)
+    {
+        Graphic[] graphics = GetComponentsInChildren<Graphic>(true);
+        foreach (Graphic graphic in graphics)
+            if (graphic != null) graphic.enabled = visible;
     }
 
     private void OnDisable()
     {
-        if (backFillRoutine != null)
-        {
-            StopCoroutine(backFillRoutine);
-            backFillRoutine = null;
-        }
+        if (backFillRoutine == null) return;
+        StopCoroutine(backFillRoutine);
+        backFillRoutine = null;
     }
 }
