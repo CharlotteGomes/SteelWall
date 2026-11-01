@@ -120,6 +120,11 @@ public class StatusEffectHUD : MonoBehaviour
         return go.GetComponent<RectTransform>();
     }
 
+    private void OnDisable()
+    {
+        HideTooltip();
+    }
+
     private void OnDestroy()
     {
         HideTooltip();
