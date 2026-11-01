@@ -76,9 +76,12 @@ public class StatusEffectData
         if (status == null) return;
         stacks = Mathf.Max(0, stacks + status.stacks);
         potency = Mathf.Max(0, potency + status.potency);
-        if (status.remainingDuration >= 0)
-            remainingDuration = remainingDuration < 0
-                ? status.remainingDuration
-                : Mathf.Max(remainingDuration, status.remainingDuration);
+        // A negative duration represents an indefinite status. Merging an
+        // indefinite application must never shorten an existing indefinite status,
+        // and an indefinite incoming application makes the merged status indefinite.
+        if (status.remainingDuration < 0)
+            remainingDuration = -1;
+        else if (remainingDuration >= 0)
+            remainingDuration = Mathf.Max(remainingDuration, status.remainingDuration);
     }
 }
