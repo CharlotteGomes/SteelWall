@@ -6,6 +6,18 @@ public class LifeBarManager : MonoBehaviour
     [SerializeField] private GameObject life_bar;
     [SerializeField] private List<LifeBar> lifeBars = new List<LifeBar>();
 
+    private StatusEffectTooltipManager tooltipManager;
+
+    private void Awake()
+    {
+        tooltipManager = GetComponent<StatusEffectTooltipManager>();
+        if (tooltipManager == null)
+            tooltipManager = gameObject.AddComponent<StatusEffectTooltipManager>();
+
+        Canvas canvas = GetComponentInParent<Canvas>();
+        tooltipManager.Initialize(canvas != null ? canvas.rootCanvas : null);
+    }
+
     public void UpdateLifeBars()
     {
         for (int i = lifeBars.Count - 1; i >= 0; i--)
@@ -63,7 +75,7 @@ public class LifeBarManager : MonoBehaviour
             return;
         }
 
-        life.SetCharacter(character);
+        life.SetCharacter(character, tooltipManager);
         lifeBars.Add(life);
     }
 
