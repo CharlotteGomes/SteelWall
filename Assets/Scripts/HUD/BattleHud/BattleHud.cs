@@ -1,48 +1,67 @@
-using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.InputSystem.HID;
+
 public class BattleHud : MonoBehaviour
 {
     public PJBattleHUD pj_hud;
     public EnemyBattleHUD enemy_hud;
     public LifeBarManager lifeManager;
     public IndicatorManager indicatorManager;
-    public void SetCharacters(BattleChar pj, BattleChar n) 
+
+    public void SetCharacters(BattleChar player, BattleChar enemy)
     {
-        SetCharacter(pj);
-        SetCharacter(n);
-        
+        SetCharacter(player);
+        SetCharacter(enemy);
     }
 
-    public void SetCharacter(BattleChar c)
+    public void SetCharacter(BattleChar character)
     {
-        if (c is PjController pj) { pj_hud.SetCharacter(c); return; }
-        if (c is EnemyController enemy) {enemy_hud.SetCharacter(c); }
+        if (character is PjController && pj_hud != null)
+        {
+            pj_hud.SetCharacter(character);
+            return;
+        }
+
+        if (character is EnemyController && enemy_hud != null)
+            enemy_hud.SetCharacter(character);
     }
 
     public void RefreshHUD()
     {
-        pj_hud.UpdateChildren();
-        enemy_hud.UpdateChildren();
-        lifeManager.UpdateLifeBars();
+        if (pj_hud != null) pj_hud.UpdateChildren();
+        if (enemy_hud != null) enemy_hud.UpdateChildren();
+        if (lifeManager != null) lifeManager.UpdateLifeBars();
     }
 
-    public void OnStartTurn(BattleChar c)
+    public void OnStartTurn(BattleChar character)
     {
-        SetCharacter(c);
-        SubscribeEvents(c);
+        if (character == null) return;
+        SetCharacter(character);
+        SubscribeEvents(character);
     }
 
-    public void SubscribeEvents(BattleChar c)
+    public void SubscribeEvents(BattleChar character)
     {
-        if(c is PjController pj) { pj_hud.SubscriveEvents(pj); }
-        if(c is EnemyController n) { enemy_hud.SubscriveEvents(n); }
-        indicatorManager.SubscribeEvents(c);
+        if (character == null) return;
+
+        if (character is PjController && pj_hud != null)
+            pj_hud.SubscriveEvents(character);
+        else if (character is EnemyController && enemy_hud != null)
+            enemy_hud.SubscriveEvents(character);
+
+        if (indicatorManager != null)
+            indicatorManager.SubscribeEvents(character);
     }
-    public void UnsubscribeEvents(BattleChar c)
+
+    public void UnsubscribeEvents(BattleChar character)
     {
-        if (c is PjController pj) { pj_hud.UnsubscriveEvents(pj); }
-        if (c is EnemyController n) { enemy_hud.UnsubscriveEvents(n); }
-        indicatorManager.UnsubscribeEvents(c);
+        if (character == null) return;
+
+        if (character is PjController && pj_hud != null)
+            pj_hud.UnsubscriveEvents(character);
+        else if (character is EnemyController && enemy_hud != null)
+            enemy_hud.UnsubscriveEvents(character);
+
+        if (indicatorManager != null)
+            indicatorManager.UnsubscribeEvents(character);
     }
 }
