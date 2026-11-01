@@ -7,15 +7,11 @@ public class MarkApplyEffect : ApplyStatusEffect
     {
         if (self)
         {
-            MarkEffect bleed = new MarkEffect(user, user, sfSO, stacks, resist);
-            user.GiveStatus(bleed);
+            user.GiveStatus(new MarkEffect(user, user, sfSO, stacks, resist, ConfiguredDuration, RuntimePotency));
             return;
         }
 
         foreach (BattleChar target in result.hit)
-        {
-            MarkEffect bleed = new MarkEffect(user, target, sfSO, stacks, resist);
-            user.GiveStatus(bleed);
-        }
+            user.GiveStatus(new MarkEffect(user, target, sfSO, stacks, resist, ConfiguredDuration, RuntimePotency));
     }
 }
