@@ -101,7 +101,7 @@ public class StatusEffectIconView : MonoBehaviour, IPointerEnterHandler, IPointe
         if (data == null) return string.Empty;
         System.Collections.Generic.List<string> parts = new System.Collections.Generic.List<string>();
         if (data.stacks > 1) parts.Add("x" + data.stacks);
-        if (data.remainingDuration > 0) parts.Add(data.remainingDuration.ToString());
+        if (data.remainingDuration > 0) parts.Add(data.remainingDuration + "t");
         return string.Join(" ", parts);
     }
 
