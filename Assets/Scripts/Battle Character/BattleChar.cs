@@ -297,6 +297,15 @@ public abstract class BattleChar : MonoBehaviour, IPointerClickHandler
         CheckStatusEffect();
     }
 
+    public void OnRoundEnd()
+    {
+        foreach (StatusEffectData status in StatusEffect.ToList())
+        {
+            status.OnRoundEnd();
+        }
+        CheckStatusEffect();
+    }
+
     public void OnUseSkill(BattleResult result)
     {
         foreach (StatusEffectData status in StatusEffect.ToList())
