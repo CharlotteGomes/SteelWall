@@ -91,6 +91,7 @@ public class LifeBar : MonoBehaviour
 
     public void SetVisible(bool visible)
     {
+        if (statusHud != null) statusHud.SetVisible(visible);
         Graphic[] graphics = GetComponentsInChildren<Graphic>(true);
         foreach (Graphic graphic in graphics)
             if (graphic != null) graphic.enabled = visible;
