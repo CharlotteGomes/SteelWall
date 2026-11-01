@@ -1,26 +1,28 @@
-using UnityEngine;
 using System.Collections.Generic;
+using UnityEngine;
 
 public class IndicatorManager : MonoBehaviour
 {
-    [SerializeField] GameObject prefab;
-    [SerializeField] List<Indicator> indicators = new List<Indicator>();
-    [SerializeField] Indicator turn_indicator;
-    [SerializeField] Sprite ind_turn, ind_atk, ind_move, ind_ally, smk_atk, smk_move, smk_ally;
-    [SerializeField] BattleChar test;
+    [SerializeField] private GameObject prefab;
+    [SerializeField] private List<Indicator> indicators = new List<Indicator>();
+    [SerializeField] private Indicator turn_indicator;
+    [SerializeField] private Sprite ind_turn, ind_atk, ind_move, ind_ally, smk_atk, smk_move, smk_ally;
 
-    void Update()
-    {
-        if (Input.GetKeyDown(KeyCode.G) && test != null) SetTurnIndicator(test);
-    }
+    private readonly HashSet<BattleChar> subscribedCharacters = new HashSet<BattleChar>();
 
     public void SetTurnIndicator(BattleChar character)
     {
         if (character == null || prefab == null) return;
+
         DeleteTurnIndicator();
         GameObject instance = Instantiate(prefab, transform);
         turn_indicator = instance.GetComponent<Indicator>();
-        if (turn_indicator == null) { Destroy(instance); return; }
+        if (turn_indicator == null)
+        {
+            Destroy(instance);
+            return;
+        }
+
         turn_indicator.SetChar(character);
         turn_indicator.SetSprites(ind_turn, null);
         StartCoroutine(turn_indicator.StartIndAnimation(character));
@@ -36,22 +38,32 @@ public class IndicatorManager : MonoBehaviour
     public void SetTargetIndicators(SkillData data)
     {
         DeleteAllIndicators();
-        if (data == null || data.original_skill == null || prefab == null) return;
-        foreach (BattleChar character in data.targets)
+        if (data == null || data.original_skill == null || data.targets == null || prefab == null) return;
+
+        foreach (BattleChar target in data.targets)
         {
-            if (character == null) continue;
-            Sprite indicatorSprite = data.original_skill.affect_enemy ? ind_atk : ind_ally;
-            Sprite smokeSprite = data.original_skill.affect_enemy ? smk_atk : smk_ally;
-            if (turn_indicator != null && turn_indicator.character == character)
+            if (target == null) continue;
+
+            bool affectsEnemy = data.original_skill.affect_enemy;
+            Sprite indicatorSprite = affectsEnemy ? ind_atk : ind_ally;
+            Sprite smokeSprite = affectsEnemy ? smk_atk : smk_ally;
+
+            if (turn_indicator != null && turn_indicator.character == target)
             {
                 turn_indicator.SetSprites(indicatorSprite, smokeSprite);
                 turn_indicator.Select(false);
                 continue;
             }
+
             GameObject instance = Instantiate(prefab, transform);
             Indicator indicator = instance.GetComponent<Indicator>();
-            if (indicator == null) { Destroy(instance); continue; }
-            indicator.SetChar(character);
+            if (indicator == null)
+            {
+                Destroy(instance);
+                continue;
+            }
+
+            indicator.SetChar(target);
             indicator.SetSprites(indicatorSprite, smokeSprite);
             indicator.Select(false);
             indicators.Add(indicator);
@@ -62,29 +74,41 @@ public class IndicatorManager : MonoBehaviour
     {
         HashSet<BattleChar> selected = new HashSet<BattleChar>();
         if (selectedCharacters != null)
-            foreach (BattleChar character in selectedCharacters)
-                if (character != null) selected.Add(character);
+        {
+            foreach (BattleChar target in selectedCharacters)
+                if (target != null) selected.Add(target);
+        }
 
         if (turn_indicator != null)
             turn_indicator.Select(selected.Contains(turn_indicator.character));
+
         foreach (Indicator indicator in indicators)
-            if (indicator != null) indicator.Select(selected.Contains(indicator.character));
+            if (indicator != null)
+                indicator.Select(selected.Contains(indicator.character));
     }
 
     public void SetMoveIndicators(BattleContext context)
     {
         SetTurnIndicatorDefault();
         if (context == null || context.Self == null || context.Party == null || prefab == null) return;
+
         int moveRange = context.Self.GetStat(StatType.MOVE);
         for (int offset = -moveRange; offset <= moveRange; offset++)
         {
             int position = offset + context.SelfPosition;
             if (position < 0 || position >= context.Party.Count) continue;
+
             BattleChar target = context.Party[position];
             if (target == null || target == context.Self || target is BattleObjects) continue;
+
             GameObject instance = Instantiate(prefab, transform);
             Indicator indicator = instance.GetComponent<Indicator>();
-            if (indicator == null) { Destroy(instance); continue; }
+            if (indicator == null)
+            {
+                Destroy(instance);
+                continue;
+            }
+
             indicator.SetChar(target);
             indicator.SetSprites(ind_move, smk_move);
             indicators.Add(indicator);
@@ -94,13 +118,15 @@ public class IndicatorManager : MonoBehaviour
     public void SelectMoveIndicators(BattleChar character)
     {
         foreach (Indicator indicator in indicators)
-            if (indicator != null) indicator.Select(indicator.character == character);
+            if (indicator != null)
+                indicator.Select(indicator.character == character);
     }
 
     public void DeleteAllIndicators()
     {
         foreach (Indicator indicator in indicators)
             if (indicator != null) Destroy(indicator.gameObject);
+
         indicators.Clear();
     }
 
@@ -113,7 +139,8 @@ public class IndicatorManager : MonoBehaviour
 
     public void SubscribeEvents(BattleChar character)
     {
-        if (character == null) return;
+        if (character == null || !subscribedCharacters.Add(character)) return;
+
         character.OnStartMyTurn += SetTurnIndicator;
         character.OnSkillConfirm += SetTargetIndicators;
         character.OnSkillCancel += SetTurnIndicatorDefault;
@@ -129,7 +156,8 @@ public class IndicatorManager : MonoBehaviour
 
     public void UnsubscribeEvents(BattleChar character)
     {
-        if (character == null) return;
+        if (character == null || !subscribedCharacters.Remove(character)) return;
+
         character.OnStartMyTurn -= SetTurnIndicator;
         character.OnSkillConfirm -= SetTargetIndicators;
         character.OnSkillCancel -= SetTurnIndicatorDefault;
@@ -141,6 +169,15 @@ public class IndicatorManager : MonoBehaviour
         character.OnEndMyTurn -= DeleteAllIndicators;
         character.OnEndMyTurn -= DeleteTurnIndicator;
         character.OnDeath -= UnsubscribeEvents;
+    }
+
+    private void OnDisable()
+    {
+        foreach (BattleChar character in new List<BattleChar>(subscribedCharacters))
+            UnsubscribeEvents(character);
+
+        DeleteAllIndicators();
+        DeleteTurnIndicator();
     }
 
     private void OnDestroy()
