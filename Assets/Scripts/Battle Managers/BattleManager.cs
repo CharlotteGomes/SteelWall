@@ -23,8 +23,12 @@ public class BattleManager : MonoBehaviour
     [SerializeField] List<BattleChar> initiative = new List<BattleChar>();
     [SerializeField] GameObject pj_prefab, enemy_prefab, tomb_prefab;
 
+    // Preserve data from both the scene override (pjs) and the original prefab (test1/test2).
     [FormerlySerializedAs("pjs")]
-    [SerializeField] List<BattleCharSO> PlayerTest, enemy;
+    [FormerlySerializedAs("test1")]
+    [SerializeField] List<BattleCharSO> PlayerTest;
+    [FormerlySerializedAs("test2")]
+    [SerializeField] List<BattleCharSO> enemy;
 
     [SerializeField] BattleChar[] pj_slot = new BattleChar[4];
     [SerializeField] BattleChar[] enemy_slot = new BattleChar[4];
