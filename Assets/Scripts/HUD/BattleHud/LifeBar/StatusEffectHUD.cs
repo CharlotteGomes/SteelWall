@@ -23,7 +23,7 @@ public class StatusEffectHUD : MonoBehaviour
 
     public void Initialize(BattleChar owner)
     {
-        Initialize(owner, null);
+        Initialize(owner, tooltipManager);
     }
 
     private void Update()
