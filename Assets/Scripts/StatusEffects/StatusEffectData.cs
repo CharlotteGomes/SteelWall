@@ -1,44 +1,41 @@
 using UnityEngine;
 
+/// <summary>
+/// Runtime state for one applied status. StatusEffectSO remains the shared definition;
+/// this object owns mutable combat state for a single target.
+/// </summary>
 [System.Serializable]
 public class StatusEffectData
 {
     public string effectName;
     public StatusEffectSO sfSO;
-
-    // Number of accumulated applications/stacks; independent from effect strength and lifetime.
     public int stacks;
     public int potency;
-    // -1 means the status has no timed expiration.
-    public int remainingDuration = -1;
-
+    public int remainingDuration;
     public BattleChar owner;
     public BattleChar source;
     public bool resistiable;
 
-    public StatusEffectData(BattleChar source, BattleChar owner, int stacks, StatusEffectSO so, bool resist)
-        : this(source, owner, stacks, stacks, -1, so, resist)
-    {
-    }
+    public bool HasFiniteDuration => remainingDuration >= 0;
+    public bool IsExpired => stacks <= 0 || remainingDuration == 0;
 
-    public StatusEffectData(BattleChar source, BattleChar owner, int stacks, int potency, int duration, StatusEffectSO so, bool resist)
+    public StatusEffectData(
+        BattleChar source,
+        BattleChar owner,
+        int stacks,
+        StatusEffectSO so,
+        bool resist,
+        int duration = -1,
+        int potency = -1)
     {
         this.owner = owner;
         this.source = source;
         this.stacks = Mathf.Max(0, stacks);
-        this.potency = Mathf.Max(0, potency);
-        remainingDuration = duration < 0 ? -1 : duration;
+        this.potency = potency >= 0 ? potency : this.stacks;
+        remainingDuration = duration;
         effectName = so != null ? so.effectName : string.Empty;
         resistiable = resist;
         sfSO = so;
-    }
-
-    public bool HasExpired => remainingDuration == 0;
-
-    protected void AdvanceDuration()
-    {
-        if (remainingDuration > 0)
-            remainingDuration--;
     }
 
     public virtual void OnApply() { }
@@ -54,18 +51,22 @@ public class StatusEffectData
     public virtual void OnGiveStatus(StatusEffectData status) { }
     public virtual void OnReceiveStatus(StatusEffectData status) { }
     public virtual void OnStatusRemoved(StatusEffectData status) { }
+    public virtual void OnCharacterDeath() { }
+
+    public void TickDuration()
+    {
+        if (remainingDuration > 0)
+            remainingDuration--;
+    }
 
     public virtual void OnStackPile(StatusEffectData status)
     {
         if (status == null) return;
         stacks += status.stacks;
         potency += status.potency;
-
-        if (remainingDuration < 0 || status.remainingDuration < 0)
-            remainingDuration = -1;
-        else
-            remainingDuration = Mathf.Max(remainingDuration, status.remainingDuration);
+        if (status.remainingDuration >= 0)
+            remainingDuration = remainingDuration < 0
+                ? status.remainingDuration
+                : Mathf.Max(remainingDuration, status.remainingDuration);
     }
-
-    public virtual void OnCharacterDeath() { }
 }
