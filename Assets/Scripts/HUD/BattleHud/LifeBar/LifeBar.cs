@@ -49,6 +49,14 @@ public class LifeBar : MonoBehaviour
     public void SetPos()
     {
         if (character == null) return;
+        if (parentCanvas == null)
+        {
+            parentCanvas = GetComponentInParent<Canvas>();
+            if (parentCanvas != null && parentCanvas.rootCanvas != null)
+                parentCanvas = parentCanvas.rootCanvas;
+            if (parentCanvas != null && parentCanvas.renderMode != RenderMode.ScreenSpaceOverlay)
+                canvasCamera = parentCanvas.worldCamera;
+        }
 
         RectTransform parentRect = transform.parent as RectTransform;
         if (parentCanvas == null || rectTransform == null || parentRect == null)
