@@ -1,41 +1,42 @@
 using TMPro;
 using UnityEngine;
-using static Unity.Burst.Intrinsics.X86.Avx;
+
 public class StatsToText : MonoBehaviour
 {
-    [SerializeField] StatType statType1, statType2;
-    BattleChar character = null; 
-    TMP_Text tmp;
-    void Start()
+    [SerializeField] private StatType statType1;
+    [SerializeField] private StatType statType2;
+
+    private BattleChar character;
+    private TMP_Text text;
+
+    private void Awake()
     {
-        tmp = GetComponent<TMP_Text>();
+        CacheReferences();
     }
 
-    // Update is called once per frame
-    void Update()
+    private void OnEnable()
     {
-        
+        CacheReferences();
     }
 
-    public void UpdateCharacter(BattleChar c)
+    private void CacheReferences()
     {
-        character = c;
+        if (text == null)
+            text = GetComponent<TMP_Text>();
+    }
+
+    public void UpdateCharacter(BattleChar target)
+    {
+        character = target;
     }
 
     public void UpdateText()
     {
-        if (character == null) return;
-        if (statType2 != StatType.NOONE)
-        {
-            tmp.text = $"{character.GetStat(statType1)}-{character.GetStat(statType2)}";
-            return;
-        }
+        if (character == null || text == null) return;
 
-        tmp.text = $"{character.GetStat(statType1)}";
-        return;
-    }
-    private void OnEnable()
-    {
-        tmp = GetComponent<TMP_Text>();
+        int firstValue = character.GetStat(statType1);
+        text.text = statType2 != StatType.NOONE
+            ? $"{firstValue}-{character.GetStat(statType2)}"
+            : firstValue.ToString();
     }
 }
