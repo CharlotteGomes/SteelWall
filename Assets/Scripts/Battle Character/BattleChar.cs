@@ -202,7 +202,8 @@ public abstract class BattleChar : MonoBehaviour, IPointerClickHandler
             }
         }
 
-        if (data.stacks <= 0 || data.remainingDuration == 0)
+        if (data.remainingDuration == 0) return;
+        if (data.stacks <= 0)
         {
             data.OnApply();
             return;
@@ -225,6 +226,7 @@ public abstract class BattleChar : MonoBehaviour, IPointerClickHandler
 
     public void StatusRemove(StatusEffectData status)
     {
+        if (status == null) return;
         if (StatusEffect.Contains(status))
         {
             StatusEffect.Remove(status);
