@@ -62,7 +62,6 @@ public sealed class BattlePresentationController : MonoBehaviour
     {
         if (battleCamera == null) return;
         if (cameraRoutine != null) StopCoroutine(cameraRoutine);
-        cameraRestPosition = battleCamera.transform.localPosition;
         cameraRoutine = StartCoroutine(CameraImpulse(strength));
     }
 
