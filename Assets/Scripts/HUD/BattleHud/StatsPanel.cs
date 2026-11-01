@@ -1,59 +1,70 @@
-using UnityEngine;
 using System.Collections.Generic;
+using UnityEngine;
+
 public class StatsPanel : MonoBehaviour
 {
     [SerializeField] protected BattleChar character;
     [SerializeField] protected List<StatsToText> statsToText = new List<StatsToText>();
-    void Start()
-    {
-        
-    }
 
-    // Update is called once per frame
-    void Update()
-    {
-        
-    }
+    private BattleChar subscribedCharacter;
 
-    public void SetCharacter(BattleChar character)
+    public void SetCharacter(BattleChar newCharacter)
     {
-        this.character = character;
+        if (subscribedCharacter != null && subscribedCharacter != newCharacter)
+            UnsubscriveEvents(subscribedCharacter);
+
+        character = newCharacter;
         UpdateChildren();
     }
 
     public virtual void UpdateChildren()
     {
-        foreach (StatsToText t in statsToText)
+        foreach (StatsToText textField in statsToText)
         {
-            if (!t.isActiveAndEnabled) continue;
-            t.UpdateCharacter(character);
-            t.UpdateText();
+            if (textField == null || !textField.isActiveAndEnabled) continue;
+            textField.UpdateCharacter(character);
+            textField.UpdateText();
         }
     }
 
-    public virtual void SubscriveEvents(BattleChar character)
+    // Kept with the existing method names to preserve derived classes and serialized scene references.
+    public virtual void SubscriveEvents(BattleChar target)
     {
-
+        TryBeginSubscription(target);
     }
 
-    public virtual void UnsubscriveEvents(BattleChar character)
+    public virtual void UnsubscriveEvents(BattleChar target)
     {
+        TryEndSubscription(target);
+    }
 
+    protected bool TryBeginSubscription(BattleChar target)
+    {
+        if (target == null || subscribedCharacter == target) return false;
+
+        if (subscribedCharacter != null)
+            UnsubscriveEvents(subscribedCharacter);
+
+        subscribedCharacter = target;
+        return true;
+    }
+
+    protected bool TryEndSubscription(BattleChar target)
+    {
+        if (target == null || subscribedCharacter != target) return false;
+        subscribedCharacter = null;
+        return true;
     }
 
     protected void OnEnable()
     {
-        if(character != null)
-        {
+        if (character != null)
             SubscriveEvents(character);
-        }
     }
 
     protected void OnDisable()
     {
-        if(character != null)
-        {
-            UnsubscriveEvents(character);
-        }
+        if (subscribedCharacter != null)
+            UnsubscriveEvents(subscribedCharacter);
     }
 }
