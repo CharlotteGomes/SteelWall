@@ -134,7 +134,7 @@ public class StatusEffectHUD : MonoBehaviour
             ? status.sfSO.effectName : status.effectName;
         string description = status.sfSO != null ? status.sfSO.description : null;
         if (string.IsNullOrWhiteSpace(description))
-            description = "Efeito ativo aplicado durante o combate.";
+            description = GetFallbackDescription(status);
 
         string duration = status.remainingDuration < 0 ? "Indefinida" : status.remainingDuration.ToString();
         tooltipTitle.text = string.IsNullOrWhiteSpace(title) ? "Efeito de status" : title;
@@ -143,6 +143,25 @@ public class StatusEffectHUD : MonoBehaviour
             "\nDuração restante: " + duration;
         tooltip.gameObject.SetActive(true);
         tooltip.SetAsLastSibling();
+    }
+
+    private static string GetFallbackDescription(StatusEffectData status)
+    {
+        if (status is BleedEffect)
+            return "Causa dano direto no início do turno do personagem.";
+        if (status is PoisonEffect)
+            return "Causa dano no final do turno do personagem.";
+        if (status is HealPerTurnEffect)
+            return "Recupera vida no início do turno do personagem.";
+        if (status is StatModifierEffect)
+            return "Altera um ou mais atributos enquanto estiver ativo.";
+        if (status is DamageModifierEffect)
+            return "Modifica o dano causado pelo personagem.";
+        if (status is Penitence)
+            return "Efeito acumulável que aplica modificadores de atributos.";
+        if (status is MarkEffect)
+            return "Marca de status ativa neste personagem.";
+        return "Efeito de status ativo durante o combate.";
     }
 
     public void HideTooltip()
