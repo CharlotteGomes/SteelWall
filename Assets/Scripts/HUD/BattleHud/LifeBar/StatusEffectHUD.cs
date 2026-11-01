@@ -13,6 +13,7 @@ public class StatusEffectHUD : MonoBehaviour
 
     private BattleChar character;
     private StatusEffectTooltipManager tooltipManager;
+    private RectTransform scrollRoot;
     private RectTransform viewport;
     private RectTransform content;
     private ScrollRect scrollRect;
@@ -47,27 +48,34 @@ public class StatusEffectHUD : MonoBehaviour
 
     private void EnsureVisuals()
     {
-        if (viewport != null) return;
+        if (scrollRoot != null) return;
+
+        GameObject scrollObject = new GameObject("StatusEffectsScroll", typeof(RectTransform), typeof(ScrollRect));
+        scrollObject.transform.SetParent(transform, false);
+        scrollRoot = scrollObject.GetComponent<RectTransform>();
+        scrollRoot.anchorMin = new Vector2(0.5f, 0.5f);
+        scrollRoot.anchorMax = new Vector2(0.5f, 0.5f);
+        scrollRoot.pivot = new Vector2(0.5f, 0f);
+        scrollRoot.anchoredPosition = new Vector2(0f, 13f);
+        scrollRoot.sizeDelta = new Vector2(
+            VisibleColumns * IconSize + (VisibleColumns - 1) * IconSpacing + 8f,
+            VisibleRows * IconSize + (VisibleRows - 1) * IconSpacing + 8f);
 
         GameObject viewportObject = new GameObject(
-            "StatusEffectsViewport", typeof(RectTransform), typeof(Image), typeof(Mask), typeof(ScrollRect));
-        viewportObject.transform.SetParent(transform, false);
+            "Viewport", typeof(RectTransform), typeof(Image), typeof(Mask));
+        viewportObject.transform.SetParent(scrollRoot, false);
         viewport = viewportObject.GetComponent<RectTransform>();
-        viewport.anchorMin = new Vector2(0.5f, 0.5f);
-        viewport.anchorMax = new Vector2(0.5f, 0.5f);
-        viewport.pivot = new Vector2(0.5f, 0f);
-        viewport.anchoredPosition = new Vector2(0f, 13f);
-        viewport.sizeDelta = new Vector2(
-            VisibleColumns * IconSize + (VisibleColumns - 1) * IconSpacing + 4f,
-            VisibleRows * IconSize + (VisibleRows - 1) * IconSpacing + 4f);
+        viewport.anchorMin = Vector2.zero;
+        viewport.anchorMax = Vector2.one;
+        viewport.offsetMin = Vector2.zero;
+        viewport.offsetMax = Vector2.zero;
 
         Image viewportImage = viewportObject.GetComponent<Image>();
         viewportImage.color = new Color(0f, 0f, 0f, 0f);
         viewportImage.raycastTarget = true;
-        Mask mask = viewportObject.GetComponent<Mask>();
-        mask.showMaskGraphic = false;
+        viewportObject.GetComponent<Mask>().showMaskGraphic = false;
 
-        scrollRect = viewportObject.GetComponent<ScrollRect>();
+        scrollRect = scrollObject.GetComponent<ScrollRect>();
         scrollRect.viewport = viewport;
         scrollRect.horizontal = false;
         scrollRect.vertical = true;
@@ -75,7 +83,7 @@ public class StatusEffectHUD : MonoBehaviour
         scrollRect.inertia = true;
         scrollRect.scrollSensitivity = 24f;
 
-        GameObject contentObject = new GameObject("StatusEffectsContent", typeof(RectTransform));
+        GameObject contentObject = new GameObject("Content", typeof(RectTransform));
         contentObject.transform.SetParent(viewport, false);
         content = contentObject.GetComponent<RectTransform>();
         content.anchorMin = new Vector2(0f, 1f);
@@ -99,7 +107,7 @@ public class StatusEffectHUD : MonoBehaviour
         fitter.horizontalFit = ContentSizeFitter.FitMode.Unconstrained;
         fitter.verticalFit = ContentSizeFitter.FitMode.PreferredSize;
 
-        viewport.gameObject.SetActive(isVisible);
+        scrollRoot.gameObject.SetActive(isVisible);
     }
 
     private void Refresh(bool force)
@@ -129,26 +137,23 @@ public class StatusEffectHUD : MonoBehaviour
             if (icon != null) Destroy(icon.gameObject);
         icons.Clear();
 
-        if (statuses == null)
+        if (statuses != null)
         {
-            scrollRect.verticalNormalizedPosition = 1f;
-            return;
+            foreach (StatusEffectData status in statuses)
+            {
+                if (status == null || status.IsExpired) continue;
+                GameObject item = new GameObject("StatusEffect", typeof(RectTransform), typeof(Image));
+                item.transform.SetParent(content, false);
+                RectTransform itemRect = item.GetComponent<RectTransform>();
+                itemRect.sizeDelta = new Vector2(IconSize, IconSize);
+                StatusEffectIconView view = item.AddComponent<StatusEffectIconView>();
+                view.Initialize(tooltipManager, status);
+                icons.Add(view);
+            }
         }
 
-        foreach (StatusEffectData status in statuses)
-        {
-            if (status == null || status.IsExpired) continue;
-            GameObject item = new GameObject("StatusEffect", typeof(RectTransform), typeof(Image));
-            item.transform.SetParent(content, false);
-            RectTransform itemRect = item.GetComponent<RectTransform>();
-            itemRect.sizeDelta = new Vector2(IconSize, IconSize);
-            StatusEffectIconView view = item.AddComponent<StatusEffectIconView>();
-            view.Initialize(tooltipManager, status);
-            icons.Add(view);
-        }
-
-        scrollRect.verticalNormalizedPosition = 1f;
         Canvas.ForceUpdateCanvases();
+        scrollRect.verticalNormalizedPosition = 1f;
     }
 
     private void HideTooltip()
@@ -160,7 +165,7 @@ public class StatusEffectHUD : MonoBehaviour
     public void SetVisible(bool visible)
     {
         isVisible = visible;
-        if (viewport != null) viewport.gameObject.SetActive(visible);
+        if (scrollRoot != null) scrollRoot.gameObject.SetActive(visible);
         if (!visible) HideTooltip();
     }
 
