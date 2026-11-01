@@ -13,6 +13,7 @@ public class LifeBar : MonoBehaviour
     private RectTransform rectTransform;
     private Camera canvasCamera;
     private StatusEffectHUD statusHud;
+    private StatusEffectTooltipManager sharedTooltipManager;
 
     private void Awake()
     {
@@ -30,13 +31,14 @@ public class LifeBar : MonoBehaviour
 
     public void SetCharacter(BattleChar target)
     {
-        SetCharacter(target, null);
+        SetCharacter(target, sharedTooltipManager);
     }
 
     public void SetCharacter(BattleChar target, StatusEffectTooltipManager sharedTooltipManager)
     {
         character = target;
-        if (statusHud != null) statusHud.Initialize(character, sharedTooltipManager);
+        this.sharedTooltipManager = sharedTooltipManager;
+        if (statusHud != null) statusHud.Initialize(character, this.sharedTooltipManager);
         UpdateBars();
         SetPos();
         SetSize();
