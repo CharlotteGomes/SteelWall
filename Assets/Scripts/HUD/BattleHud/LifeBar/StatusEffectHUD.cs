@@ -14,6 +14,7 @@ public class StatusEffectHUD : MonoBehaviour
     private TextMeshProUGUI tooltipBody;
     private readonly List<StatusEffectIconView> icons = new List<StatusEffectIconView>();
     private string lastSignature = string.Empty;
+    private bool isVisible = true;
 
     public void Initialize(BattleChar owner)
     {
@@ -44,6 +45,7 @@ public class StatusEffectHUD : MonoBehaviour
         row.pivot = new Vector2(0.5f, 1f);
         row.anchoredPosition = new Vector2(0f, -16f);
         row.sizeDelta = new Vector2(180f, 34f);
+        row.gameObject.SetActive(isVisible);
 
         HorizontalLayoutGroup layout = row.gameObject.AddComponent<HorizontalLayoutGroup>();
         layout.childAlignment = TextAnchor.UpperCenter;
@@ -146,6 +148,13 @@ public class StatusEffectHUD : MonoBehaviour
     public void HideTooltip()
     {
         if (tooltip != null) tooltip.gameObject.SetActive(false);
+    }
+
+    public void SetVisible(bool visible)
+    {
+        isVisible = visible;
+        if (row != null) row.gameObject.SetActive(visible);
+        if (!visible) HideTooltip();
     }
 
     private static RectTransform CreateRect(string objectName, RectTransform parent)
